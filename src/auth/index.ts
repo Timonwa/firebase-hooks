@@ -1,4 +1,5 @@
 // The ./auth entry — everything Firebase Auth, including its error catalogue.
+// Shared shapes (HookResult, …) live in the core entry, not here.
 
 export type { OnIdToken } from "./_shared.js";
 export { AUTH_ERROR_MESSAGES } from "./auth-error-messages.js";

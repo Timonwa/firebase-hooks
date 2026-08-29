@@ -21,7 +21,7 @@
  * formatFirebaseError(cause, { messages: { ...AUTH_ERROR_MESSAGES, "auth/invalid-credential": "Email ou mot de passe incorrect." } })
  */
 
-import { getFirebaseErrorCode } from "./_shared";
+import { getFirebaseErrorCode } from "./get-firebase-error-code";
 
 export interface FormatFirebaseErrorOptions {
   messages?: Record<string, string>;

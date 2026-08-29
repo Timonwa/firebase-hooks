@@ -1,7 +1,7 @@
 import { defineConfig } from "tsdown";
 
 export default defineConfig({
-  entry: ["src/index.ts", "src/auth.ts"],
+  entry: { index: "src/core/index.ts", auth: "src/auth/index.ts" },
   format: ["esm", "cjs"],
   dts: true,
   clean: true,

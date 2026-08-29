@@ -12,16 +12,13 @@ import {
   type User,
 } from "firebase/auth";
 import { createContext, useCallback, useContext, useRef, useState } from "react";
+import { getFirebaseErrorCode } from "../core/get-firebase-error-code";
+import type { HookErrorContext, HookErrorOptions, HookResult } from "../core/types";
 
-/**
- * Result shape every action in this package resolves to — never throws.
- * Failures carry three layers so our processing can never gate the raw
- * information: `error` (the processed message), `code` (Firebase's raw error
- * code, extracted for convenience), and `cause` (the complete untouched error).
- */
-export type HookResult<T extends object = Record<never, never>> =
-  | ({ success: true } & T)
-  | { success: false; error: string; code: string | null; cause: unknown };
+export type { HookErrorContext, HookErrorOptions, HookResult };
+// Re-exported so every hook in this module imports its shared shapes from one
+// place; the public copies live in the core entry.
+export { getFirebaseErrorCode };
 
 /**
  * Where a server session integrates: called with a fresh ID token after a
@@ -30,47 +27,11 @@ export type HookResult<T extends object = Record<never, never>> =
  */
 export type OnIdToken = (idToken: string, user: User) => void | Promise<void>;
 
-export interface HookErrorOptions {
-  /**
-   * Override the `error` message for this hook. Takes precedence over the
-   * provider-level config; the default (no config anywhere) is the raw error's
-   * own message, untouched.
-   */
-  formatErrorMessage?: (error: unknown) => string;
-}
-
-/**
- * The `code` of a Firebase error ("auth/invalid-credential",
- * "firestore/permission-denied", …), or null for anything that isn't one —
- * the same extraction that fills every failure result's `code` field. Works for every Firebase service (auth/*, firestore/*, storage/* codes share one shape).
- */
-export function getFirebaseErrorCode(error: unknown): string | null {
-  if (
-    typeof error === "object" &&
-    error !== null &&
-    "code" in error &&
-    typeof (error as { code: unknown }).code === "string"
-  ) {
-    return (error as { code: string }).code;
-  }
-  return null;
-}
-
 /** The raw message, untouched — no rewording, no guessing. */
 function rawErrorMessage(error: unknown, fallback: string): string {
   if (error instanceof Error && error.message) return error.message;
   if (typeof error === "string" && error) return error;
   return fallback;
-}
-
-/** What failed, for the global `onError` observer. */
-export interface HookErrorContext {
-  /** Stable id of the operation: "login", "oauth-sign-in", "update-password", … */
-  action: string;
-  /** Firebase's raw error code, or null. */
-  code: string | null;
-  /** The resolved display message the user saw. */
-  message: string;
 }
 
 /** Provider-level configuration shared with every hook below the provider. */
