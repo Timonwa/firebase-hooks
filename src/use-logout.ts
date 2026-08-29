@@ -16,18 +16,24 @@
 "use client";
 
 import { type Auth, signOut } from "firebase/auth";
-import { type AuthErrorOptions, type AuthResult, useAuthTask } from "./_shared";
+import {
+  type AuthErrorOptions,
+  type AuthResult,
+  useAuthTask,
+  useResolvedConfig,
+} from "./_shared";
 
 interface UseLogoutOptionsProps extends AuthErrorOptions {
-  onBeforeSignOut?: () => void | Promise<void>;
+  onBeforeSignOut?: (() => void | Promise<void>) | null;
 }
 
 export function useLogout(auth: Auth | null, options: UseLogoutOptionsProps = {}) {
   const { loading, error, run } = useAuthTask(options);
+  const onBeforeSignOut = useResolvedConfig("onBeforeSignOut", options.onBeforeSignOut);
 
   const logout = (): Promise<AuthResult> =>
     run("Logout failed", async () => {
-      await options.onBeforeSignOut?.();
+      await onBeforeSignOut?.();
       if (auth) await signOut(auth);
       return {};
     });

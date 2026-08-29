@@ -12,5 +12,5 @@ export default defineConfig({
   // importing from a Server Component gets a cryptic hooks error instead of
   // the framework's clear "use client" guidance.
   banner: { js: '"use client";' },
-  external: ["react", "@timonwa/app-utilities", /^firebase(\/|$)/],
+  external: ["react", /^firebase(\/|$)/],
 });

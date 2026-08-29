@@ -21,10 +21,11 @@ import {
   type AuthResult,
   requireCurrentUser,
   useAuthTask,
+  useResolvedConfig,
 } from "./_shared";
 
 interface UseSendEmailVerificationOptionsProps extends AuthErrorOptions {
-  actionCodeSettings?: ActionCodeSettings;
+  actionCodeSettings?: ActionCodeSettings | null;
 }
 
 export function useSendEmailVerification(
@@ -32,12 +33,16 @@ export function useSendEmailVerification(
   options: UseSendEmailVerificationOptionsProps = {},
 ) {
   const { loading, error, run } = useAuthTask(options);
+  const actionCodeSettings = useResolvedConfig(
+    "actionCodeSettings",
+    options.actionCodeSettings,
+  );
   const [success, setSuccess] = useState(false);
 
   const send = async (): Promise<AuthResult> => {
     setSuccess(false);
     const result = await run("Failed to send verification email", async () => {
-      await sendEmailVerification(requireCurrentUser(auth), options.actionCodeSettings);
+      await sendEmailVerification(requireCurrentUser(auth), actionCodeSettings);
       return {};
     });
     if (result.success) setSuccess(true);

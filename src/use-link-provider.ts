@@ -21,6 +21,7 @@ import {
   linkWithCredential,
   linkWithPopup,
   type User,
+  type UserCredential,
 } from "firebase/auth";
 import {
   type AuthErrorOptions,
@@ -34,22 +35,22 @@ export function useLinkProvider(auth: Auth | null, options: AuthErrorOptions = {
 
   const linkWithProvider = (
     provider: FirebaseAuthProvider,
-  ): Promise<AuthResult<{ user: User }>> =>
+  ): Promise<AuthResult<{ user: User; credential: UserCredential }>> =>
     run("Failed to link account", async () => {
       const credential = await linkWithPopup(requireCurrentUser(auth), provider);
-      return { user: credential.user };
+      return { user: credential.user, credential };
     });
 
   const linkWithPassword = (
     email: string,
     password: string,
-  ): Promise<AuthResult<{ user: User }>> =>
+  ): Promise<AuthResult<{ user: User; credential: UserCredential }>> =>
     run("Failed to link account", async () => {
       const credential = await linkWithCredential(
         requireCurrentUser(auth),
         EmailAuthProvider.credential(email, password),
       );
-      return { user: credential.user };
+      return { user: credential.user, credential };
     });
 
   return { linkWithProvider, linkWithPassword, loading, error };

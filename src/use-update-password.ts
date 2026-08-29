@@ -1,14 +1,17 @@
 /**
- * @description Changes the signed-in user's password, with the required
- * reauthentication built in — Firebase rejects sensitive operations on stale
- * sessions, so the hook reauthenticates with the current password first.
+ * @description Changes the signed-in user's password. Pass `currentPassword`
+ * and the hook reauthenticates automatically before the change (Firebase
+ * rejects sensitive operations on stale sessions); omit it and the change runs
+ * directly — a stale session then surfaces `auth/requires-recent-login`
+ * through `code`/`cause` for your own policy (e.g. `useReauthenticate`).
  *
  * @param auth - Firebase `Auth` instance, or null while it initialises
  * @returns `{ update, loading, error, success }`
  *
  * @example
  * const { update, loading, error, success } = useUpdatePassword(auth);
- * await update(currentPassword, newPassword);
+ * await update({ newPassword, currentPassword }); // reauthenticates first
+ * await update({ newPassword });                  // no reauth — your call
  */
 
 "use client";
@@ -27,14 +30,17 @@ export function useUpdatePassword(auth: Auth | null, options: AuthErrorOptions =
   const { loading, error, run } = useAuthTask(options);
   const [success, setSuccess] = useState(false);
 
-  const update = async (
-    currentPassword: string,
-    newPassword: string,
-  ): Promise<AuthResult> => {
+  const update = async ({
+    newPassword,
+    currentPassword,
+  }: {
+    newPassword: string;
+    currentPassword?: string;
+  }): Promise<AuthResult> => {
     setSuccess(false);
     const result = await run("Failed to update password", async () => {
       const user = requireCurrentUser(auth);
-      await reauthenticateUserWithPassword(user, currentPassword);
+      if (currentPassword) await reauthenticateUserWithPassword(user, currentPassword);
       await updatePassword(user, newPassword);
       return {};
     });

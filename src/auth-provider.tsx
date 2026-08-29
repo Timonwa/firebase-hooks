@@ -5,11 +5,22 @@
  * without a reload. `isLoading` is true only until the first callback, so
  * consumers can distinguish "signed out" from "not yet known".
  *
- * Server-fetched user records are an app concern: layer them in your own
- * provider on top of this one.
+ * Also the home of package-wide defaults: `formatErrorMessage` (error
+ * wording), `onIdToken` (session minting — every sign-in hook inherits it),
+ * `onBeforeSignOut`, and `actionCodeSettings`. A hook's own option overrides
+ * the global, an explicit `null` opts a single flow out, and every hook still
+ * works with no provider at all. Server-fetched user records are an app
+ * concern: layer them in your own provider on top of this one.
  *
  * @example
- * <AuthProvider auth={getFirebaseAuth()}>{children}</AuthProvider>
+ * <AuthProvider
+ *   auth={getFirebaseAuth()}
+ *   onIdToken={(idToken) => createSession(idToken)}
+ *   onBeforeSignOut={() => clearSession()}
+ *   formatErrorMessage={(e) => formatFirebaseError(e, { messages: AUTH_ERROR_MESSAGES })}
+ * >
+ *   {children}
+ * </AuthProvider>
  *
  * const { firebaseUser, claims, isAuthenticated, isLoading } = useAuth();
  * if (claims?.isAdmin) showAdminNav();
@@ -17,8 +28,9 @@
 
 "use client";
 
-import { onIdTokenChanged, type Auth, type User } from "firebase/auth";
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { type ActionCodeSettings, type Auth, onIdTokenChanged, type User } from "firebase/auth";
+import { createContext, type ReactNode, useContext, useEffect, useMemo, useState } from "react";
+import { AuthConfigContext, type OnIdToken } from "./_shared";
 
 interface AuthContextValueProps {
   firebaseUser: User | null;
@@ -33,10 +45,25 @@ const AuthContext = createContext<AuthContextValueProps | undefined>(undefined);
 interface AuthProviderProps {
   /** The Firebase `Auth` instance, or null while it initialises. */
   auth: Auth | null;
+  /** Package-wide default error wording; each hook's own option overrides it. */
+  formatErrorMessage?: (error: unknown) => string;
+  /** Package-wide session callback — every sign-in hook inherits it. */
+  onIdToken?: OnIdToken;
+  /** Package-wide server-session clearing for `useLogout`. */
+  onBeforeSignOut?: () => void | Promise<void>;
+  /** Package-wide default for every emailed link's landing settings. */
+  actionCodeSettings?: ActionCodeSettings;
   children: ReactNode;
 }
 
-export function AuthProvider({ auth, children }: AuthProviderProps) {
+export function AuthProvider({
+  auth,
+  formatErrorMessage,
+  onIdToken,
+  onBeforeSignOut,
+  actionCodeSettings,
+  children,
+}: AuthProviderProps) {
   const [firebaseUser, setFirebaseUser] = useState<User | null>(null);
   const [claims, setClaims] = useState<Record<string, unknown> | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -64,12 +91,19 @@ export function AuthProvider({ auth, children }: AuthProviderProps) {
     return () => unsubscribe();
   }, [auth]);
 
+  const config = useMemo(
+    () => ({ formatErrorMessage, onIdToken, onBeforeSignOut, actionCodeSettings }),
+    [formatErrorMessage, onIdToken, onBeforeSignOut, actionCodeSettings],
+  );
+
   return (
-    <AuthContext.Provider
-      value={{ firebaseUser, claims, isAuthenticated: firebaseUser !== null, isLoading }}
-    >
-      {children}
-    </AuthContext.Provider>
+    <AuthConfigContext.Provider value={config}>
+      <AuthContext.Provider
+        value={{ firebaseUser, claims, isAuthenticated: firebaseUser !== null, isLoading }}
+      >
+        {children}
+      </AuthContext.Provider>
+    </AuthConfigContext.Provider>
   );
 }
 

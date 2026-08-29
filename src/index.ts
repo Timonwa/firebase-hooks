@@ -1,6 +1,16 @@
 // The public surface — one explicit export line per file.
-export type { AuthErrorOptions, AuthResult, OnIdToken } from "./_shared.js";
+export {
+  type AuthErrorOptions,
+  type AuthResult,
+  getFirebaseErrorCode,
+  type OnIdToken,
+} from "./_shared.js";
+export { AUTH_ERROR_MESSAGES } from "./auth-error-messages.js";
 export { AuthProvider, useAuth } from "./auth-provider.js";
+export {
+  type FormatFirebaseErrorOptions,
+  formatFirebaseError,
+} from "./format-firebase-error.js";
 export { useAnonymousSignIn } from "./use-anonymous-sign-in.js";
 export { useConfirmPasswordReset } from "./use-confirm-password-reset.js";
 export { useCustomTokenSignIn } from "./use-custom-token-sign-in.js";

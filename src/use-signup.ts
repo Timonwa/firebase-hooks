@@ -25,6 +25,7 @@ import {
   createUserWithEmailAndPassword,
   sendEmailVerification,
   type User,
+  type UserCredential,
   updateProfile,
 } from "firebase/auth";
 import {
@@ -34,22 +35,24 @@ import {
   requireAuth,
   runOnIdToken,
   useAuthTask,
+  useResolvedConfig,
 } from "./_shared";
 
 interface UseSignupOptionsProps extends AuthErrorOptions {
   sendVerificationEmail?: boolean;
-  onIdToken?: OnIdToken;
+  onIdToken?: OnIdToken | null;
 }
 
 export function useSignup(auth: Auth | null, options: UseSignupOptionsProps = {}) {
-  const { sendVerificationEmail = true, onIdToken } = options;
+  const { sendVerificationEmail = true } = options;
   const { loading, error, run } = useAuthTask(options);
+  const onIdToken = useResolvedConfig("onIdToken", options.onIdToken);
 
   const signup = (
     email: string,
     password: string,
     profile: { displayName?: string; photoURL?: string } = {},
-  ): Promise<AuthResult<{ user: User }>> =>
+  ): Promise<AuthResult<{ user: User; credential: UserCredential }>> =>
     run("Signup failed", async () => {
       const credential = await createUserWithEmailAndPassword(
         requireAuth(auth),
@@ -63,7 +66,7 @@ export function useSignup(auth: Auth | null, options: UseSignupOptionsProps = {}
         await sendEmailVerification(credential.user);
       }
       await runOnIdToken(onIdToken, credential.user);
-      return { user: credential.user };
+      return { user: credential.user, credential };
     });
 
   return { signup, loading, error };

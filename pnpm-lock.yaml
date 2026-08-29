@@ -7,10 +7,6 @@ settings:
 importers:
 
   .:
-    dependencies:
-      '@timonwa/app-utilities':
-        specifier: ^0.4.0
-        version: 0.4.0
     devDependencies:
       '@arethetypeswrong/cli':
         specifier: ^0.18.5
@@ -719,10 +715,6 @@ packages:
       '@types/react-dom':
         optional: true
 
-  '@timonwa/app-utilities@0.4.0':
-    resolution: {integrity: sha512-kHtFEzrJ1anTw8Wjj3Zk3jy53JjtCJtM55w+6ndelWG9ymXQ2SobR2eM7p1+n39Bqg2608sbIDyuBsGVr69VKw==}
-    engines: {node: '>=20'}
-
   '@types/aria-query@5.0.4':
     resolution: {integrity: sha512-rfT93uj5s0PRL7EzccGMs3brplhcrghnDoV26NqKhCAS1hVo+WdNsPvE/yb6ilfr5hi2MEk6d5EWJTKdxg8jVw==}
 
@@ -1016,9 +1008,6 @@ packages:
 
   dataloader@1.4.0:
     resolution: {integrity: sha512-68s5jYdlvasItOJnCuI2Q9s4q98g0pCyL3HrcKJu8KNugUl8ahgmZYg38ysLTgQjjXX3H8CJLkAvWrclWfcalw==}
-
-  date-fns@4.4.0:
-    resolution: {integrity: sha512-+1UMbeh68lH1SegH83CGWwpb6OHHbpSgr3+s5Eww5M4CAgswBpoWS0AjTOfEJ33HiYKz1hdj/KTFprzXHmq/6w==}
 
   debug@4.4.3:
     resolution: {integrity: sha512-RGwwWnwQvkVfavKVt22FGLw+xYSdzARwm0ru6DhTVA3umU5hZc28V3kO4stgYryrTlLpuvgI9GiijltAjNbcqA==}
@@ -2520,10 +2509,6 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.2.18
 
-  '@timonwa/app-utilities@0.4.0':
-    dependencies:
-      date-fns: 4.4.0
-
   '@types/aria-query@5.0.4': {}
 
   '@types/chai@5.2.3':
@@ -2762,8 +2747,6 @@ snapshots:
       - '@noble/hashes'
 
   dataloader@1.4.0: {}
-
-  date-fns@4.4.0: {}
 
   debug@4.4.3(supports-color@7.2.0):
     dependencies:

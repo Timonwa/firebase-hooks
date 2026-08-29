@@ -8,7 +8,8 @@
  * @param auth - Firebase `Auth` instance, or null while it initialises
  * @param oobCode - The code from the verification link, or null while parsing the URL
  * @param options.onVerified - Runs after a successful verification (e.g. refresh the session)
- * @returns `{ status, error }` — status is "processing" | "success" | "failed"
+ * @returns `{ status, error, code, cause }` — status is "processing" | "success" | "failed";
+ * `code`/`cause` carry the raw failure like every other hook
  *
  * @example
  * const oobCode = searchParams.get("oobCode");
@@ -20,10 +21,13 @@
 
 "use client";
 
-import { formatAuthError } from "@timonwa/app-utilities";
 import { type Auth, applyActionCode, type User } from "firebase/auth";
 import { useEffect, useRef, useState } from "react";
-import type { AuthErrorOptions } from "./_shared";
+import {
+  type AuthErrorOptions,
+  getFirebaseErrorCode,
+  useErrorMessageResolver,
+} from "./_shared";
 
 type VerifyEmailStatusType = "processing" | "success" | "failed";
 
@@ -38,9 +42,12 @@ export function useVerifyEmail(
 ) {
   const [status, setStatus] = useState<VerifyEmailStatusType>("processing");
   const [error, setError] = useState<string | null>(null);
+  const [code, setCode] = useState<string | null>(null);
+  const [cause, setCause] = useState<unknown>(null);
   const appliedRef = useRef(false);
-  const optionsRef = useRef(options);
-  optionsRef.current = options;
+  const resolveMessage = useErrorMessageResolver(options);
+  const onVerifiedRef = useRef(options.onVerified);
+  onVerifiedRef.current = options.onVerified;
 
   useEffect(() => {
     if (!auth) return;
@@ -63,17 +70,16 @@ export function useVerifyEmail(
             /* best-effort — verification itself already succeeded */
           }
         }
-        await optionsRef.current.onVerified?.(auth.currentUser);
+        await onVerifiedRef.current?.(auth.currentUser);
         setStatus("success");
       })
       .catch((err: unknown) => {
         setStatus("failed");
-        setError(
-          optionsRef.current.formatErrorMessage?.(err) ??
-            formatAuthError(err, { fallback: "Failed to verify email" }),
-        );
+        setError(resolveMessage(err, "Failed to verify email"));
+        setCode(getFirebaseErrorCode(err));
+        setCause(err);
       });
-  }, [auth, oobCode]);
+  }, [auth, oobCode, resolveMessage]);
 
-  return { status, error };
+  return { status, error, code, cause };
 }

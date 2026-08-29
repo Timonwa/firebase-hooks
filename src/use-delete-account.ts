@@ -1,8 +1,9 @@
 /**
- * @description Deletes the signed-in user's account. Pass the current password
- * for email/password accounts — Firebase requires a recent sign-in for
- * deletion, so the hook reauthenticates first (OAuth-only accounts can omit it
- * and reauthenticate via `useReauthenticate` beforehand). The optional
+ * @description Deletes the signed-in user's account. Pass `currentPassword`
+ * and the hook reauthenticates automatically first (deletion requires a recent
+ * sign-in); omit it — OAuth-only accounts, or your own reauth policy via
+ * `useReauthenticate` — and a stale session surfaces
+ * `auth/requires-recent-login` through `code`/`cause`. The optional
  * `onBeforeDelete` callback runs while the user is still authenticated — clean
  * up server-side data there; throwing aborts the deletion.
  *
@@ -14,7 +15,7 @@
  * const { deleteAccount, loading, error } = useDeleteAccount(auth, {
  *   onBeforeDelete: (user) => deleteUserRecord(user.uid),
  * });
- * const result = await deleteAccount(currentPassword);
+ * const result = await deleteAccount({ currentPassword });
  * if (result.success) router.push("/goodbye");
  */
 
@@ -39,7 +40,11 @@ export function useDeleteAccount(
 ) {
   const { loading, error, run } = useAuthTask(options);
 
-  const deleteAccount = (currentPassword?: string): Promise<AuthResult> =>
+  const deleteAccount = ({
+    currentPassword,
+  }: {
+    currentPassword?: string;
+  } = {}): Promise<AuthResult> =>
     run("Failed to delete account", async () => {
       const user = requireCurrentUser(auth);
       if (currentPassword) await reauthenticateUserWithPassword(user, currentPassword);

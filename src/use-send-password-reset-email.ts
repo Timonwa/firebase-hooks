@@ -26,10 +26,11 @@ import {
   type AuthResult,
   requireAuth,
   useAuthTask,
+  useResolvedConfig,
 } from "./_shared";
 
 interface UseSendPasswordResetEmailOptionsProps extends AuthErrorOptions {
-  actionCodeSettings?: ActionCodeSettings;
+  actionCodeSettings?: ActionCodeSettings | null;
 }
 
 export function useSendPasswordResetEmail(
@@ -37,12 +38,16 @@ export function useSendPasswordResetEmail(
   options: UseSendPasswordResetEmailOptionsProps = {},
 ) {
   const { loading, error, setError, run } = useAuthTask(options);
+  const actionCodeSettings = useResolvedConfig(
+    "actionCodeSettings",
+    options.actionCodeSettings,
+  );
   const [success, setSuccess] = useState(false);
 
   const send = async (email: string): Promise<AuthResult> => {
     setSuccess(false);
     const result = await run("Failed to send reset email", async () => {
-      await sendPasswordResetEmail(requireAuth(auth), email, options.actionCodeSettings);
+      await sendPasswordResetEmail(requireAuth(auth), email, actionCodeSettings);
       return {};
     });
     if (result.success) setSuccess(true);

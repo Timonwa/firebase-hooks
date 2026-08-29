@@ -28,7 +28,10 @@ import {
 } from "firebase/auth";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
+  AUTH_ERROR_MESSAGES,
   AuthProvider,
+  formatFirebaseError,
+  getFirebaseErrorCode,
   useAnonymousSignIn,
   useAuth,
   useConfirmPasswordReset,
@@ -394,7 +397,7 @@ describe("password flows", () => {
     vi.mocked(updatePassword).mockImplementation(async () => void order.push("update"));
     const { result } = renderHook(() => useUpdatePassword(makeAuth(makeUser())));
     await act(async () => {
-      await result.current.update("current-pw", "new-pw");
+      await result.current.update({ newPassword: "new-pw", currentPassword: "current-pw" });
     });
     expect(order).toEqual(["reauth", "update"]);
     expect(result.current.success).toBe(true);
@@ -428,7 +431,7 @@ describe("email flows", () => {
     const user = makeUser();
     const { result } = renderHook(() => useUpdateEmail(makeAuth(user)));
     await act(async () => {
-      await result.current.update("current-pw", "new@b.c");
+      await result.current.update({ newEmail: "new@b.c", currentPassword: "current-pw" });
     });
     expect(reauthenticateWithCredential).toHaveBeenCalled();
     expect(verifyBeforeUpdateEmail).toHaveBeenCalledWith(user, "new@b.c", undefined);
@@ -456,7 +459,7 @@ describe("account and linking", () => {
       }),
     );
     await act(async () => {
-      await result.current.deleteAccount("pw");
+      await result.current.deleteAccount({ currentPassword: "pw" });
     });
     expect(reauthenticateWithCredential).toHaveBeenCalled();
     expect(deleteUser).not.toHaveBeenCalled();
@@ -478,5 +481,201 @@ describe("account and linking", () => {
       await unlinkHook.result.current.unlinkProvider("google.com");
     });
     expect(unlink).toHaveBeenCalledWith(user, "google.com");
+  });
+});
+
+class FakeFirebaseError extends Error {
+  code: string;
+  constructor(code: string, message: string) {
+    super(message);
+    this.code = code;
+  }
+}
+
+describe("error model", () => {
+  it("failures carry error, code, and cause — raw never gated behind processing", async () => {
+    const firebaseError = new FakeFirebaseError(
+      "auth/invalid-credential",
+      "Firebase: Error (auth/invalid-credential).",
+    );
+    vi.mocked(signInWithEmailAndPassword).mockRejectedValue(firebaseError);
+    const { result } = renderHook(() => useLogin(makeAuth()));
+    let outcome: Awaited<ReturnType<typeof result.current.login>> | undefined;
+    await act(async () => {
+      outcome = await result.current.login("a@b.c", "pw");
+    });
+    expect(outcome).toMatchObject({
+      success: false,
+      error: "Firebase: Error (auth/invalid-credential).", // raw by default
+      code: "auth/invalid-credential",
+      cause: firebaseError,
+    });
+  });
+
+  it("a throwing formatter falls back to the raw message instead of losing the error", async () => {
+    vi.mocked(signInWithEmailAndPassword).mockRejectedValue(new Error("real problem"));
+    const { result } = renderHook(() =>
+      useLogin(makeAuth(), {
+        formatErrorMessage: () => {
+          throw new Error("formatter bug");
+        },
+      }),
+    );
+    await act(async () => {
+      await result.current.login("a@b.c", "pw");
+    });
+    expect(result.current.error).toBe("real problem");
+  });
+
+  it("the provider-level formatter applies, and a hook-level one overrides it", async () => {
+    vi.mocked(signInWithEmailAndPassword).mockRejectedValue(new Error("boom"));
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <AuthProvider auth={makeAuth()} formatErrorMessage={() => "from provider"}>
+        {children}
+      </AuthProvider>
+    );
+
+    const viaProvider = renderHook(() => useLogin(makeAuth()), { wrapper });
+    await act(async () => {
+      await viaProvider.result.current.login("a@b.c", "pw");
+    });
+    expect(viaProvider.result.current.error).toBe("from provider");
+
+    const viaHook = renderHook(
+      () => useLogin(makeAuth(), { formatErrorMessage: () => "from hook" }),
+      { wrapper },
+    );
+    await act(async () => {
+      await viaHook.result.current.login("a@b.c", "pw");
+    });
+    expect(viaHook.result.current.error).toBe("from hook");
+  });
+});
+
+describe("formatFirebaseError / getFirebaseErrorCode / AUTH_ERROR_MESSAGES", () => {
+  it("a mapped code returns the catalogue copy", () => {
+    const err = new FakeFirebaseError("auth/invalid-credential", "Firebase: Error (auth/invalid-credential).");
+    expect(formatFirebaseError(err, { messages: AUTH_ERROR_MESSAGES })).toBe(
+      "Incorrect email or password.",
+    );
+  });
+
+  it("an unmapped Firebase error gets Firebase's own words, cleaned", () => {
+    const err = new FakeFirebaseError(
+      "auth/some-new-code",
+      "Firebase: The thing went sideways. (auth/some-new-code).",
+    );
+    expect(formatFirebaseError(err)).toBe("The thing went sideways.");
+  });
+
+  it("a message with no usable words falls back to the code itself", () => {
+    const err = new FakeFirebaseError("auth/mystery", "Firebase: Error (auth/mystery).");
+    expect(formatFirebaseError(err)).toBe("auth/mystery");
+  });
+
+  it("non-Firebase errors pass through raw — no envelope unwrapping", () => {
+    expect(formatFirebaseError(new Error("my server said no"))).toBe("my server said no");
+    expect(formatFirebaseError("plain string")).toBe("plain string");
+    expect(formatFirebaseError({ weird: true }, { fallback: "Fallback." })).toBe("Fallback.");
+  });
+
+  it("getFirebaseErrorCode extracts codes and returns null otherwise", () => {
+    expect(getFirebaseErrorCode(new FakeFirebaseError("storage/object-not-found", "x"))).toBe(
+      "storage/object-not-found",
+    );
+    expect(getFirebaseErrorCode(new Error("no code"))).toBe(null);
+  });
+});
+
+describe("optional currentPassword", () => {
+  it("useUpdatePassword skips reauthentication when currentPassword is omitted", async () => {
+    const user = makeUser();
+    const { result } = renderHook(() => useUpdatePassword(makeAuth(user)));
+    await act(async () => {
+      await result.current.update({ newPassword: "new-pw" });
+    });
+    expect(reauthenticateWithCredential).not.toHaveBeenCalled();
+    expect(updatePassword).toHaveBeenCalledWith(user, "new-pw");
+  });
+
+  it("useUpdateEmail without currentPassword goes straight to verifyBeforeUpdateEmail", async () => {
+    const user = makeUser();
+    const { result } = renderHook(() => useUpdateEmail(makeAuth(user)));
+    await act(async () => {
+      await result.current.update({ newEmail: "new@b.c" });
+    });
+    expect(reauthenticateWithCredential).not.toHaveBeenCalled();
+    expect(verifyBeforeUpdateEmail).toHaveBeenCalledWith(user, "new@b.c", undefined);
+  });
+});
+
+describe("raw wrapper access", () => {
+  it("sign-in successes include the untouched UserCredential", async () => {
+    const user = makeUser();
+    const rawCredential = { user, providerId: "password", operationType: "signIn" };
+    vi.mocked(signInWithEmailAndPassword).mockResolvedValue(rawCredential as never);
+    const { result } = renderHook(() => useLogin(makeAuth()));
+    let outcome: Awaited<ReturnType<typeof result.current.login>> | undefined;
+    await act(async () => {
+      outcome = await result.current.login("a@b.c", "pw");
+    });
+    expect(outcome).toMatchObject({ success: true, user, credential: rawCredential });
+  });
+});
+
+describe("global config on AuthProvider", () => {
+  it("sign-in hooks inherit onIdToken from the provider; an explicit null opts out", async () => {
+    const user = makeUser();
+    vi.mocked(signInWithEmailAndPassword).mockResolvedValue({ user } as never);
+    const globalOnIdToken = vi.fn();
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <AuthProvider auth={makeAuth()} onIdToken={globalOnIdToken}>
+        {children}
+      </AuthProvider>
+    );
+
+    const inherited = renderHook(() => useLogin(makeAuth()), { wrapper });
+    await act(async () => {
+      await inherited.result.current.login("a@b.c", "pw");
+    });
+    expect(globalOnIdToken).toHaveBeenCalledWith("id-token-123", user);
+
+    globalOnIdToken.mockClear();
+    const optedOut = renderHook(() => useLogin(makeAuth(), { onIdToken: null }), { wrapper });
+    await act(async () => {
+      await optedOut.result.current.login("a@b.c", "pw");
+    });
+    expect(globalOnIdToken).not.toHaveBeenCalled();
+  });
+
+  it("useLogout inherits onBeforeSignOut and keeps the server-first ordering", async () => {
+    const globalClear = vi.fn(() => {
+      throw new Error("server unreachable");
+    });
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <AuthProvider auth={makeAuth()} onBeforeSignOut={globalClear}>
+        {children}
+      </AuthProvider>
+    );
+    const { result } = renderHook(() => useLogout(makeAuth()), { wrapper });
+    await act(async () => {
+      await result.current.logout();
+    });
+    expect(globalClear).toHaveBeenCalled();
+    expect(signOut).not.toHaveBeenCalled();
+  });
+
+  it("actionCodeSettings flows from the provider into email sends", async () => {
+    const settings = { url: "https://app/handler", handleCodeInApp: true };
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <AuthProvider auth={makeAuth()} actionCodeSettings={settings}>
+        {children}
+      </AuthProvider>
+    );
+    const { result } = renderHook(() => useSendPasswordResetEmail(makeAuth()), { wrapper });
+    await act(async () => {
+      await result.current.send("a@b.c");
+    });
+    expect(sendPasswordResetEmail).toHaveBeenCalledWith(expect.anything(), "a@b.c", settings);
   });
 });

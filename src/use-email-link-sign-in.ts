@@ -36,6 +36,7 @@ import {
   sendSignInLinkToEmail,
   signInWithEmailLink,
   type User,
+  type UserCredential,
 } from "firebase/auth";
 import {
   type AuthErrorOptions,
@@ -44,25 +45,37 @@ import {
   requireAuth,
   runOnIdToken,
   useAuthTask,
+  useResolvedConfig,
 } from "./_shared";
 
 interface UseEmailLinkSignInOptionsProps extends AuthErrorOptions {
-  actionCodeSettings?: ActionCodeSettings;
+  actionCodeSettings?: ActionCodeSettings | null;
   storageKey?: string;
   sendLink?: (email: string) => Promise<void>;
-  onIdToken?: OnIdToken;
+  onIdToken?: OnIdToken | null;
 }
 
 type CompleteSignInResult =
-  | { success: true; user: User }
-  | { success: false; error: string; needsEmail?: boolean };
+  | { success: true; user: User; credential: UserCredential }
+  | {
+      success: false;
+      error: string;
+      code?: string | null;
+      cause?: unknown;
+      needsEmail?: boolean;
+    };
 
 export function useEmailLinkSignIn(
   auth: Auth | null,
   options: UseEmailLinkSignInOptionsProps = {},
 ) {
-  const { actionCodeSettings, storageKey = "emailForSignIn", onIdToken } = options;
+  const { storageKey = "emailForSignIn" } = options;
   const { loading, error, setError, run } = useAuthTask(options);
+  const onIdToken = useResolvedConfig("onIdToken", options.onIdToken);
+  const actionCodeSettings = useResolvedConfig(
+    "actionCodeSettings",
+    options.actionCodeSettings,
+  );
 
   const sendLink = (email: string): Promise<AuthResult> =>
     run("Failed to send sign-in link", async () => {
@@ -116,7 +129,7 @@ export function useEmailLinkSignIn(
         /* best-effort */
       }
       await runOnIdToken(onIdToken, credential.user);
-      return { user: credential.user };
+      return { user: credential.user, credential };
     });
     return result;
   };

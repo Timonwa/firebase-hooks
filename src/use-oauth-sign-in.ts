@@ -29,6 +29,7 @@ import {
   signInWithPopup,
   signInWithRedirect,
   type User,
+  type UserCredential,
 } from "firebase/auth";
 import { useEffect, useRef } from "react";
 import {
@@ -38,10 +39,11 @@ import {
   requireAuth,
   runOnIdToken,
   useAuthTask,
+  useResolvedConfig,
 } from "./_shared";
 
 interface UseOAuthSignInOptionsProps extends AuthErrorOptions {
-  onIdToken?: OnIdToken;
+  onIdToken?: OnIdToken | null;
 }
 
 export function useOAuthSignIn(
@@ -52,8 +54,9 @@ export function useOAuthSignIn(
   // getRedirectResult consumes the pending result — guard Strict Mode's double effect.
   const redirectHandledRef = useRef(false);
   // Read the callback through a ref so an inline option object can't re-trigger the effect.
-  const onIdTokenRef = useRef(options.onIdToken);
-  onIdTokenRef.current = options.onIdToken;
+  const onIdToken = useResolvedConfig("onIdToken", options.onIdToken);
+  const onIdTokenRef = useRef(onIdToken);
+  onIdTokenRef.current = onIdToken;
 
   useEffect(() => {
     if (!auth || redirectHandledRef.current) return;
@@ -68,17 +71,17 @@ export function useOAuthSignIn(
   const signIn = (
     provider: FirebaseAuthProvider,
     { method = "popup" }: { method?: "popup" | "redirect" } = {},
-  ): Promise<AuthResult<{ user: User | null }>> =>
+  ): Promise<AuthResult<{ user: User | null; credential: UserCredential | null }>> =>
     run("Sign-in failed", async () => {
       const instance = requireAuth(auth);
       if (method === "redirect") {
         // Navigates away; the mount effect completes the flow when we return.
         await signInWithRedirect(instance, provider);
-        return { user: null };
+        return { user: null, credential: null };
       }
       const credential = await signInWithPopup(instance, provider);
-      await runOnIdToken(options.onIdToken, credential.user);
-      return { user: credential.user };
+      await runOnIdToken(onIdTokenRef.current, credential.user);
+      return { user: credential.user, credential };
     });
 
   return { signIn, loading, error };

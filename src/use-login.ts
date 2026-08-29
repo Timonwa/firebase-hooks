@@ -18,7 +18,12 @@
 
 "use client";
 
-import { type Auth, signInWithEmailAndPassword, type User } from "firebase/auth";
+import {
+  type Auth,
+  signInWithEmailAndPassword,
+  type User,
+  type UserCredential,
+} from "firebase/auth";
 import {
   type AuthErrorOptions,
   type AuthResult,
@@ -26,24 +31,29 @@ import {
   requireAuth,
   runOnIdToken,
   useAuthTask,
+  useResolvedConfig,
 } from "./_shared";
 
 interface UseLoginOptionsProps extends AuthErrorOptions {
-  onIdToken?: OnIdToken;
+  onIdToken?: OnIdToken | null;
 }
 
 export function useLogin(auth: Auth | null, options: UseLoginOptionsProps = {}) {
   const { loading, error, run } = useAuthTask(options);
+  const onIdToken = useResolvedConfig("onIdToken", options.onIdToken);
 
-  const login = (email: string, password: string): Promise<AuthResult<{ user: User }>> =>
+  const login = (
+    email: string,
+    password: string,
+  ): Promise<AuthResult<{ user: User; credential: UserCredential }>> =>
     run("Login failed", async () => {
       const credential = await signInWithEmailAndPassword(
         requireAuth(auth),
         email,
         password,
       );
-      await runOnIdToken(options.onIdToken, credential.user);
-      return { user: credential.user };
+      await runOnIdToken(onIdToken, credential.user);
+      return { user: credential.user, credential };
     });
 
   return { login, loading, error };
