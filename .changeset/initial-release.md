@@ -1,0 +1,5 @@
+---
+"@timonwa/firebase-hooks": minor
+---
+
+Initial release — the full Firebase Auth client surface as typed hooks: `AuthProvider`/`useAuth` (live user + custom claims via `onIdTokenChanged`), sign-in flows (`useLogin`, `useSignup`, `useOAuthSignIn` with popup/redirect, `useEmailLinkSignIn` with `needsEmail` instead of `window.prompt`, `usePhoneSignIn` with managed reCAPTCHA, `useAnonymousSignIn`, `useCustomTokenSignIn`, `useLogout` server-session-first), password flows (`useSendPasswordResetEmail`, `useConfirmPasswordReset` with `verifyCode`, `useUpdatePassword`), email flows (`useVerifyEmail`, `useSendEmailVerification`, `useUpdateEmail`), and account management (`useUpdateProfile`, `useDeleteAccount`, `useReauthenticate`, `useLinkProvider`, `useUnlinkProvider`). Reauthentication is built into the sensitive operations; server sessions integrate via optional `onIdToken`/`onBefore*` callbacks that throw to abort; every action resolves to `AuthResult` and never throws. Ships ESM + CJS with a `"use client"` banner.

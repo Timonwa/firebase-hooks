@@ -1,0 +1,58 @@
+/**
+ * @description The "forgot password" flow: sends Firebase's password-reset
+ * email. `success` flips true after a send, and `resetState` clears both flags
+ * — for forms the user can retry with a different address.
+ *
+ * @param auth - Firebase `Auth` instance, or null while it initialises
+ * @param options.actionCodeSettings - Where the emailed reset link lands
+ * @returns `{ send, loading, error, success, resetState }`
+ *
+ * @example
+ * const { send, loading, success } = useSendPasswordResetEmail(auth);
+ * await send(email);
+ * {success && <p>If an account exists for {email}, a reset link is on its way.</p>}
+ */
+
+"use client";
+
+import {
+  type ActionCodeSettings,
+  type Auth,
+  sendPasswordResetEmail,
+} from "firebase/auth";
+import { useState } from "react";
+import {
+  type AuthErrorOptions,
+  type AuthResult,
+  requireAuth,
+  useAuthTask,
+} from "./_shared";
+
+interface UseSendPasswordResetEmailOptionsProps extends AuthErrorOptions {
+  actionCodeSettings?: ActionCodeSettings;
+}
+
+export function useSendPasswordResetEmail(
+  auth: Auth | null,
+  options: UseSendPasswordResetEmailOptionsProps = {},
+) {
+  const { loading, error, setError, run } = useAuthTask(options);
+  const [success, setSuccess] = useState(false);
+
+  const send = async (email: string): Promise<AuthResult> => {
+    setSuccess(false);
+    const result = await run("Failed to send reset email", async () => {
+      await sendPasswordResetEmail(requireAuth(auth), email, options.actionCodeSettings);
+      return {};
+    });
+    if (result.success) setSuccess(true);
+    return result;
+  };
+
+  const resetState = () => {
+    setError(null);
+    setSuccess(false);
+  };
+
+  return { send, loading, error, success, resetState };
+}
