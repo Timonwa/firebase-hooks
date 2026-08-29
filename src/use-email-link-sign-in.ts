@@ -39,8 +39,8 @@ import {
   type UserCredential,
 } from "firebase/auth";
 import {
-  type AuthErrorOptions,
-  type AuthResult,
+  type HookErrorOptions,
+  type HookResult,
   type OnIdToken,
   requireAuth,
   runOnIdToken,
@@ -48,7 +48,7 @@ import {
   useResolvedConfig,
 } from "./_shared";
 
-interface UseEmailLinkSignInOptionsProps extends AuthErrorOptions {
+interface UseEmailLinkSignInOptionsProps extends HookErrorOptions {
   actionCodeSettings?: ActionCodeSettings | null;
   storageKey?: string;
   sendLink?: (email: string) => Promise<void>;
@@ -77,8 +77,8 @@ export function useEmailLinkSignIn(
     options.actionCodeSettings,
   );
 
-  const sendLink = (email: string): Promise<AuthResult> =>
-    run("Failed to send sign-in link", async () => {
+  const sendLink = (email: string): Promise<HookResult> =>
+    run("send-sign-in-link", "Failed to send sign-in link", async () => {
       if (options.sendLink) {
         await options.sendLink(email);
       } else {
@@ -119,18 +119,23 @@ export function useEmailLinkSignIn(
     }
     const confirmedEmail = stored;
 
-    const result = await run("Failed to complete sign-in", async () => {
-      const instance = requireAuth(auth);
-      if (!isSignInWithEmailLink(instance, url)) throw new Error("Invalid sign-in link");
-      const credential = await signInWithEmailLink(instance, confirmedEmail, url);
-      try {
-        window.localStorage.removeItem(storageKey);
-      } catch {
-        /* best-effort */
-      }
-      await runOnIdToken(onIdToken, credential.user);
-      return { user: credential.user, credential };
-    });
+    const result = await run(
+      "email-link-sign-in",
+      "Failed to complete sign-in",
+      async () => {
+        const instance = requireAuth(auth);
+        if (!isSignInWithEmailLink(instance, url))
+          throw new Error("Invalid sign-in link");
+        const credential = await signInWithEmailLink(instance, confirmedEmail, url);
+        try {
+          window.localStorage.removeItem(storageKey);
+        } catch {
+          /* best-effort */
+        }
+        await runOnIdToken(onIdToken, credential.user);
+        return { user: credential.user, credential };
+      },
+    );
     return result;
   };
 

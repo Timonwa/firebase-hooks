@@ -24,19 +24,19 @@ import {
   type UserCredential,
 } from "firebase/auth";
 import {
-  type AuthErrorOptions,
-  type AuthResult,
+  type HookErrorOptions,
+  type HookResult,
   requireCurrentUser,
   useAuthTask,
 } from "./_shared";
 
-export function useLinkProvider(auth: Auth | null, options: AuthErrorOptions = {}) {
+export function useLinkProvider(auth: Auth | null, options: HookErrorOptions = {}) {
   const { loading, error, run } = useAuthTask(options);
 
   const linkWithProvider = (
     provider: FirebaseAuthProvider,
-  ): Promise<AuthResult<{ user: User; credential: UserCredential }>> =>
-    run("Failed to link account", async () => {
+  ): Promise<HookResult<{ user: User; credential: UserCredential }>> =>
+    run("link-provider", "Failed to link account", async () => {
       const credential = await linkWithPopup(requireCurrentUser(auth), provider);
       return { user: credential.user, credential };
     });
@@ -44,8 +44,8 @@ export function useLinkProvider(auth: Auth | null, options: AuthErrorOptions = {
   const linkWithPassword = (
     email: string,
     password: string,
-  ): Promise<AuthResult<{ user: User; credential: UserCredential }>> =>
-    run("Failed to link account", async () => {
+  ): Promise<HookResult<{ user: User; credential: UserCredential }>> =>
+    run("link-provider", "Failed to link account", async () => {
       const credential = await linkWithCredential(
         requireCurrentUser(auth),
         EmailAuthProvider.credential(email, password),

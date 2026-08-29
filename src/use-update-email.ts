@@ -27,15 +27,15 @@ import {
 } from "firebase/auth";
 import { useState } from "react";
 import {
-  type AuthErrorOptions,
-  type AuthResult,
+  type HookErrorOptions,
+  type HookResult,
   reauthenticateUserWithPassword,
   requireCurrentUser,
   useAuthTask,
   useResolvedConfig,
 } from "./_shared";
 
-interface UseUpdateEmailOptionsProps extends AuthErrorOptions {
+interface UseUpdateEmailOptionsProps extends HookErrorOptions {
   actionCodeSettings?: ActionCodeSettings | null;
 }
 
@@ -56,9 +56,9 @@ export function useUpdateEmail(
   }: {
     newEmail: string;
     currentPassword?: string;
-  }): Promise<AuthResult> => {
+  }): Promise<HookResult> => {
     setSuccess(false);
-    const result = await run("Failed to update email", async () => {
+    const result = await run("update-email", "Failed to update email", async () => {
       const user = requireCurrentUser(auth);
       if (currentPassword) await reauthenticateUserWithPassword(user, currentPassword);
       await verifyBeforeUpdateEmail(user, newEmail, actionCodeSettings);

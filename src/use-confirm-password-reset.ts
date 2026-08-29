@@ -19,31 +19,39 @@
 import { type Auth, confirmPasswordReset, verifyPasswordResetCode } from "firebase/auth";
 import { useState } from "react";
 import {
-  type AuthErrorOptions,
-  type AuthResult,
+  type HookErrorOptions,
+  type HookResult,
   requireAuth,
   useAuthTask,
 } from "./_shared";
 
 export function useConfirmPasswordReset(
   auth: Auth | null,
-  options: AuthErrorOptions = {},
+  options: HookErrorOptions = {},
 ) {
   const { loading, error, setError, run } = useAuthTask(options);
   const [success, setSuccess] = useState(false);
 
-  const verifyCode = (oobCode: string): Promise<AuthResult<{ email: string }>> =>
-    run("This reset link is invalid or has expired", async () => {
-      const email = await verifyPasswordResetCode(requireAuth(auth), oobCode);
-      return { email };
-    });
+  const verifyCode = (oobCode: string): Promise<HookResult<{ email: string }>> =>
+    run(
+      "verify-password-reset-code",
+      "This reset link is invalid or has expired",
+      async () => {
+        const email = await verifyPasswordResetCode(requireAuth(auth), oobCode);
+        return { email };
+      },
+    );
 
-  const confirm = async (oobCode: string, newPassword: string): Promise<AuthResult> => {
+  const confirm = async (oobCode: string, newPassword: string): Promise<HookResult> => {
     setSuccess(false);
-    const result = await run("Failed to reset password", async () => {
-      await confirmPasswordReset(requireAuth(auth), oobCode, newPassword);
-      return {};
-    });
+    const result = await run(
+      "confirm-password-reset",
+      "Failed to reset password",
+      async () => {
+        await confirmPasswordReset(requireAuth(auth), oobCode, newPassword);
+        return {};
+      },
+    );
     if (result.success) setSuccess(true);
     return result;
   };

@@ -31,8 +31,8 @@ import {
 } from "firebase/auth";
 import { useEffect, useRef, useState } from "react";
 import {
-  type AuthErrorOptions,
-  type AuthResult,
+  type HookErrorOptions,
+  type HookResult,
   type OnIdToken,
   requireAuth,
   runOnIdToken,
@@ -40,7 +40,7 @@ import {
   useResolvedConfig,
 } from "./_shared";
 
-interface UsePhoneSignInOptionsProps extends AuthErrorOptions {
+interface UsePhoneSignInOptionsProps extends HookErrorOptions {
   recaptchaSize?: "invisible" | "normal";
   onIdToken?: OnIdToken | null;
 }
@@ -65,8 +65,8 @@ export function usePhoneSignIn(
   const sendCode = (
     phoneNumber: string,
     recaptchaContainer: string | HTMLElement,
-  ): Promise<AuthResult> =>
-    run("Failed to send verification code", async () => {
+  ): Promise<HookResult> =>
+    run("send-phone-code", "Failed to send verification code", async () => {
       const instance = requireAuth(auth);
       verifierRef.current ??= new RecaptchaVerifier(instance, recaptchaContainer, {
         size: options.recaptchaSize ?? "invisible",
@@ -82,8 +82,8 @@ export function usePhoneSignIn(
 
   const confirmCode = (
     code: string,
-  ): Promise<AuthResult<{ user: User; credential: UserCredential }>> =>
-    run("Invalid verification code", async () => {
+  ): Promise<HookResult<{ user: User; credential: UserCredential }>> =>
+    run("confirm-phone-code", "Invalid verification code", async () => {
       if (!confirmationRef.current) throw new Error("Send a verification code first");
       const credential = await confirmationRef.current.confirm(code);
       await runOnIdToken(onIdToken, credential.user);

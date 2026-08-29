@@ -33,8 +33,8 @@ import {
 } from "firebase/auth";
 import { useEffect, useRef } from "react";
 import {
-  type AuthErrorOptions,
-  type AuthResult,
+  type HookErrorOptions,
+  type HookResult,
   type OnIdToken,
   requireAuth,
   runOnIdToken,
@@ -42,7 +42,7 @@ import {
   useResolvedConfig,
 } from "./_shared";
 
-interface UseOAuthSignInOptionsProps extends AuthErrorOptions {
+interface UseOAuthSignInOptionsProps extends HookErrorOptions {
   onIdToken?: OnIdToken | null;
 }
 
@@ -61,7 +61,7 @@ export function useOAuthSignIn(
   useEffect(() => {
     if (!auth || redirectHandledRef.current) return;
     redirectHandledRef.current = true;
-    void run("Sign-in failed", async () => {
+    void run("oauth-redirect", "Sign-in failed", async () => {
       const result = await getRedirectResult(auth);
       if (result) await runOnIdToken(onIdTokenRef.current, result.user);
       return {};
@@ -71,8 +71,8 @@ export function useOAuthSignIn(
   const signIn = (
     provider: FirebaseAuthProvider,
     { method = "popup" }: { method?: "popup" | "redirect" } = {},
-  ): Promise<AuthResult<{ user: User | null; credential: UserCredential | null }>> =>
-    run("Sign-in failed", async () => {
+  ): Promise<HookResult<{ user: User | null; credential: UserCredential | null }>> =>
+    run("oauth-sign-in", "Sign-in failed", async () => {
       const instance = requireAuth(auth);
       if (method === "redirect") {
         // Navigates away; the mount effect completes the flow when we return.

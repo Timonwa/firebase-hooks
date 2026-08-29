@@ -24,14 +24,15 @@
 import { type Auth, applyActionCode, type User } from "firebase/auth";
 import { useEffect, useRef, useState } from "react";
 import {
-  type AuthErrorOptions,
   getFirebaseErrorCode,
+  type HookErrorOptions,
+  useAuthErrorObserver,
   useErrorMessageResolver,
 } from "./_shared";
 
 type VerifyEmailStatusType = "processing" | "success" | "failed";
 
-interface UseVerifyEmailOptionsProps extends AuthErrorOptions {
+interface UseVerifyEmailOptionsProps extends HookErrorOptions {
   onVerified?: (user: User | null) => void | Promise<void>;
 }
 
@@ -46,6 +47,7 @@ export function useVerifyEmail(
   const [cause, setCause] = useState<unknown>(null);
   const appliedRef = useRef(false);
   const resolveMessage = useErrorMessageResolver(options);
+  const notifyError = useAuthErrorObserver();
   const onVerifiedRef = useRef(options.onVerified);
   onVerifiedRef.current = options.onVerified;
 
@@ -74,12 +76,18 @@ export function useVerifyEmail(
         setStatus("success");
       })
       .catch((err: unknown) => {
+        const message = resolveMessage(err, "Failed to verify email");
         setStatus("failed");
-        setError(resolveMessage(err, "Failed to verify email"));
+        setError(message);
         setCode(getFirebaseErrorCode(err));
         setCause(err);
+        notifyError(err, {
+          action: "verify-email",
+          code: getFirebaseErrorCode(err),
+          message,
+        });
       });
-  }, [auth, oobCode, resolveMessage]);
+  }, [auth, oobCode, resolveMessage, notifyError]);
 
   return { status, error, code, cause };
 }

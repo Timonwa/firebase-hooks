@@ -25,8 +25,8 @@ import {
   type UserCredential,
 } from "firebase/auth";
 import {
-  type AuthErrorOptions,
-  type AuthResult,
+  type HookErrorOptions,
+  type HookResult,
   type OnIdToken,
   requireAuth,
   runOnIdToken,
@@ -34,7 +34,7 @@ import {
   useResolvedConfig,
 } from "./_shared";
 
-interface UseLoginOptionsProps extends AuthErrorOptions {
+interface UseLoginOptionsProps extends HookErrorOptions {
   onIdToken?: OnIdToken | null;
 }
 
@@ -45,8 +45,8 @@ export function useLogin(auth: Auth | null, options: UseLoginOptionsProps = {}) 
   const login = (
     email: string,
     password: string,
-  ): Promise<AuthResult<{ user: User; credential: UserCredential }>> =>
-    run("Login failed", async () => {
+  ): Promise<HookResult<{ user: User; credential: UserCredential }>> =>
+    run("login", "Login failed", async () => {
       const credential = await signInWithEmailAndPassword(
         requireAuth(auth),
         email,

@@ -22,7 +22,7 @@ pnpm verify   # typecheck, lint, test, build, publint, attw — the same gate CI
 
 - **One file per hook**, kebab-cased after it, flat in `src/` — `src/use-login.ts`. Start the file with a `"use client"` directive and a JSDoc block; the JSDoc is what editors show, so keep it agreeing with the README. Shared internals live in `src/_shared.ts` and never reach the barrel (only its public types do).
 - **Follow the shared contract.** `auth: Auth | null` first argument; actions resolve to `AuthResult` and never throw (`useAuthTask` gives you the skeleton); sensitive operations reauthenticate first.
-- **Export it explicitly** from `src/index.ts`, one line per file, alphabetical.
+- **Export it explicitly** from its service's entry barrel (`src/auth.ts` for auth), one line per file, alphabetical. The root entry (`src/index.ts`) carries only the service-agnostic core — nothing service-specific is ever added to it; a new service gets a new subpath entry.
 - **Document it in `README.md` in the same change** — the README is the only documentation. Add the hook to its group's table and give it a section (signature, options with defaults, example), alphabetical within the group.
 - **Tests go through the barrel** (`import { … } from "./index.js"`) and mock `firebase/auth` — what's under test is the hook's orchestration (ordering, callbacks, error paths), not Firebase. Cover the edges: the null `auth`, the throwing callback, the signed-out user.
 

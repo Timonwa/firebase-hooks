@@ -15,17 +15,17 @@
 
 import { type Auth, type User, unlink } from "firebase/auth";
 import {
-  type AuthErrorOptions,
-  type AuthResult,
+  type HookErrorOptions,
+  type HookResult,
   requireCurrentUser,
   useAuthTask,
 } from "./_shared";
 
-export function useUnlinkProvider(auth: Auth | null, options: AuthErrorOptions = {}) {
+export function useUnlinkProvider(auth: Auth | null, options: HookErrorOptions = {}) {
   const { loading, error, run } = useAuthTask(options);
 
-  const unlinkProvider = (providerId: string): Promise<AuthResult<{ user: User }>> =>
-    run("Failed to unlink provider", async () => {
+  const unlinkProvider = (providerId: string): Promise<HookResult<{ user: User }>> =>
+    run("unlink-provider", "Failed to unlink provider", async () => {
       const user = await unlink(requireCurrentUser(auth), providerId);
       return { user };
     });

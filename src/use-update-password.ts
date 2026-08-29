@@ -19,14 +19,14 @@
 import { type Auth, updatePassword } from "firebase/auth";
 import { useState } from "react";
 import {
-  type AuthErrorOptions,
-  type AuthResult,
+  type HookErrorOptions,
+  type HookResult,
   reauthenticateUserWithPassword,
   requireCurrentUser,
   useAuthTask,
 } from "./_shared";
 
-export function useUpdatePassword(auth: Auth | null, options: AuthErrorOptions = {}) {
+export function useUpdatePassword(auth: Auth | null, options: HookErrorOptions = {}) {
   const { loading, error, run } = useAuthTask(options);
   const [success, setSuccess] = useState(false);
 
@@ -36,9 +36,9 @@ export function useUpdatePassword(auth: Auth | null, options: AuthErrorOptions =
   }: {
     newPassword: string;
     currentPassword?: string;
-  }): Promise<AuthResult> => {
+  }): Promise<HookResult> => {
     setSuccess(false);
-    const result = await run("Failed to update password", async () => {
+    const result = await run("update-password", "Failed to update password", async () => {
       const user = requireCurrentUser(auth);
       if (currentPassword) await reauthenticateUserWithPassword(user, currentPassword);
       await updatePassword(user, newPassword);

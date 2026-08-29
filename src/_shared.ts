@@ -19,7 +19,7 @@ import { createContext, useCallback, useContext, useRef, useState } from "react"
  * information: `error` (the processed message), `code` (Firebase's raw error
  * code, extracted for convenience), and `cause` (the complete untouched error).
  */
-export type AuthResult<T extends object = Record<never, never>> =
+export type HookResult<T extends object = Record<never, never>> =
   | ({ success: true } & T)
   | { success: false; error: string; code: string | null; cause: unknown };
 
@@ -30,7 +30,7 @@ export type AuthResult<T extends object = Record<never, never>> =
  */
 export type OnIdToken = (idToken: string, user: User) => void | Promise<void>;
 
-export interface AuthErrorOptions {
+export interface HookErrorOptions {
   /**
    * Override the `error` message for this hook. Takes precedence over the
    * provider-level config; the default (no config anywhere) is the raw error's
@@ -42,7 +42,7 @@ export interface AuthErrorOptions {
 /**
  * The `code` of a Firebase error ("auth/invalid-credential",
  * "firestore/permission-denied", …), or null for anything that isn't one —
- * the same extraction that fills every failure result's `code` field.
+ * the same extraction that fills every failure result's `code` field. Works for every Firebase service (auth/*, firestore/*, storage/* codes share one shape).
  */
 export function getFirebaseErrorCode(error: unknown): string | null {
   if (
@@ -63,12 +63,23 @@ function rawErrorMessage(error: unknown, fallback: string): string {
   return fallback;
 }
 
+/** What failed, for the global `onError` observer. */
+export interface HookErrorContext {
+  /** Stable id of the operation: "login", "oauth-sign-in", "update-password", … */
+  action: string;
+  /** Firebase's raw error code, or null. */
+  code: string | null;
+  /** The resolved display message the user saw. */
+  message: string;
+}
+
 /** Provider-level configuration shared with every hook below the provider. */
 export interface AuthConfigContextValueProps {
   formatErrorMessage?: (error: unknown) => string;
   onIdToken?: OnIdToken;
   onBeforeSignOut?: () => void | Promise<void>;
   actionCodeSettings?: ActionCodeSettings;
+  onError?: (error: unknown, context: HookErrorContext) => void;
 }
 
 export const AuthConfigContext = createContext<AuthConfigContextValueProps | undefined>(
@@ -124,7 +135,7 @@ export async function runOnIdToken(
  * provider config → the raw message. A throwing formatter falls back to the
  * raw message — formatting must never be able to lose the error.
  */
-export function useErrorMessageResolver(options?: AuthErrorOptions) {
+export function useErrorMessageResolver(options?: HookErrorOptions) {
   const config = useContext(AuthConfigContext);
   const formatRef = useRef<((error: unknown) => string) | undefined>(undefined);
   formatRef.current = options?.formatErrorMessage ?? config?.formatErrorMessage;
@@ -143,20 +154,39 @@ export function useErrorMessageResolver(options?: AuthErrorOptions) {
 }
 
 /**
+ * The global observer, fire-and-forget: a throwing observer can never break
+ * or alter a flow — it runs in addition to the result, never instead of it.
+ */
+export function useAuthErrorObserver() {
+  const config = useContext(AuthConfigContext);
+  const ref = useRef(config?.onError);
+  ref.current = config?.onError;
+  return useCallback((error: unknown, context: HookErrorContext) => {
+    try {
+      ref.current?.(error, context);
+    } catch {
+      /* observers never affect the flow */
+    }
+  }, []);
+}
+
+/**
  * The loading/error/try-catch skeleton every action hook repeats. `run` never
  * throws: failures come back as `{ success: false, error, code, cause }` with
  * the `error` state set to the same message.
  */
-export function useAuthTask(options?: AuthErrorOptions) {
+export function useAuthTask(options?: HookErrorOptions) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const resolveMessage = useErrorMessageResolver(options);
+  const notifyError = useAuthErrorObserver();
 
   const run = useCallback(
     async <T extends object>(
+      action: string,
       fallback: string,
       task: () => Promise<T>,
-    ): Promise<AuthResult<T>> => {
+    ): Promise<HookResult<T>> => {
       setLoading(true);
       setError(null);
       try {
@@ -164,18 +194,15 @@ export function useAuthTask(options?: AuthErrorOptions) {
         return { success: true, ...value };
       } catch (cause) {
         const message = resolveMessage(cause, fallback);
+        const code = getFirebaseErrorCode(cause);
         setError(message);
-        return {
-          success: false,
-          error: message,
-          code: getFirebaseErrorCode(cause),
-          cause,
-        };
+        notifyError(cause, { action, code, message });
+        return { success: false, error: message, code, cause };
       } finally {
         setLoading(false);
       }
     },
-    [resolveMessage],
+    [resolveMessage, notifyError],
   );
 
   return { loading, error, setError, run };

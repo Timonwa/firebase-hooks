@@ -20,8 +20,8 @@ import {
   type UserCredential,
 } from "firebase/auth";
 import {
-  type AuthErrorOptions,
-  type AuthResult,
+  type HookErrorOptions,
+  type HookResult,
   type OnIdToken,
   requireAuth,
   runOnIdToken,
@@ -29,7 +29,7 @@ import {
   useResolvedConfig,
 } from "./_shared";
 
-interface UseAnonymousSignInOptionsProps extends AuthErrorOptions {
+interface UseAnonymousSignInOptionsProps extends HookErrorOptions {
   onIdToken?: OnIdToken | null;
 }
 
@@ -40,8 +40,8 @@ export function useAnonymousSignIn(
   const { loading, error, run } = useAuthTask(options);
   const onIdToken = useResolvedConfig("onIdToken", options.onIdToken);
 
-  const signIn = (): Promise<AuthResult<{ user: User; credential: UserCredential }>> =>
-    run("Sign-in failed", async () => {
+  const signIn = (): Promise<HookResult<{ user: User; credential: UserCredential }>> =>
+    run("anonymous-sign-in", "Sign-in failed", async () => {
       const credential = await signInAnonymously(requireAuth(auth));
       await runOnIdToken(onIdToken, credential.user);
       return { user: credential.user, credential };

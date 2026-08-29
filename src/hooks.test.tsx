@@ -30,8 +30,6 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   AUTH_ERROR_MESSAGES,
   AuthProvider,
-  formatFirebaseError,
-  getFirebaseErrorCode,
   useAnonymousSignIn,
   useAuth,
   useConfirmPasswordReset,
@@ -51,7 +49,8 @@ import {
   useUpdatePassword,
   useUpdateProfile,
   useVerifyEmail,
-} from "./index.js";
+} from "./auth.js";
+import { formatFirebaseError, getFirebaseErrorCode } from "./index.js";
 
 vi.mock("firebase/auth", () => ({
   applyActionCode: vi.fn(async () => {}),
@@ -677,5 +676,66 @@ describe("global config on AuthProvider", () => {
       await result.current.send("a@b.c");
     });
     expect(sendPasswordResetEmail).toHaveBeenCalledWith(expect.anything(), "a@b.c", settings);
+  });
+});
+
+describe("global onError observer", () => {
+  it("fires with the raw error and { action, code, message } on every failure", async () => {
+    const firebaseError = new FakeFirebaseError(
+      "auth/too-many-requests",
+      "Firebase: Error (auth/too-many-requests).",
+    );
+    vi.mocked(signInWithEmailAndPassword).mockRejectedValue(firebaseError);
+    const onError = vi.fn();
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <AuthProvider auth={makeAuth()} onError={onError}>
+        {children}
+      </AuthProvider>
+    );
+    const { result } = renderHook(() => useLogin(makeAuth()), { wrapper });
+    await act(async () => {
+      await result.current.login("a@b.c", "pw");
+    });
+    expect(onError).toHaveBeenCalledWith(firebaseError, {
+      action: "login",
+      code: "auth/too-many-requests",
+      message: "Firebase: Error (auth/too-many-requests).",
+    });
+  });
+
+  it("a throwing observer never breaks or alters the flow", async () => {
+    vi.mocked(signInWithEmailAndPassword).mockRejectedValue(new Error("real problem"));
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <AuthProvider
+        auth={makeAuth()}
+        onError={() => {
+          throw new Error("observer bug");
+        }}
+      >
+        {children}
+      </AuthProvider>
+    );
+    const { result } = renderHook(() => useLogin(makeAuth()), { wrapper });
+    let outcome: Awaited<ReturnType<typeof result.current.login>> | undefined;
+    await act(async () => {
+      outcome = await result.current.login("a@b.c", "pw");
+    });
+    expect(outcome).toMatchObject({ success: false, error: "real problem" });
+    expect(result.current.error).toBe("real problem");
+  });
+
+  it("is not called on success", async () => {
+    vi.mocked(signInWithEmailAndPassword).mockResolvedValue({ user: makeUser() } as never);
+    const onError = vi.fn();
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <AuthProvider auth={makeAuth()} onError={onError}>
+        {children}
+      </AuthProvider>
+    );
+    const { result } = renderHook(() => useLogin(makeAuth()), { wrapper });
+    await act(async () => {
+      await result.current.login("a@b.c", "pw");
+    });
+    expect(onError).not.toHaveBeenCalled();
   });
 });

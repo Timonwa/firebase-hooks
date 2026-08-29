@@ -15,22 +15,22 @@
 import { type Auth, updateProfile } from "firebase/auth";
 import { useState } from "react";
 import {
-  type AuthErrorOptions,
-  type AuthResult,
+  type HookErrorOptions,
+  type HookResult,
   requireCurrentUser,
   useAuthTask,
 } from "./_shared";
 
-export function useUpdateProfile(auth: Auth | null, options: AuthErrorOptions = {}) {
+export function useUpdateProfile(auth: Auth | null, options: HookErrorOptions = {}) {
   const { loading, error, run } = useAuthTask(options);
   const [success, setSuccess] = useState(false);
 
   const update = async (profile: {
     displayName?: string | null;
     photoURL?: string | null;
-  }): Promise<AuthResult> => {
+  }): Promise<HookResult> => {
     setSuccess(false);
-    const result = await run("Failed to update profile", async () => {
+    const result = await run("update-profile", "Failed to update profile", async () => {
       await updateProfile(requireCurrentUser(auth), profile);
       return {};
     });

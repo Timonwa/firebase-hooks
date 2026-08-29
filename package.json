@@ -30,6 +30,16 @@
         "types": "./dist/index.d.cts",
         "default": "./dist/index.cjs"
       }
+    },
+    "./auth": {
+      "import": {
+        "types": "./dist/auth.d.mts",
+        "default": "./dist/auth.mjs"
+      },
+      "require": {
+        "types": "./dist/auth.d.cts",
+        "default": "./dist/auth.cjs"
+      }
     }
   },
   "publishConfig": {

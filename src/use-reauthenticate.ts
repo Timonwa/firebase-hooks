@@ -25,26 +25,26 @@ import {
   reauthenticateWithPopup,
 } from "firebase/auth";
 import {
-  type AuthErrorOptions,
-  type AuthResult,
+  type HookErrorOptions,
+  type HookResult,
   reauthenticateUserWithPassword,
   requireCurrentUser,
   useAuthTask,
 } from "./_shared";
 
-export function useReauthenticate(auth: Auth | null, options: AuthErrorOptions = {}) {
+export function useReauthenticate(auth: Auth | null, options: HookErrorOptions = {}) {
   const { loading, error, run } = useAuthTask(options);
 
-  const reauthenticateWithPassword = (currentPassword: string): Promise<AuthResult> =>
-    run("Reauthentication failed", async () => {
+  const reauthenticateWithPassword = (currentPassword: string): Promise<HookResult> =>
+    run("reauthenticate", "Reauthentication failed", async () => {
       await reauthenticateUserWithPassword(requireCurrentUser(auth), currentPassword);
       return {};
     });
 
   const reauthenticateWithProvider = (
     provider: FirebaseAuthProvider,
-  ): Promise<AuthResult> =>
-    run("Reauthentication failed", async () => {
+  ): Promise<HookResult> =>
+    run("reauthenticate", "Reauthentication failed", async () => {
       await reauthenticateWithPopup(requireCurrentUser(auth), provider);
       return {};
     });

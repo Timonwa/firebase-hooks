@@ -17,13 +17,13 @@
 
 import { type Auth, signOut } from "firebase/auth";
 import {
-  type AuthErrorOptions,
-  type AuthResult,
+  type HookErrorOptions,
+  type HookResult,
   useAuthTask,
   useResolvedConfig,
 } from "./_shared";
 
-interface UseLogoutOptionsProps extends AuthErrorOptions {
+interface UseLogoutOptionsProps extends HookErrorOptions {
   onBeforeSignOut?: (() => void | Promise<void>) | null;
 }
 
@@ -31,8 +31,8 @@ export function useLogout(auth: Auth | null, options: UseLogoutOptionsProps = {}
   const { loading, error, run } = useAuthTask(options);
   const onBeforeSignOut = useResolvedConfig("onBeforeSignOut", options.onBeforeSignOut);
 
-  const logout = (): Promise<AuthResult> =>
-    run("Logout failed", async () => {
+  const logout = (): Promise<HookResult> =>
+    run("logout", "Logout failed", async () => {
       await onBeforeSignOut?.();
       if (auth) await signOut(auth);
       return {};

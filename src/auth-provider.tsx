@@ -30,7 +30,7 @@
 
 import { type ActionCodeSettings, type Auth, onIdTokenChanged, type User } from "firebase/auth";
 import { createContext, type ReactNode, useContext, useEffect, useMemo, useState } from "react";
-import { AuthConfigContext, type OnIdToken } from "./_shared";
+import { AuthConfigContext, type HookErrorContext, type OnIdToken } from "./_shared";
 
 interface AuthContextValueProps {
   firebaseUser: User | null;
@@ -53,6 +53,8 @@ interface AuthProviderProps {
   onBeforeSignOut?: () => void | Promise<void>;
   /** Package-wide default for every emailed link's landing settings. */
   actionCodeSettings?: ActionCodeSettings;
+  /** Fire-and-forget observer every hook failure flows through (logging/analytics). */
+  onError?: (error: unknown, context: HookErrorContext) => void;
   children: ReactNode;
 }
 
@@ -62,6 +64,7 @@ export function AuthProvider({
   onIdToken,
   onBeforeSignOut,
   actionCodeSettings,
+  onError,
   children,
 }: AuthProviderProps) {
   const [firebaseUser, setFirebaseUser] = useState<User | null>(null);
@@ -92,8 +95,8 @@ export function AuthProvider({
   }, [auth]);
 
   const config = useMemo(
-    () => ({ formatErrorMessage, onIdToken, onBeforeSignOut, actionCodeSettings }),
-    [formatErrorMessage, onIdToken, onBeforeSignOut, actionCodeSettings],
+    () => ({ formatErrorMessage, onIdToken, onBeforeSignOut, actionCodeSettings, onError }),
+    [formatErrorMessage, onIdToken, onBeforeSignOut, actionCodeSettings, onError],
   );
 
   return (

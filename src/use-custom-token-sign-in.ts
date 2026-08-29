@@ -21,8 +21,8 @@ import {
   type UserCredential,
 } from "firebase/auth";
 import {
-  type AuthErrorOptions,
-  type AuthResult,
+  type HookErrorOptions,
+  type HookResult,
   type OnIdToken,
   requireAuth,
   runOnIdToken,
@@ -30,7 +30,7 @@ import {
   useResolvedConfig,
 } from "./_shared";
 
-interface UseCustomTokenSignInOptionsProps extends AuthErrorOptions {
+interface UseCustomTokenSignInOptionsProps extends HookErrorOptions {
   onIdToken?: OnIdToken | null;
 }
 
@@ -43,8 +43,8 @@ export function useCustomTokenSignIn(
 
   const signIn = (
     customToken: string,
-  ): Promise<AuthResult<{ user: User; credential: UserCredential }>> =>
-    run("Sign-in failed", async () => {
+  ): Promise<HookResult<{ user: User; credential: UserCredential }>> =>
+    run("custom-token-sign-in", "Sign-in failed", async () => {
       const credential = await signInWithCustomToken(requireAuth(auth), customToken);
       await runOnIdToken(onIdToken, credential.user);
       return { user: credential.user, credential };

@@ -23,14 +23,14 @@
 
 import { type Auth, deleteUser, type User } from "firebase/auth";
 import {
-  type AuthErrorOptions,
-  type AuthResult,
+  type HookErrorOptions,
+  type HookResult,
   reauthenticateUserWithPassword,
   requireCurrentUser,
   useAuthTask,
 } from "./_shared";
 
-interface UseDeleteAccountOptionsProps extends AuthErrorOptions {
+interface UseDeleteAccountOptionsProps extends HookErrorOptions {
   onBeforeDelete?: (user: User) => void | Promise<void>;
 }
 
@@ -44,8 +44,8 @@ export function useDeleteAccount(
     currentPassword,
   }: {
     currentPassword?: string;
-  } = {}): Promise<AuthResult> =>
-    run("Failed to delete account", async () => {
+  } = {}): Promise<HookResult> =>
+    run("delete-account", "Failed to delete account", async () => {
       const user = requireCurrentUser(auth);
       if (currentPassword) await reauthenticateUserWithPassword(user, currentPassword);
       await options.onBeforeDelete?.(user);

@@ -29,8 +29,8 @@ import {
   updateProfile,
 } from "firebase/auth";
 import {
-  type AuthErrorOptions,
-  type AuthResult,
+  type HookErrorOptions,
+  type HookResult,
   type OnIdToken,
   requireAuth,
   runOnIdToken,
@@ -38,7 +38,7 @@ import {
   useResolvedConfig,
 } from "./_shared";
 
-interface UseSignupOptionsProps extends AuthErrorOptions {
+interface UseSignupOptionsProps extends HookErrorOptions {
   sendVerificationEmail?: boolean;
   onIdToken?: OnIdToken | null;
 }
@@ -52,8 +52,8 @@ export function useSignup(auth: Auth | null, options: UseSignupOptionsProps = {}
     email: string,
     password: string,
     profile: { displayName?: string; photoURL?: string } = {},
-  ): Promise<AuthResult<{ user: User; credential: UserCredential }>> =>
-    run("Signup failed", async () => {
+  ): Promise<HookResult<{ user: User; credential: UserCredential }>> =>
+    run("signup", "Signup failed", async () => {
       const credential = await createUserWithEmailAndPassword(
         requireAuth(auth),
         email,
