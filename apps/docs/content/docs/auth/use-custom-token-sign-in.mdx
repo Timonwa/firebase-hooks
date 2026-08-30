@@ -1,0 +1,24 @@
+---
+title: useCustomTokenSignIn
+description: Sign in with a server-minted custom token.
+---
+
+For bridging your own auth system into Firebase. Your server mints the token with the Admin SDK's `createCustomToken`.
+
+```tsx
+const { signIn } = useCustomTokenSignIn(auth);
+
+const { token } = await fetchCustomTokenFromYourApi();
+await signIn(token);
+```
+
+## Returns
+
+`signIn(customToken)` resolves to `{ success: true, user, credential }` or a failure result. Also exposes `loading` and `error`.
+
+## Options
+
+<AutoTypeTable
+  path="../../packages/firebase-hooks/src/auth/use-custom-token-sign-in.ts"
+  name="UseCustomTokenSignInOptionsProps"
+/>

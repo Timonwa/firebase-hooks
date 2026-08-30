@@ -1,0 +1,69 @@
+---
+title: Getting started
+description: Install the package and sign a user in.
+---
+
+## Install
+
+```bash tab="pnpm"
+pnpm add @timonwa/firebase-hooks firebase
+```
+
+```bash tab="npm"
+npm install @timonwa/firebase-hooks firebase
+```
+
+```bash tab="yarn"
+yarn add @timonwa/firebase-hooks firebase
+```
+
+```bash tab="bun"
+bun add @timonwa/firebase-hooks firebase
+```
+
+Requires **React 18 or 19** and **Firebase 11 or 12**. Both are peer dependencies, so you control the versions.
+
+## Sign a user in
+
+Every hook takes your Firebase `Auth` instance as its first argument. There's no global and no hidden singleton.
+
+```tsx
+import { useLogin } from '@timonwa/firebase-hooks/auth';
+import { auth } from '@/lib/firebase'; // your initialised Auth instance
+
+function LoginForm() {
+  const { login, loading, error } = useLogin(auth, {
+    onIdToken: (idToken) => createSession(idToken), // mint your server session here
+  });
+
+  async function onSubmit(email: string, password: string) {
+    const result = await login(email, password);
+    if (result.success) router.push('/dashboard');
+  }
+}
+```
+
+`login` resolves to a result rather than throwing, so a failed sign-in is a value you read.
+
+## Add the provider
+
+Optional, but it's where app-wide defaults live — and it gives you the live user anywhere in the tree.
+
+```tsx
+import { AuthProvider } from '@timonwa/firebase-hooks/auth';
+
+<AuthProvider auth={auth} onIdToken={(idToken) => createSession(idToken)}>
+  {children}
+</AuthProvider>;
+```
+
+Now `useLogin(auth)` inherits the session minting with nothing to wire. Hooks keep working with no provider at all.
+
+<Cards>
+  <Card title="How every hook works" href="/docs/how-hooks-work">
+    The one contract every hook shares.
+  </Card>
+  <Card title="Auth reference" href="/docs/auth/auth-provider">
+    All twenty hooks, grouped by flow.
+  </Card>
+</Cards>

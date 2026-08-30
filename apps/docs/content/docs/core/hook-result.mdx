@@ -1,0 +1,59 @@
+---
+title: HookResult
+description: The shape every action resolves to.
+---
+
+Every action in this package resolves to a `HookResult`. Actions never throw.
+
+```ts
+type HookResult<T> =
+  | ({ success: true } & T)
+  | { success: false; error: string; code: string | null; cause: unknown };
+```
+
+```ts
+import type { HookResult } from '@timonwa/firebase-hooks';
+```
+
+## On success
+
+`success: true` plus whatever that action returns. Sign-ins add `user` and `credential`, where `credential` is Firebase's raw `UserCredential` — nothing is withheld or reshaped.
+
+```tsx
+const result = await login(email, password);
+if (result.success) {
+  result.user; // User
+  result.credential; // UserCredential
+}
+```
+
+Actions with nothing to return resolve to plain `{ success: true }`.
+
+## On failure
+
+| Field   | Type             | What it is                                            |
+| ------- | ---------------- | ----------------------------------------------------- |
+| `error` | `string`         | The message for rendering — raw by default            |
+| `code`  | `string \| null` | Firebase's own code, e.g. `"auth/invalid-credential"` |
+| `cause` | `unknown`        | The complete untouched error                          |
+
+`code` and `cause` are always Firebase's own. Only `error` is ever processed, and only if you opt in — see [Error handling](/docs/guides/error-handling).
+
+## Narrowing
+
+`success` is a discriminant, so TypeScript narrows on it:
+
+```tsx
+const result = await login(email, password);
+if (!result.success) {
+  result.code; // string | null
+  return;
+}
+result.user; // User — narrowed, no optional chaining needed
+```
+
+## Related types
+
+`HookErrorOptions` — the `formatErrorMessage` option every hook accepts.
+
+`HookErrorContext` — what the provider's `onError` observer receives: `{ action, code, message }`.

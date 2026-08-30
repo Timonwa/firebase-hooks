@@ -1,0 +1,137 @@
+@import 'tailwindcss';
+@import 'fumadocs-ui/css/preset.css';
+
+/* Colours are defined here rather than by importing a Fumadocs preset, so the
+   whole palette is one violet-tinted ramp instead of a grey one with an accent
+   bolted on. Neutrals carry a trace of the accent hue (chroma 0.004–0.015),
+   which is what stops the greys reading as flat browser default. */
+@theme {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  --color-fd-background: oklch(99.4% 0.002 285);
+  --color-fd-foreground: oklch(19% 0.014 285);
+  --color-fd-muted: oklch(96.8% 0.004 285);
+  --color-fd-muted-foreground: oklch(52% 0.016 285);
+  --color-fd-popover: oklch(99.4% 0.002 285);
+  --color-fd-popover-foreground: oklch(19% 0.014 285);
+  --color-fd-card: oklch(98.4% 0.003 285);
+  --color-fd-card-foreground: oklch(19% 0.014 285);
+  --color-fd-border: oklch(89% 0.008 285);
+  --color-fd-primary: oklch(56% 0.19 285);
+  --color-fd-primary-foreground: oklch(99% 0.002 285);
+  --color-fd-secondary: oklch(96.4% 0.005 285);
+  --color-fd-secondary-foreground: oklch(24% 0.016 285);
+  --color-fd-accent: oklch(95.4% 0.012 285);
+  --color-fd-accent-foreground: oklch(35% 0.09 285);
+  --color-fd-ring: oklch(56% 0.19 285);
+  --color-fd-overlay: oklch(19% 0.014 285 / 0.25);
+}
+
+.dark {
+  --color-fd-background: oklch(15.2% 0.012 285);
+  --color-fd-foreground: oklch(94% 0.004 285);
+  --color-fd-muted: oklch(21% 0.013 285);
+  --color-fd-muted-foreground: oklch(70.5% 0.014 285);
+  --color-fd-popover: oklch(18.5% 0.013 285);
+  --color-fd-popover-foreground: oklch(92% 0.005 285);
+  --color-fd-card: oklch(18% 0.013 285);
+  --color-fd-card-foreground: oklch(95% 0.004 285);
+  --color-fd-border: oklch(32% 0.016 285);
+  /* Lighter and less saturated than the light-mode violet: the same colour on a
+     dark background fails contrast and vibrates against it. */
+  --color-fd-primary: oklch(75% 0.145 285);
+  --color-fd-primary-foreground: oklch(16% 0.02 285);
+  --color-fd-secondary: oklch(22% 0.014 285);
+  --color-fd-secondary-foreground: oklch(92% 0.005 285);
+  --color-fd-accent: oklch(27% 0.028 285);
+  --color-fd-accent-foreground: oklch(90% 0.02 285);
+  --color-fd-ring: oklch(75% 0.145 285);
+  --color-fd-overlay: oklch(8% 0.01 285 / 0.5);
+}
+
+/* Callout and diff colours. Hue-independent of the theme, so they keep their
+   conventional meaning; defined here because we don't import a colour preset. */
+@theme static {
+  --color-fd-info: oklch(62.3% 0.214 259.815);
+  --color-fd-warning: oklch(76.9% 0.188 70.08);
+  --color-fd-error: oklch(63.7% 0.237 25.331);
+  --color-fd-success: oklch(72.3% 0.219 149.579);
+  --color-fd-idea: oklch(70.5% 0.209 60.849);
+  --color-fd-diff-remove: rgba(200, 10, 100, 0.12);
+  --color-fd-diff-remove-symbol: rgb(230, 10, 100);
+  --color-fd-diff-add: rgba(14, 180, 100, 0.1);
+  --color-fd-diff-add-symbol: rgb(10, 200, 100);
+}
+
+html {
+  scrollbar-gutter: stable;
+}
+
+html > body[data-scroll-locked] {
+  margin-right: 0px !important;
+  --removed-body-scroll-bar-size: 0px !important;
+}
+
+::selection {
+  background-color: var(--color-fd-primary);
+  color: var(--color-fd-primary-foreground);
+}
+
+/* Landing-page surfaces. Defined once here rather than repeated inline, so the
+   radius, border weight and elevation stay one system. Light comes from above:
+   the shadow falls below and the border is lighter at the top. */
+@utility surface {
+  border: 1px solid var(--color-fd-border);
+  border-radius: 0.75rem;
+  background-color: var(--color-fd-card);
+  box-shadow: 0 1px 2px oklch(0% 0 0 / 0.04);
+}
+
+@utility surface-raised {
+  border: 1px solid var(--color-fd-border);
+  border-radius: 0.75rem;
+  background-color: var(--color-fd-card);
+  box-shadow:
+    0 1px 2px oklch(0% 0 0 / 0.04),
+    0 8px 24px -12px oklch(0% 0 0 / 0.12);
+}
+
+/* Icon container. Tinted rather than filled, so six of them in a grid read as
+   quiet supporting marks instead of six competing colour blocks. */
+@utility icon-tile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.625rem;
+  color: var(--color-fd-primary);
+  background-color: color-mix(in oklch, var(--color-fd-primary) 12%, transparent);
+}
+
+/* The hero's dot grid — the one decorative signature on the page. Masked so it
+   fades out rather than ending on a hard edge.
+
+   Each mode gets its own strength: a dark dot on a light background reads far
+   fainter than a light dot on a dark one at the same mix, so a single value
+   leaves the grid invisible in light mode. */
+:root {
+  --dot-grid-color: color-mix(in oklch, var(--color-fd-foreground) 30%, transparent);
+}
+
+.dark {
+  --dot-grid-color: color-mix(in oklch, var(--color-fd-foreground) 20%, transparent);
+}
+
+@utility dot-grid {
+  background-image: radial-gradient(var(--dot-grid-color) 1.2px, transparent 1.2px);
+  background-size: 22px 22px;
+  mask-image: radial-gradient(ellipse 85% 70% at 50% 0%, black, transparent 80%);
+}
+
+/* Geist Mono renders wide at the inherited size; the small step down keeps an
+   inline `useEmailLinkSignIn` from outrunning the prose around it. */
+code {
+  font-size: 0.9em;
+}

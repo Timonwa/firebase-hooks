@@ -1,0 +1,25 @@
+---
+title: useAnonymousSignIn
+description: Guest sessions, upgradeable to a real account later.
+---
+
+```tsx
+const { signIn } = useAnonymousSignIn(auth);
+
+<button onClick={signIn}>Continue as guest</button>;
+```
+
+## Returns
+
+`signIn()` resolves to `{ success: true, user, credential }` or a failure result. Also exposes `loading` and `error`.
+
+## Upgrading a guest
+
+The resulting user can be upgraded to a real account **without losing their data** — pair with [`useLinkProvider`](/docs/auth/use-link-provider).
+
+## Options
+
+<AutoTypeTable
+  path="../../packages/firebase-hooks/src/auth/use-anonymous-sign-in.ts"
+  name="UseAnonymousSignInOptionsProps"
+/>

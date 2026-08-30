@@ -1,0 +1,18 @@
+---
+title: useUpdateProfile
+description: Display name and photo URL.
+---
+
+```tsx
+const { update, loading } = useUpdateProfile(auth);
+
+await update({ displayName: fullName, photoURL: avatarUrl });
+```
+
+## Returns
+
+`update({ displayName?, photoURL? })` resolves to `{ success: true }` or a failure result. Both fields accept `null` to clear them. Also exposes `loading`, `error`, and `success`.
+
+## Notes
+
+No reauthentication needed — Firebase treats profile fields as non-sensitive.

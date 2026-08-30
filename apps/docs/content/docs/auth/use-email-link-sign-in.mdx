@@ -1,0 +1,42 @@
+---
+title: useEmailLinkSignIn
+description: Passwordless magic-link sign-in, with no window.prompt.
+---
+
+Two steps across two page loads: send the link, then complete the sign-in when the user clicks it.
+
+```tsx
+// Request page
+const { sendLink } = useEmailLinkSignIn(auth, {
+  actionCodeSettings: { url: `${origin}/auth/callback`, handleCodeInApp: true },
+});
+await sendLink(email);
+
+// Callback page
+const { completeSignIn } = useEmailLinkSignIn(auth, { onIdToken: createSession });
+const result = await completeSignIn(window.location.href);
+if (!result.success && result.needsEmail) showEmailConfirmField();
+```
+
+## Returns
+
+`sendLink(email)` emails the link and remembers the address in `localStorage`.
+
+`completeSignIn(url, email?)` resolves to `{ success: true, user, credential }` or a failure result.
+
+Also exposes `loading` and `error`.
+
+## When the link opens on another device
+
+The stored address won't be there. Rather than calling `window.prompt`, the result carries `needsEmail: true` — render your own input and call `completeSignIn` again with the address.
+
+```tsx
+const result = await completeSignIn(url, confirmedEmail);
+```
+
+## Options
+
+<AutoTypeTable
+  path="../../packages/firebase-hooks/src/auth/use-email-link-sign-in.ts"
+  name="UseEmailLinkSignInOptionsProps"
+/>

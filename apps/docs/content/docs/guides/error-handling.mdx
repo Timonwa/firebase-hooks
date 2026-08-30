@@ -1,0 +1,92 @@
+---
+title: Error handling
+description: Failures are values, Firebase's own data is never withheld, and message formatting is opt-in.
+---
+
+Actions never throw. A failed call resolves to a result you read:
+
+```ts
+{
+  success: false,
+  error: string,        // processed message — raw by default
+  code: string | null,  // Firebase's raw code: "auth/invalid-credential"
+  cause: unknown        // the complete untouched error
+}
+```
+
+`code` and `cause` are always Firebase's own. Only `error` is ever processed, and only if you ask for it.
+
+## Branching on codes
+
+The most precise option is to ignore messages entirely and read the code:
+
+```tsx
+const result = await login(email, password);
+if (!result.success && result.code === 'auth/too-many-requests') startCooldown();
+```
+
+## Formatting messages
+
+With no configuration, `error` is the message Firebase produced. Formatting is opt-in through `formatFirebaseError`, which resolves in a fixed order:
+
+1. A match in your `messages` map wins.
+2. An unmapped Firebase error keeps Firebase's own words with the framing stripped — `"Firebase: The email address is badly formatted. (auth/invalid-email)."` becomes `"The email address is badly formatted."`
+3. Anything else passes through raw, so an error you threw from your own `onIdToken` arrives exactly as you threw it.
+
+```ts
+import { formatFirebaseError } from '@timonwa/firebase-hooks';
+import { AUTH_ERROR_MESSAGES } from '@timonwa/firebase-hooks/auth';
+
+formatFirebaseError(error, { messages: AUTH_ERROR_MESSAGES });
+```
+
+If your formatter throws, `error` falls back to the raw message — the failure still reaches you.
+
+## The shipped catalogue
+
+`AUTH_ERROR_MESSAGES` is a curated `auth/*` catalogue written to be security-conscious: credential failures never reveal whether an account exists.
+
+Apply it globally:
+
+```tsx
+<AuthProvider
+  auth={auth}
+  formatErrorMessage={(e) => formatFirebaseError(e, { messages: AUTH_ERROR_MESSAGES })}
+>
+  {children}
+</AuthProvider>
+```
+
+Or spread and override it for your own voice or another language:
+
+```ts
+formatFirebaseError(e, {
+  messages: {
+    ...AUTH_ERROR_MESSAGES,
+    'auth/invalid-credential': 'Email ou mot de passe incorrect.',
+  },
+});
+```
+
+## Observing every failure
+
+The provider's `onError` observer sees every failure from every hook — for logging and analytics.
+
+```tsx
+<AuthProvider
+  auth={auth}
+  onError={(error, { action, code }) => track('auth_error', { action, code })}
+>
+  {children}
+</AuthProvider>
+```
+
+`action` is a stable id such as `"login"` or `"update-password"`. It's fire-and-forget: a throwing observer never affects the flow.
+
+## Reading a code yourself
+
+```ts
+import { getFirebaseErrorCode } from '@timonwa/firebase-hooks';
+
+getFirebaseErrorCode(error); // "auth/invalid-email" | null
+```

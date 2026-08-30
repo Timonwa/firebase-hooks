@@ -1,0 +1,33 @@
+---
+title: useVerifyEmail
+description: Apply the emailed verification code on mount.
+---
+
+Unlike the other hooks, this one runs on mount and reports a status the page renders from. Pass the `oobCode` from the URL, or `null` while you're still reading it.
+
+```tsx
+const { status, error } = useVerifyEmail(auth, searchParams.get('oobCode'), {
+  onVerified: refreshSession,
+});
+
+if (status === 'processing') return <Spinner />;
+if (status === 'failed') return <ErrorState message={error} />;
+return <SuccessState />;
+```
+
+## Returns
+
+`status` is `"processing"`, `"success"`, or `"failed"`. `error` carries the message on failure.
+
+## Notes
+
+Guarded against React Strict Mode's double effect, because the code is single-use — without that guard the second run always fails.
+
+After verifying, the current user is reloaded and the token refreshed so `emailVerified` propagates, then `onVerified` runs.
+
+## Options
+
+<AutoTypeTable
+  path="../../packages/firebase-hooks/src/auth/use-verify-email.ts"
+  name="UseVerifyEmailOptionsProps"
+/>

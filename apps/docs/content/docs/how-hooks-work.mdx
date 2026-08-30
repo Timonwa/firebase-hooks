@@ -1,0 +1,69 @@
+---
+title: How every hook works
+description: One contract, so learning one hook is learning them all.
+---
+
+Every hook in this package follows the same shape. Once you've used one, the rest are predictable.
+
+## `auth` is the first argument
+
+Your Firebase `Auth` instance, or `null` while it initialises. No global, no hidden singleton.
+
+```tsx
+const { login } = useLogin(auth);
+```
+
+Passing `null` is always safe. State hooks report signed-out/loading, and actions fail cleanly with `{ success: false, error, code, cause }` instead of throwing — which matters during SSR hydration and while Firebase boots.
+
+## Every action resolves to a result
+
+Actions never throw. Each resolves to a `HookResult`:
+
+```ts
+{ success: true, ...data }
+// or
+{ success: false, error, code, cause }
+```
+
+The hook's own `error` state carries the same message for rendering, and `loading` tracks the action. Some hooks also expose `success` and `resetState`.
+
+```tsx
+const result = await login(email, password);
+if (result.success) router.push('/dashboard');
+else if (result.code === 'auth/too-many-requests') startCooldown();
+```
+
+See [Error handling](/docs/guides/error-handling) for the full model.
+
+## `onIdToken` runs after a successful sign-in
+
+With a freshly minted token, so you can trade it for a server session. Throwing inside it aborts the flow, and the error surfaces like any other failure.
+
+```tsx
+const { login } = useLogin(auth, {
+  onIdToken: (idToken, user) => createSession(idToken),
+});
+```
+
+See [Server sessions](/docs/guides/server-sessions).
+
+## `currentPassword` triggers reauthentication
+
+Firebase rejects sensitive operations on a stale sign-in. Pass `currentPassword` to [`useUpdatePassword`](/docs/auth/use-update-password), [`useUpdateEmail`](/docs/auth/use-update-email), or [`useDeleteAccount`](/docs/auth/use-delete-account) and the hook reauthenticates first.
+
+Omit it — OAuth-only accounts have no password — and `auth/requires-recent-login` reaches you through `code` and `cause`, so you can run your own policy with [`useReauthenticate`](/docs/auth/use-reauthenticate).
+
+## Provider options are defaults, hook options win
+
+`onIdToken`, `onBeforeSignOut`, `actionCodeSettings`, `formatErrorMessage`, and the `onError` observer can all be set once on [`AuthProvider`](/docs/auth/auth-provider).
+
+A hook's own option overrides the provider, and an explicit `null` opts that flow out entirely.
+
+```tsx
+<AuthProvider auth={auth} onIdToken={createSession}>
+  {children}
+</AuthProvider>;
+
+const { login } = useLogin(auth); // inherits session minting
+const { login } = useLogin(auth, { onIdToken: null }); // opts out
+```

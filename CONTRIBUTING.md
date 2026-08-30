@@ -11,6 +11,8 @@ pnpm install
 pnpm verify   # typecheck, lint, test, build, publint, attw — the same gate CI runs
 ```
 
+This is a pnpm workspace. The published package lives in `packages/firebase-hooks/`, and every root script delegates to it, so `pnpm test` and `pnpm build` work from the repo root. **Paths below are relative to `packages/firebase-hooks/`.**
+
 ## What gets accepted
 
 - **Firebase client-SDK flows any React app can use.** The Services table in the README tracks what's live and what's next; a new service starts as its own folder and subpath entry. Nothing tied to a product or a framework (no `next/*` imports). `firebase` and `react` stay peer dependencies; the Admin SDK is server-side and out of scope.
@@ -22,9 +24,10 @@ pnpm verify   # typecheck, lint, test, build, publint, attw — the same gate CI
 
 - **One folder per service** (`src/core/`, `src/auth/`, later `src/firestore/`, `src/storage/`), each with its own `index.ts` entry barrel. **One file per hook**, kebab-cased after it — `src/auth/use-login.ts`. Start the file with a `"use client"` directive and a JSDoc block; the JSDoc is what editors show, so keep it agreeing with the README. Internals a service shares live in that folder's `_shared.ts` and never reach the barrel.
 - **Follow the shared contract.** `auth: Auth | null` first argument; actions resolve to `HookResult` and never throw (`useAuthTask` gives you the skeleton); sensitive operations reauthenticate first.
+- **Options go in an exported `Use<Name>OptionsProps` interface** extending `HookErrorOptions`, with a TSDoc line on every field it declares itself (and `@defaultValue` where there is one). The docs site generates its options table from that interface, so an undocumented field ships an empty cell. Exported for the generator's sake — keep it out of the barrel, so the published types don't change.
 - **Export it explicitly** from its service's entry barrel (`src/auth/index.ts` for auth), one line per file, alphabetical. The root entry (`src/core/index.ts`) carries only the service-agnostic core — nothing service-specific is ever added to it; a new service gets a new folder + subpath entry.
-- **Document it in `README.md` in the same change** — until the docs site ships, the README's [hook reference](README.md#hook-reference) is the only documentation. Add the hook to its group's table and give it a section (signature, options with defaults, example), alphabetical within the group.
-- **A hook ships with its test file beside it** (`src/auth/use-login.test.tsx`), importing through that service's barrel. Shared fakes and builders live in that folder's `_test-helpers` file (never exported from the barrel); cross-cutting behaviour — the error model, formatter precedence, global config inheritance, the `onError` observer — lives in `src/auth/auth-provider.test.tsx`; the `firebase/auth` mock lives in the root `__mocks__/` directory, activated per file with a bare `vi.mock("firebase/auth")`. What's under test is the hook's orchestration (ordering, callbacks, error paths), not Firebase. Cover the edges: the null `auth`, the throwing callback, the signed-out user.
+- **Document it in the same change** — add a page under `apps/docs/content/docs/auth/` and list it in that folder's `meta.json`. Follow the shape of the existing pages: prose intro, example, `## Returns`, then `<AutoTypeTable>` for the options. The table generates from the option interface's TSDoc, so document each field there rather than hand-writing a table.
+- **A hook ships with its test file beside it** (`src/auth/use-login.test.tsx`), importing through that service's barrel. Shared fakes and builders live in that folder's `_test-helpers` file (never exported from the barrel); cross-cutting behaviour — the error model, formatter precedence, global config inheritance, the `onError` observer — lives in `src/auth/auth-provider.test.tsx`; the `firebase/auth` mock lives in the package's `__mocks__/` directory, activated per file with a bare `vi.mock("firebase/auth")`. What's under test is the hook's orchestration (ordering, callbacks, error paths), not Firebase. Cover the edges: the null `auth`, the throwing callback, the signed-out user.
 
 ## Submitting a change
 

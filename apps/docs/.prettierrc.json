@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json.schemastore.org/prettierrc",
+  "singleQuote": true,
+  "semi": true,
+  "trailingComma": "all",
+  "printWidth": 90,
+  "plugins": ["prettier-plugin-tailwindcss"],
+  "overrides": [
+    {
+      "files": "*.mdx",
+      "options": {
+        "proseWrap": "never"
+      }
+    }
+  ]
+}

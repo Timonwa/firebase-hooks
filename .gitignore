@@ -1,6 +1,11 @@
 node_modules/
 dist/
 coverage/
+.next/
+.source/
 *.tsbuildinfo
 .DS_Store
 .turbo/
+
+# Generated at publish from the root README — one source of truth.
+packages/firebase-hooks/README.md

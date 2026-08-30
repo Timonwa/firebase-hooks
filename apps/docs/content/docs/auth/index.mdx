@@ -1,0 +1,70 @@
+---
+title: Auth
+description: Twenty hooks covering every Firebase Auth client flow, plus the provider that holds them together.
+---
+
+Every Firebase Auth client flow, one hook each. They all follow the [same contract](/docs/how-hooks-work), so learning one is learning the rest.
+
+```ts
+import {
+  AuthProvider,
+  useLogin,
+  AUTH_ERROR_MESSAGES,
+} from '@timonwa/firebase-hooks/auth';
+```
+
+## Start here
+
+<Cards>
+  <Card title="AuthProvider / useAuth" href="/docs/auth/auth-provider">
+    The live user and custom claims for your whole tree, and the one place app-wide
+    defaults live. Optional — hooks work without it.
+  </Card>
+  <Card title="useLogin" href="/docs/auth/use-login">
+    Email/password sign-in. The shortest path to seeing the result shape and `onIdToken`
+    in action.
+  </Card>
+</Cards>
+
+## Signing in and out
+
+| Hook | What it does |
+| --- | --- |
+| [`useLogin`](/docs/auth/use-login) | Email/password sign-in |
+| [`useSignup`](/docs/auth/use-signup) | Signup with optional profile and verification email |
+| [`useLogout`](/docs/auth/use-logout) | Sign-out, your server session cleared first |
+| [`useOAuthSignIn`](/docs/auth/use-oauth-sign-in) | Any provider — popup or redirect, both halves handled |
+| [`useEmailLinkSignIn`](/docs/auth/use-email-link-sign-in) | Passwordless magic link, no `window.prompt` |
+| [`usePhoneSignIn`](/docs/auth/use-phone-sign-in) | SMS code with a managed reCAPTCHA verifier |
+| [`useAnonymousSignIn`](/docs/auth/use-anonymous-sign-in) | Guest sessions, upgradeable later |
+| [`useCustomTokenSignIn`](/docs/auth/use-custom-token-sign-in) | Server-minted custom token |
+
+## Passwords
+
+| Hook | What it does |
+| --- | --- |
+| [`useSendPasswordResetEmail`](/docs/auth/use-send-password-reset-email) | The forgot-password email |
+| [`useConfirmPasswordReset`](/docs/auth/use-confirm-password-reset) | Complete a reset from the emailed code |
+| [`useUpdatePassword`](/docs/auth/use-update-password) | Change it, reauthentication built in |
+
+## Email
+
+| Hook | What it does |
+| --- | --- |
+| [`useSendEmailVerification`](/docs/auth/use-send-email-verification) | The resend-verification button |
+| [`useVerifyEmail`](/docs/auth/use-verify-email) | Apply the emailed code on mount |
+| [`useUpdateEmail`](/docs/auth/use-update-email) | Change it via verify-before-update |
+
+## Account and linking
+
+| Hook | What it does |
+| --- | --- |
+| [`useUpdateProfile`](/docs/auth/use-update-profile) | Display name and photo URL |
+| [`useDeleteAccount`](/docs/auth/use-delete-account) | Delete, with reauth and server cleanup |
+| [`useReauthenticate`](/docs/auth/use-reauthenticate) | The recent-sign-in check, standalone |
+| [`useLinkProvider`](/docs/auth/use-link-provider) | Add a sign-in method — upgrade a guest |
+| [`useUnlinkProvider`](/docs/auth/use-unlink-provider) | Remove a sign-in method |
+
+## Not covered yet
+
+Multi-factor auth (TOTP and SMS enrolment/resolution) and multi-tenancy are planned for a later minor. The Admin SDK is server-side and out of scope — see [Compatibility](/docs/guides/compatibility).

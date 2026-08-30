@@ -1,0 +1,36 @@
+---
+title: useUpdateEmail
+description: Change the email via verify-before-update.
+---
+
+```tsx
+const { update, success } = useUpdateEmail(auth);
+
+await update({ newEmail, currentPassword }); // password account
+await update({ newEmail }); // OAuth account
+
+{
+  success && <p>Check {newEmail} to confirm the change.</p>;
+}
+```
+
+## Returns
+
+`update({ newEmail, currentPassword? })` resolves to `{ success: true }` or a failure result. Also exposes `loading`, `error`, and `success`.
+
+## `success` means "email sent"
+
+This uses Firebase's `verifyBeforeUpdateEmail`. Firebase mails a verification link to the **new** address, and the change lands only when it's clicked.
+
+So `success` means the verification email went out — not that the email changed. Word your UI accordingly.
+
+## Reauthentication
+
+Pass `currentPassword` for automatic reauthentication. Omit it for OAuth-only accounts, which have no password, and handle a stale session with [`useReauthenticate`](/docs/auth/use-reauthenticate).
+
+## Options
+
+<AutoTypeTable
+  path="../../packages/firebase-hooks/src/auth/use-update-email.ts"
+  name="UseUpdateEmailOptionsProps"
+/>

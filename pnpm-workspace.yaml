@@ -1,6 +1,11 @@
+packages:
+  - "packages/*"
+  - "apps/*"
+
 # pnpm blocks dependency lifecycle scripts by default — allowlist only what must build.
 allowBuilds:
   "@firebase/util": true
+  esbuild: true # fetches its platform binary on install; Next/fumadocs won't build without it
   protobufjs: true
 minimumReleaseAgeExclude:
   - '@timonwa/app-utilities@0.4.0'
