@@ -9,7 +9,7 @@ const { deleteAccount, loading, error } = useDeleteAccount(auth, {
 });
 
 const result = await deleteAccount({ currentPassword });
-if (result.success) router.push("/goodbye");
+if (result.success) router.push('/goodbye');
 ```
 
 ## Returns
@@ -26,4 +26,7 @@ Deletion requires a recent sign-in. Pass `currentPassword` for automatic reauthe
 
 ## Options
 
-<AutoTypeTable path="../../packages/firebase-hooks/src/auth/use-delete-account.ts" name="UseDeleteAccountOptionsProps" />
+<AutoTypeTable
+  path="../../packages/firebase-hooks/src/auth/use-delete-account.ts"
+  name="UseDeleteAccountOptionsProps"
+/>

@@ -7,7 +7,7 @@ description: Add a sign-in method to the current user.
 const { linkWithProvider, linkWithPassword } = useLinkProvider(auth);
 
 await linkWithProvider(new GoogleAuthProvider()); // guest -> Google account
-await linkWithPassword(email, password);          // guest -> email/password account
+await linkWithPassword(email, password); // guest -> email/password account
 ```
 
 ## Returns

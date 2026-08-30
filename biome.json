@@ -4,14 +4,11 @@
     "includes": [
       "packages/*/src/**/*.{ts,tsx}",
       "packages/*/*.{ts,json}",
-      "apps/*/src/**/*.{ts,tsx}",
-      "apps/*/*.{ts,json}",
       "*.ts",
       "*.json",
       "!**/dist",
-      "!**/.next",
-      "!**/.source",
-      "!**/node_modules"
+      "!**/node_modules",
+      "!apps"
     ]
   },
   "formatter": {

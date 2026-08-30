@@ -12,7 +12,7 @@ type HookResult<T> =
 ```
 
 ```ts
-import type { HookResult } from "@timonwa/firebase-hooks";
+import type { HookResult } from '@timonwa/firebase-hooks';
 ```
 
 ## On success
@@ -22,7 +22,7 @@ import type { HookResult } from "@timonwa/firebase-hooks";
 ```tsx
 const result = await login(email, password);
 if (result.success) {
-  result.user;       // User
+  result.user; // User
   result.credential; // UserCredential
 }
 ```
@@ -31,11 +31,11 @@ Actions with nothing to return resolve to plain `{ success: true }`.
 
 ## On failure
 
-| Field | Type | What it is |
-| --- | --- | --- |
-| `error` | `string` | The message for rendering — raw by default |
-| `code` | `string \| null` | Firebase's own code, e.g. `"auth/invalid-credential"` |
-| `cause` | `unknown` | The complete untouched error |
+| Field   | Type             | What it is                                            |
+| ------- | ---------------- | ----------------------------------------------------- |
+| `error` | `string`         | The message for rendering — raw by default            |
+| `code`  | `string \| null` | Firebase's own code, e.g. `"auth/invalid-credential"` |
+| `cause` | `unknown`        | The complete untouched error                          |
 
 `code` and `cause` are always Firebase's own. Only `error` is ever processed, and only if you opt in — see [Error handling](/docs/guides/error-handling).
 
@@ -46,10 +46,10 @@ Actions with nothing to return resolve to plain `{ success: true }`.
 ```tsx
 const result = await login(email, password);
 if (!result.success) {
-  result.code;  // string | null
+  result.code; // string | null
   return;
 }
-result.user;    // User — narrowed, no optional chaining needed
+result.user; // User — narrowed, no optional chaining needed
 ```
 
 ## Related types

@@ -6,17 +6,23 @@ description: Twenty hooks covering every Firebase Auth client flow, plus the pro
 Every Firebase Auth client flow, one hook each. They all follow the [same contract](/docs/how-hooks-work), so learning one is learning the rest.
 
 ```ts
-import { AuthProvider, useLogin, AUTH_ERROR_MESSAGES } from "@timonwa/firebase-hooks/auth";
+import {
+  AuthProvider,
+  useLogin,
+  AUTH_ERROR_MESSAGES,
+} from '@timonwa/firebase-hooks/auth';
 ```
 
 ## Start here
 
 <Cards>
   <Card title="AuthProvider / useAuth" href="/docs/auth/auth-provider">
-    The live user and custom claims for your whole tree, and the one place app-wide defaults live. Optional — hooks work without it.
+    The live user and custom claims for your whole tree, and the one place app-wide
+    defaults live. Optional — hooks work without it.
   </Card>
   <Card title="useLogin" href="/docs/auth/use-login">
-    Email/password sign-in. The shortest path to seeing the result shape and `onIdToken` in action.
+    Email/password sign-in. The shortest path to seeing the result shape and `onIdToken`
+    in action.
   </Card>
 </Cards>
 

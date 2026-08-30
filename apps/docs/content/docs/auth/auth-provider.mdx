@@ -40,7 +40,7 @@ Set these once and every hook below inherits them:
   onBeforeSignOut={() => clearSession()}
   actionCodeSettings={{ url: `${origin}/auth/action`, handleCodeInApp: true }}
   formatErrorMessage={(e) => formatFirebaseError(e, { messages: AUTH_ERROR_MESSAGES })}
-  onError={(error, { action, code }) => track("auth_error", { action, code })}
+  onError={(error, { action, code }) => track('auth_error', { action, code })}
 >
   {children}
 </AuthProvider>

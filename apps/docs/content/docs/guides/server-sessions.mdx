@@ -12,8 +12,8 @@ Firebase signs users in on the client. If your server needs to know who they are
 ```tsx
 const { login } = useLogin(auth, {
   onIdToken: async (idToken, user) => {
-    await fetch("/api/session", {
-      method: "POST",
+    await fetch('/api/session', {
+      method: 'POST',
       body: JSON.stringify({ idToken }),
     });
   },
@@ -30,7 +30,7 @@ Every sign-in hook accepts it: [`useLogin`](/docs/auth/use-login), [`useSignup`]
 
 ```tsx
 const { logout } = useLogout(auth, {
-  onBeforeSignOut: () => fetch("/api/session", { method: "DELETE" }),
+  onBeforeSignOut: () => fetch('/api/session', { method: 'DELETE' }),
 });
 ```
 

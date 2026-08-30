@@ -21,42 +21,42 @@ export default function HomePage() {
     <main className="flex flex-1 flex-col">
       <section className="mx-auto flex w-full max-w-5xl flex-col gap-8 px-6 pt-20 pb-16 sm:pt-28">
         <div className="flex flex-col gap-5">
-          <span className="w-fit rounded-full border border-fd-border bg-fd-card px-3 py-1 text-xs font-medium text-fd-muted-foreground">
+          <span className="border-fd-border bg-fd-card text-fd-muted-foreground w-fit rounded-full border px-3 py-1 text-xs font-medium">
             v{packageVersion} · Auth available
           </span>
           <h1 className="max-w-3xl text-4xl font-semibold tracking-tight text-balance sm:text-5xl">
             Typed React hooks for Firebase, one hook per flow
           </h1>
-          <p className="max-w-2xl text-lg text-pretty text-fd-muted-foreground">
+          <p className="text-fd-muted-foreground max-w-2xl text-lg text-pretty">
             Each hook runs a whole flow end to end and holds its own loading, error, and
-            success state. Zero dependencies — <code>firebase</code> and <code>react</code>{' '}
-            stay peers.
+            success state. Zero dependencies — <code>firebase</code> and{' '}
+            <code>react</code> stay peers.
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
           <Link
             href="/docs"
-            className="rounded-lg bg-fd-primary px-5 py-2.5 text-sm font-medium text-fd-primary-foreground transition-opacity hover:opacity-90"
+            className="bg-fd-primary text-fd-primary-foreground rounded-lg px-5 py-2.5 text-sm font-medium transition-opacity hover:opacity-90"
           >
             Read the docs
           </Link>
           <Link
             href="/docs/getting-started"
-            className="rounded-lg border border-fd-border px-5 py-2.5 text-sm font-medium transition-colors hover:bg-fd-accent"
+            className="border-fd-border hover:bg-fd-accent rounded-lg border px-5 py-2.5 text-sm font-medium transition-colors"
           >
             Getting started
           </Link>
           <a
             href={npmUrl}
             rel="noreferrer noopener"
-            className="px-2 py-2.5 text-sm font-medium text-fd-muted-foreground transition-colors hover:text-fd-foreground"
+            className="text-fd-muted-foreground hover:text-fd-foreground px-2 py-2.5 text-sm font-medium transition-colors"
           >
             {packageName} ↗
           </a>
         </div>
 
-        <pre className="mt-4 overflow-x-auto rounded-xl border border-fd-border bg-fd-card p-5 text-sm">
+        <pre className="border-fd-border bg-fd-card mt-4 overflow-x-auto rounded-xl border p-5 text-sm">
           <code className="font-mono">
             <span className="text-fd-muted-foreground">
               {'// mint your server session in the same call'}
@@ -73,10 +73,10 @@ export default function HomePage() {
         {HIGHLIGHTS.map((item) => (
           <div
             key={item.title}
-            className="rounded-xl border border-fd-border bg-fd-card p-5"
+            className="border-fd-border bg-fd-card rounded-xl border p-5"
           >
             <h2 className="mb-2 text-sm font-semibold">{item.title}</h2>
-            <p className="text-sm text-pretty text-fd-muted-foreground">{item.body}</p>
+            <p className="text-fd-muted-foreground text-sm text-pretty">{item.body}</p>
           </div>
         ))}
       </section>

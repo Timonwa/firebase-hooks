@@ -7,7 +7,7 @@ export function baseOptions(): BaseLayoutProps {
       title: (
         <span className="inline-flex items-baseline gap-2">
           <span className="font-medium">{appName}</span>
-          <span className="rounded-full border px-1.5 py-0.5 text-[10px] leading-none text-fd-muted-foreground">
+          <span className="text-fd-muted-foreground rounded-full border px-1.5 py-0.5 text-[10px] leading-none">
             v{packageVersion}
           </span>
         </span>

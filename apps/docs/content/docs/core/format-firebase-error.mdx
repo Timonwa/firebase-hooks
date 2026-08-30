@@ -6,7 +6,7 @@ description: Opt-in message formatting, and reading a raw Firebase error code.
 Both live on the root import, because every service shares them.
 
 ```ts
-import { formatFirebaseError, getFirebaseErrorCode } from "@timonwa/firebase-hooks";
+import { formatFirebaseError, getFirebaseErrorCode } from '@timonwa/firebase-hooks';
 ```
 
 ## formatFirebaseError
@@ -39,7 +39,7 @@ getFirebaseErrorCode(error: unknown): string | null
 Pulls the code out of an unknown error, or returns `null` if it isn't a Firebase error.
 
 ```ts
-if (getFirebaseErrorCode(err) === "auth/too-many-requests") startCooldown();
+if (getFirebaseErrorCode(err) === 'auth/too-many-requests') startCooldown();
 ```
 
 You rarely need it on results — `code` is already there. It's for errors caught elsewhere.
@@ -49,7 +49,7 @@ You rarely need it on results — `code` is already there. It's for errors caugh
 Ships with the auth import, not the root:
 
 ```ts
-import { AUTH_ERROR_MESSAGES } from "@timonwa/firebase-hooks/auth";
+import { AUTH_ERROR_MESSAGES } from '@timonwa/firebase-hooks/auth';
 ```
 
 A curated `auth/*` catalogue written to be security-conscious — credential failures never reveal whether an account exists.
@@ -60,7 +60,7 @@ Spread and override it for your own voice or another language:
 formatFirebaseError(e, {
   messages: {
     ...AUTH_ERROR_MESSAGES,
-    "auth/invalid-credential": "Email ou mot de passe incorrect.",
+    'auth/invalid-credential': 'Email ou mot de passe incorrect.',
   },
 });
 ```

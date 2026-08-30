@@ -8,7 +8,9 @@ Sends, or re-sends, the verification email to the signed-in user.
 ```tsx
 const { send, loading, success } = useSendEmailVerification(auth);
 
-<button onClick={send} disabled={loading}>Resend verification email</button>;
+<button onClick={send} disabled={loading}>
+  Resend verification email
+</button>;
 ```
 
 ## Returns
@@ -21,4 +23,7 @@ Pair with a cooldown to stop rapid re-sends — Firebase rate-limits these, and 
 
 ## Options
 
-<AutoTypeTable path="../../packages/firebase-hooks/src/auth/use-send-email-verification.ts" name="UseSendEmailVerificationOptionsProps" />
+<AutoTypeTable
+  path="../../packages/firebase-hooks/src/auth/use-send-email-verification.ts"
+  name="UseSendEmailVerificationOptionsProps"
+/>

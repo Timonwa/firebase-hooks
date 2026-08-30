@@ -3,19 +3,22 @@ title: Guides
 description: Task-focused walkthroughs for the parts of auth that span more than one hook.
 ---
 
-The [reference](/docs/core/hook-result) tells you what each hook returns. These guides cover the decisions that sit *across* hooks — the things you have to get right once and then stop thinking about.
+The [reference](/docs/core/hook-result) tells you what each hook returns. These guides cover the decisions that sit _across_ hooks — the things you have to get right once and then stop thinking about.
 
 Read them when you hit the problem, not upfront.
 
 <Cards>
   <Card title="Server sessions" href="/docs/guides/server-sessions">
-    Trade a fresh ID token for your own session cookie, and tear it down before sign-out. Start here if your backend needs to know who the user is.
+    Trade a fresh ID token for your own session cookie, and tear it down before sign-out.
+    Start here if your backend needs to know who the user is.
   </Card>
   <Card title="Error handling" href="/docs/guides/error-handling">
-    Why actions return failures instead of throwing, how to branch on Firebase codes, and how to opt into message formatting or replace the wording entirely.
+    Why actions return failures instead of throwing, how to branch on Firebase codes, and
+    how to opt into message formatting or replace the wording entirely.
   </Card>
   <Card title="SSR and server components" href="/docs/guides/ssr">
-    Where the client boundary is, why passing a null `auth` is always safe, and how to avoid flashing a signed-out UI on every load.
+    Where the client boundary is, why passing a null `auth` is always safe, and how to
+    avoid flashing a signed-out UI on every load.
   </Card>
   <Card title="Compatibility" href="/docs/guides/compatibility">
     Which frameworks these run in, what works on React Native, and what isn't covered yet.

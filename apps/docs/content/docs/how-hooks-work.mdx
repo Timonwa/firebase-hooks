@@ -29,8 +29,8 @@ The hook's own `error` state carries the same message for rendering, and `loadin
 
 ```tsx
 const result = await login(email, password);
-if (result.success) router.push("/dashboard");
-else if (result.code === "auth/too-many-requests") startCooldown();
+if (result.success) router.push('/dashboard');
+else if (result.code === 'auth/too-many-requests') startCooldown();
 ```
 
 See [Error handling](/docs/guides/error-handling) for the full model.
@@ -64,6 +64,6 @@ A hook's own option overrides the provider, and an explicit `null` opts that flo
   {children}
 </AuthProvider>;
 
-const { login } = useLogin(auth);              // inherits session minting
+const { login } = useLogin(auth); // inherits session minting
 const { login } = useLogin(auth, { onIdToken: null }); // opts out
 ```

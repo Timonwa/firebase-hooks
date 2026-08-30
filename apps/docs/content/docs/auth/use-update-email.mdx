@@ -7,9 +7,11 @@ description: Change the email via verify-before-update.
 const { update, success } = useUpdateEmail(auth);
 
 await update({ newEmail, currentPassword }); // password account
-await update({ newEmail });                  // OAuth account
+await update({ newEmail }); // OAuth account
 
-{success && <p>Check {newEmail} to confirm the change.</p>}
+{
+  success && <p>Check {newEmail} to confirm the change.</p>;
+}
 ```
 
 ## Returns
@@ -28,4 +30,7 @@ Pass `currentPassword` for automatic reauthentication. Omit it for OAuth-only ac
 
 ## Options
 
-<AutoTypeTable path="../../packages/firebase-hooks/src/auth/use-update-email.ts" name="UseUpdateEmailOptionsProps" />
+<AutoTypeTable
+  path="../../packages/firebase-hooks/src/auth/use-update-email.ts"
+  name="UseUpdateEmailOptionsProps"
+/>

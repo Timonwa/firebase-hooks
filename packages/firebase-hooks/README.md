@@ -3,10 +3,7 @@
   <b>Typed React hooks for Firebase — one hook per flow, with its state, errors, and callbacks handled.</b>
   <br/><br/>
 
-<a href="https://www.npmjs.com/package/@timonwa/firebase-hooks"><img alt="npm" src="https://img.shields.io/npm/v/%40timonwa%2Ffirebase-hooks?style=flat-square&label=npm" /></a>
-<a href="./LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue?style=flat-square" /></a>
-<a href="../../CONTRIBUTING.md"><img alt="PRs welcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen?style=flat-square" /></a>
-<a href="https://www.timonwa.com/support"><img alt="Support" src="https://img.shields.io/badge/Support-%E2%9D%A4-ea4aaa?style=flat-square&logo=githubsponsors&logoColor=white" /></a>
+<a href="https://www.npmjs.com/package/@timonwa/firebase-hooks"><img alt="npm" src="https://img.shields.io/npm/v/%40timonwa%2Ffirebase-hooks?style=flat-square&label=npm" /></a> <a href="./LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue?style=flat-square" /></a> <a href="../../CONTRIBUTING.md"><img alt="PRs welcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen?style=flat-square" /></a> <a href="https://www.timonwa.com/support"><img alt="Support" src="https://img.shields.io/badge/Support-%E2%9D%A4-ea4aaa?style=flat-square&logo=githubsponsors&logoColor=white" /></a>
 </div>
 
 ---
@@ -66,7 +63,11 @@ Each service is its own import, so an app only carries the services it uses. The
 
 ```ts
 import { formatFirebaseError, getFirebaseErrorCode } from "@timonwa/firebase-hooks";
-import { AuthProvider, useLogin, AUTH_ERROR_MESSAGES } from "@timonwa/firebase-hooks/auth";
+import {
+  AuthProvider,
+  useLogin,
+  AUTH_ERROR_MESSAGES,
+} from "@timonwa/firebase-hooks/auth";
 ```
 
 Every hook has its own page — signature, options, and a worked example — in the [documentation](https://github.com/Timonwa/firebase-hooks/tree/main/apps/docs/content/docs).
@@ -134,7 +135,10 @@ If your formatter throws, `error` falls back to the raw message, so the failure 
 For logging and analytics, the provider's **`onError` observer** sees every failure from every hook. It receives the raw error and `{ action, code, message }`, where `action` is a stable id such as `"login"` or `"update-password"`. It is fire-and-forget: a throwing observer never affects the flow.
 
 ```tsx
-<AuthProvider auth={auth} onError={(error, { action, code }) => track("auth_error", { action, code })}>
+<AuthProvider
+  auth={auth}
+  onError={(error, { action, code }) => track("auth_error", { action, code })}
+>
   {children}
 </AuthProvider>
 ```

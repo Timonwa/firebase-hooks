@@ -6,7 +6,7 @@ description: Google, Apple, GitHub, or any provider — popup or redirect.
 Works with any Firebase provider — Google, Apple, GitHub, Facebook, Microsoft, X, or a custom `OAuthProvider`.
 
 ```tsx
-import { GoogleAuthProvider } from "firebase/auth";
+import { GoogleAuthProvider } from 'firebase/auth';
 
 const { signIn, loading, error } = useOAuthSignIn(auth, { onIdToken: createSession });
 
@@ -24,11 +24,14 @@ const { signIn, loading, error } = useOAuthSignIn(auth, { onIdToken: createSessi
 Pass `method: "redirect"` for environments that block popups, such as in-app browsers.
 
 ```tsx
-await signIn(new GoogleAuthProvider(), { method: "redirect" });
+await signIn(new GoogleAuthProvider(), { method: 'redirect' });
 ```
 
 The hook also completes a pending redirect on mount via `getRedirectResult`, running the same `onIdToken`. One hook covers both halves of the round-trip — you don't need a second one on the return page.
 
 ## Options
 
-<AutoTypeTable path="../../packages/firebase-hooks/src/auth/use-oauth-sign-in.ts" name="UseOAuthSignInOptionsProps" />
+<AutoTypeTable
+  path="../../packages/firebase-hooks/src/auth/use-oauth-sign-in.ts"
+  name="UseOAuthSignInOptionsProps"
+/>

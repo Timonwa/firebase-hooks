@@ -13,16 +13,21 @@ Zero dependencies. `firebase` and `react` are peers.
 
 <Cards>
   <Card title="Whole flows, not single calls" href="/docs/how-hooks-work">
-    `useEmailLinkSignIn` reports `needsEmail` when it needs the address. `usePhoneSignIn` creates and cleans up the reCAPTCHA verifier. `useOAuthSignIn` finishes a redirect sign-in when the page returns.
+    `useEmailLinkSignIn` reports `needsEmail` when it needs the address. `usePhoneSignIn`
+    creates and cleans up the reCAPTCHA verifier. `useOAuthSignIn` finishes a redirect
+    sign-in when the page returns.
   </Card>
   <Card title="Server sessions built in" href="/docs/guides/server-sessions">
-    `onIdToken` hands you a fresh ID token after every sign-in. `onBeforeSignOut` runs before Firebase clears the session, so a failed teardown leaves the user signed in.
+    `onIdToken` hands you a fresh ID token after every sign-in. `onBeforeSignOut` runs
+    before Firebase clears the session, so a failed teardown leaves the user signed in.
   </Card>
   <Card title="Failures are values" href="/docs/guides/error-handling">
-    Actions never throw. A failed call carries Firebase's own error code and the original error, so you branch on it instead of catching it.
+    Actions never throw. A failed call carries Firebase's own error code and the original
+    error, so you branch on it instead of catching it.
   </Card>
   <Card title="Configure once or per call" href="/docs/auth/auth-provider">
-    Session callbacks, action-code settings, and error wording live on the provider. Any hook can override them, or opt out with `null`.
+    Session callbacks, action-code settings, and error wording live on the provider. Any
+    hook can override them, or opt out with `null`.
   </Card>
 </Cards>
 
@@ -30,12 +35,12 @@ Zero dependencies. `firebase` and `react` are peers.
 
 Each service is its own import, so an app only carries what it uses.
 
-| Service | Import | Status |
-| --- | --- | --- |
-| Core | `@timonwa/firebase-hooks` | Available |
-| Auth | `@timonwa/firebase-hooks/auth` | Available |
-| Firestore | `@timonwa/firebase-hooks/firestore` | Coming soon |
-| Storage | `@timonwa/firebase-hooks/storage` | Coming soon |
+| Service         | Import                              | Status      |
+| --------------- | ----------------------------------- | ----------- |
+| Core            | `@timonwa/firebase-hooks`           | Available   |
+| Auth            | `@timonwa/firebase-hooks/auth`      | Available   |
+| Firestore       | `@timonwa/firebase-hooks/firestore` | Coming soon |
+| Storage         | `@timonwa/firebase-hooks/storage`   | Coming soon |
 | Cloud Functions | `@timonwa/firebase-hooks/functions` | Coming soon |
 
 The most-used services ship first; more may follow once these land.

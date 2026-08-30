@@ -9,7 +9,7 @@ The standard client-side signup: create the account, set the optional profile, s
 const { signup, loading, error } = useSignup(auth, { onIdToken: createSession });
 
 const result = await signup(email, password, { displayName: fullName });
-if (result.success) router.push("/verify-email");
+if (result.success) router.push('/verify-email');
 ```
 
 ## Returns
@@ -24,4 +24,7 @@ Server-first signups — where your API creates the record and the client signs 
 
 ## Options
 
-<AutoTypeTable path="../../packages/firebase-hooks/src/auth/use-signup.ts" name="UseSignupOptionsProps" />
+<AutoTypeTable
+  path="../../packages/firebase-hooks/src/auth/use-signup.ts"
+  name="UseSignupOptionsProps"
+/>
