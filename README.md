@@ -1,19 +1,29 @@
-# @timonwa/firebase-hooks
+<div align="center">
+  <h1>@timonwa/firebase-hooks</h1>
+  <b>Typed React hooks for Firebase — one hook per flow, with its state, errors, and callbacks handled.</b>
+  <br/><br/>
 
-Typed React hooks for Firebase, one entry per service. **Auth ships first** — every client sign-in flow, plus password, email, profile, and provider management — with Firestore and Storage next. Zero dependencies; `firebase` and `react` are peers.
+<a href="https://www.npmjs.com/package/@timonwa/firebase-hooks"><img alt="npm" src="https://img.shields.io/npm/v/%40timonwa%2Ffirebase-hooks?style=flat-square&label=npm" /></a>
+<a href="./LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue?style=flat-square" /></a>
+<a href="./CONTRIBUTING.md"><img alt="PRs welcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen?style=flat-square" /></a>
+<a href="https://www.timonwa.com/support"><img alt="Support" src="https://img.shields.io/badge/Support-%E2%9D%A4-ea4aaa?style=flat-square&logo=githubsponsors&logoColor=white" /></a>
+</div>
 
-[![npm](https://img.shields.io/npm/v/@timonwa/firebase-hooks)](https://www.npmjs.com/package/@timonwa/firebase-hooks)
-[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-timonwa-FFDD00?logo=buymeacoffee&logoColor=black)](https://www.buymeacoffee.com/timonwa)
+---
+
+Each hook runs one flow end to end. It holds its own loading, error, and success state, and sets up the browser pieces and callbacks the flow needs. Every action returns a result you can branch on: `{ success: true, … }` when it works, `{ success: false, error, code, cause }` when it doesn't. Firebase's own response is on both paths.
+
+Zero dependencies — `firebase` and `react` are peers.
 
 ## Features
 
-- **Whole flows, not primitives.** `useEmailLinkSignIn` gives you `needsEmail` so you render your own input instead of `window.prompt`. `usePhoneSignIn` creates and cleans up the reCAPTCHA verifier. `useOAuthSignIn` finishes a redirect sign-in when the page returns. `useVerifyEmail` reports where the code-application got to.
+- **Each hook covers a whole flow.** `useEmailLinkSignIn` reports `needsEmail` when it needs the address, so you render the input in your own UI. `usePhoneSignIn` creates and cleans up the reCAPTCHA verifier. `useOAuthSignIn` finishes a redirect sign-in when the page returns. `useVerifyEmail` reports how far the code got.
 - **Server sessions built in.** `onIdToken` hands you a fresh ID token after every sign-in — trade it for a session cookie in one line. `onBeforeSignOut` runs before Firebase clears the session, so a failed teardown leaves the user signed in.
-- **Actions never throw.** Every one resolves to `{ success: true, ... }` or `{ success: false, error, code, cause }`.
+- **Every action returns a result.** `{ success: true, ... }` or `{ success: false, error, code, cause }`, so a failed call is a value you read.
 - **Firebase's own data, unmodified.** Sign-ins return the raw `UserCredential`; failures carry Firebase's error code and the original error. Message formatting is opt-in.
 - **Automatic reauthentication.** Pass `currentPassword` to a sensitive operation and the hook handles the recent-sign-in check; omit it and `auth/requires-recent-login` reaches you.
-- **Configure once or per call.** Session callbacks, action-code settings, error wording, and the `onError` observer live on `AuthProvider`; any hook can override them or opt out with `null`.
-- **Typed, tested, ESM + CJS.** The `"use client"` banner means React Server Component frameworks give a clear boundary error rather than a cryptic hooks crash.
+- **Configure once or per call.** Session callbacks, action-code settings, error wording, and the `onError` observer live on the provider; any hook can override them or opt out with `null`.
+- **Typed, tested, ESM + CJS.** The `"use client"` banner tells React Server Component frameworks where the client boundary is.
 
 ## Quickstart
 
@@ -40,17 +50,23 @@ function LoginForm() {
 }
 ```
 
-## Package structure
+## Services
 
-One entry per Firebase service, plus a service-agnostic core at the root — so an auth-only app never carries Firestore code, and future services arrive without touching existing imports:
+| Service   | Import                              | Status      |
+| --------- | ----------------------------------- | ----------- |
+| Core      | `@timonwa/firebase-hooks`           | Available   |
+| Auth      | `@timonwa/firebase-hooks/auth`      | Available   |
+| Firestore | `@timonwa/firebase-hooks/firestore` | Coming soon |
+| Storage   | `@timonwa/firebase-hooks/storage`   | Coming soon |
+
+Each service is its own import, so an app only carries the services it uses. The root holds what every service shares — `formatFirebaseError`, `getFirebaseErrorCode`, and the `HookResult` types.
 
 ```ts
-import { formatFirebaseError, getFirebaseErrorCode } from "@timonwa/firebase-hooks";      // core: shared utilities + types
-import { AuthProvider, useLogin, AUTH_ERROR_MESSAGES } from "@timonwa/firebase-hooks/auth"; // everything Firebase Auth
-// coming: "@timonwa/firebase-hooks/firestore", "@timonwa/firebase-hooks/storage"
+import { formatFirebaseError, getFirebaseErrorCode } from "@timonwa/firebase-hooks";
+import { AuthProvider, useLogin, AUTH_ERROR_MESSAGES } from "@timonwa/firebase-hooks/auth";
 ```
 
-Everything documented below is the `/auth` entry. Firestore and Storage will document their own.
+The hook reference below covers Auth.
 
 ## How every hook works
 
@@ -91,7 +107,7 @@ formatFirebaseError(error, options?: { messages?: Record<string, string>; fallba
 AUTH_ERROR_MESSAGES: Record<string, string>
 ```
 
-With no configuration, `error` is the raw error's own message — nothing is reworded for you. Formatting is opt-in via `formatFirebaseError`, which resolves in strict order: a match in `messages` wins; an unmapped Firebase error keeps Firebase's own words with the framing stripped (`"Firebase: The email address is badly formatted. (auth/invalid-email)."` → `"The email address is badly formatted."`); any other error passes through raw. It never unwraps HTTP envelopes — an error thrown from your own `onIdToken`/`onBefore*` callback is yours and arrives untouched.
+With no configuration, `error` is the message Firebase produced. Formatting is opt-in via `formatFirebaseError`, which resolves in a fixed order. A match in `messages` wins. An unmapped Firebase error keeps Firebase's own words with the framing stripped: `"Firebase: The email address is badly formatted. (auth/invalid-email)."` becomes `"The email address is badly formatted."` Any other error passes through raw, so an error thrown from your own `onIdToken` or `onBefore*` callback arrives exactly as you threw it.
 
 `AUTH_ERROR_MESSAGES` is the shipped `auth/*` catalogue with security-conscious copy (credential failures never reveal whether an account exists). Spread and override it for i18n or your own voice:
 
@@ -110,13 +126,29 @@ const result = await login(email, password);
 if (!result.success && result.code === "auth/too-many-requests") startCooldown();
 ```
 
-A formatter that throws falls back to the raw message — formatting can never lose the error.
+If your formatter throws, `error` falls back to the raw message, so the failure still reaches you.
 
-For logging and analytics, the provider's **`onError` observer** sees every failure from every hook — fire-and-forget (a throwing observer never affects a flow), called with the raw error and `{ action, code, message }`, where `action` is a stable id like `"login"` or `"update-password"`:
+For logging and analytics, the provider's **`onError` observer** sees every failure from every hook. It receives the raw error and `{ action, code, message }`, where `action` is a stable id such as `"login"` or `"update-password"`. It is fire-and-forget: a throwing observer never affects the flow.
 
 ```tsx
 <AuthProvider auth={auth} onError={(error, { action, code }) => track("auth_error", { action, code })}>
-``` Future service catalogues ship with their own subpath (`FIRESTORE_ERROR_MESSAGES` with the Firestore hooks, `STORAGE_ERROR_MESSAGES` with Storage).
+  {children}
+</AuthProvider>
+```
+
+Future service catalogues ship with their own import (`FIRESTORE_ERROR_MESSAGES` with the Firestore hooks, `STORAGE_ERROR_MESSAGES` with Storage).
+
+## SSR and server components
+
+Every hook is a client hook. The built output carries a `"use client"` banner. In React Server Component frameworks you import from this package inside client components with no extra ceremony. Importing from a server component fails with the framework's own boundary error. Passing `auth: null` during initialisation is always safe: state hooks report signed-out/loading, and actions fail cleanly with `{ success: false, error, code, cause }`.
+
+## Works with
+
+Plain React hooks with no framework imports, so they run anywhere React runs. That covers Next.js (App or Pages Router), Remix / React Router, Gatsby, TanStack Start, Waku, plain Vite/CRA SPAs, and Astro's React islands.
+
+**React Native / Expo** (with the Firebase **web** SDK): the email/password, anonymous, custom-token, logout, password, email, profile, reauthentication, and linking hooks work as-is. Web-only by nature: `useOAuthSignIn` (popup/redirect are browser concepts), `usePhoneSignIn` (reCAPTCHA needs the DOM), and `useEmailLinkSignIn`'s email persistence (uses `localStorage`; a pluggable storage option is planned). The `react-native-firebase` native SDK is a different import surface and is not supported.
+
+Not in Auth yet: multi-factor auth (TOTP/SMS enrolment and resolution) and multi-tenancy — planned for a later minor. The Admin SDK is server-side and out of scope.
 
 ## Provider and state
 
@@ -139,7 +171,7 @@ AuthProvider(props: {
 useAuth(): { firebaseUser: User | null; claims: Record<string, unknown> | null; isAuthenticated: boolean; isLoading: boolean }
 ```
 
-Subscribes to `onIdTokenChanged`, so `firebaseUser` and `claims` update on sign-in, sign-out, **and token refreshes** — custom-claim changes (roles) propagate without a reload. `isLoading` is true only until the first callback, so you can distinguish "signed out" from "not yet known". The provider is also the home of app-wide defaults — `onIdToken`, `onBeforeSignOut`, `actionCodeSettings`, `formatErrorMessage` — inherited by every hook below it (hook option overrides; explicit `null` opts a flow out); hooks keep working with no provider at all. Server-fetched user records are an app concern: layer them in your own provider on top of this one.
+Subscribes to `onIdTokenChanged`, so `firebaseUser` and `claims` update on sign-in, sign-out, **and token refreshes** — custom-claim changes (roles) propagate without a reload. `isLoading` is true only until the first callback, so you can distinguish "signed out" from "not yet known". The provider is also where app-wide defaults live: `onIdToken`, `onBeforeSignOut`, `actionCodeSettings`, and `formatErrorMessage`. Every hook below it inherits them, a hook's own option overrides, and an explicit `null` opts that flow out. Hooks keep working with no provider at all. Server-fetched user records are an app concern: layer them in your own provider on top of this one.
 
 ```tsx
 <AuthProvider auth={auth}>{children}</AuthProvider>;
@@ -201,7 +233,7 @@ useEmailLinkSignIn(auth, options?: {
 }): { sendLink; completeSignIn; loading; error }
 ```
 
-Passwordless (magic link) sign-in. `sendLink(email)` emails the link and remembers the address in localStorage; `completeSignIn(url, email?)` runs on the callback page. When the address isn't in storage (link opened on another device), the result carries `needsEmail: true` — render your own email-confirm input and call `completeSignIn` again with the address; there is no `window.prompt`.
+Passwordless (magic link) sign-in. `sendLink(email)` emails the link and remembers the address in localStorage; `completeSignIn(url, email?)` runs on the callback page. When the address isn't in storage — the link was opened on another device — the result carries `needsEmail: true`. Render your own email-confirm input and call `completeSignIn` again with the address.
 
 ```tsx
 // Request page
@@ -238,7 +270,7 @@ useLogout(auth, options?: { onBeforeSignOut?: () => void | Promise<void>; format
   { logout: () => Promise<HookResult>; loading; error }
 ```
 
-Sign-out. `onBeforeSignOut` runs **first** — clear your server session there. The order is deliberate: if the server call throws, the Firebase session is preserved so the user can retry, instead of being half signed out.
+Sign-out. `onBeforeSignOut` runs **first**, so clear your server session there. If that call throws, the Firebase session is left intact and the user can retry.
 
 ```tsx
 const { logout, loading } = useLogout(auth, { onBeforeSignOut: clearSession });
@@ -271,7 +303,7 @@ usePhoneSignIn(auth, options?: { recaptchaSize?: "invisible" | "normal"; onIdTok
 }
 ```
 
-Phone-number sign-in in two steps: `sendCode` verifies the caller via reCAPTCHA and texts the SMS code; `confirmCode` completes sign-in. The reCAPTCHA verifier is created and cleaned up for you — pass the id (or element) of an empty container node, and choose `recaptchaSize: "invisible"` (the default) or `"normal"` for the visible widget.
+Phone-number sign-in in two steps: `sendCode` verifies the caller via reCAPTCHA and texts the SMS code; `confirmCode` completes sign-in. The reCAPTCHA verifier is created and cleaned up for you. Pass the id (or element) of an empty container node, and choose `recaptchaSize: "invisible"` (the default) or `"normal"` for the visible widget.
 
 ```tsx
 const { sendCode, confirmCode, codeSent } = usePhoneSignIn(auth, { onIdToken: createSession });
@@ -314,7 +346,7 @@ useConfirmPasswordReset(auth, options?): {
 }
 ```
 
-Completes a password reset with the `oobCode` from the reset email. `verifyCode` optionally checks the code first and returns the account email, so the page can show whose password is being reset before asking for the new one.
+Completes a password reset with the `oobCode` from the reset email. `verifyCode` optionally checks the code first and returns the account email. The page can then show whose password is being reset before asking for the new one.
 
 ```tsx
 const { confirm, verifyCode, success, error } = useConfirmPasswordReset(auth);
@@ -346,7 +378,7 @@ useUpdatePassword(auth, options?): {
 }
 ```
 
-Changes the signed-in user's password. Pass `currentPassword` and the hook reauthenticates automatically first (Firebase rejects sensitive operations on stale sessions); omit it and the change runs directly — a stale session then surfaces `auth/requires-recent-login` through `code`/`cause` for your own policy (e.g. [`useReauthenticate`](#usereauthenticate)).
+Changes the signed-in user's password. Pass `currentPassword` and the hook reauthenticates first, because Firebase rejects sensitive operations on stale sessions. Omit it and the change runs directly, so a stale session surfaces `auth/requires-recent-login` through `code` and `cause` for your own policy — see [`useReauthenticate`](#usereauthenticate).
 
 ```tsx
 const { update, loading, error, success } = useUpdatePassword(auth);
@@ -383,7 +415,7 @@ useUpdateEmail(auth, options?: { actionCodeSettings?; formatErrorMessage? }):
   { update: (args: { newEmail: string; currentPassword?: string }) => Promise<HookResult>; loading; error; success }
 ```
 
-Changes the signed-in user's email via `verifyBeforeUpdateEmail`: Firebase mails a verification link to the **new** address and the change only lands when it's clicked — so `success` means "verification email sent", not "email changed". Pass `currentPassword` for automatic reauthentication; omit it (OAuth-only accounts have no password) and handle a stale session via [`useReauthenticate`](#usereauthenticate).
+Changes the signed-in user's email via `verifyBeforeUpdateEmail`. Firebase mails a verification link to the **new** address, and the change lands only when it is clicked. So `success` means "verification email sent", not "email changed". Pass `currentPassword` for automatic reauthentication; omit it (OAuth-only accounts have no password) and handle a stale session via [`useReauthenticate`](#usereauthenticate).
 
 ```tsx
 const { update, success } = useUpdateEmail(auth);
@@ -498,18 +530,6 @@ Updates the signed-in user's display name and/or photo URL. No reauthentication 
 const { update, loading } = useUpdateProfile(auth);
 await update({ displayName: fullName, photoURL: avatarUrl });
 ```
-
-## SSR and server components
-
-Every hook is a client hook. The built output carries a `"use client"` banner, so in React Server Component frameworks you import from this package inside client components with no extra ceremony — and importing from a server component fails with the framework's clear boundary error rather than a runtime crash. Passing `auth: null` during initialisation is always safe: state hooks report signed-out/loading, and actions fail cleanly with `{ success: false, error, code, cause }`.
-
-## Works with
-
-Plain React hooks, no framework imports — they run anywhere React runs: Next.js (App or Pages Router), Remix / React Router, Gatsby, TanStack Start, Waku, plain Vite/CRA SPAs, and Astro's React islands.
-
-**React Native / Expo** (with the Firebase **web** SDK): the email/password, anonymous, custom-token, logout, password, email, profile, reauthentication, and linking hooks work as-is. Web-only by nature: `useOAuthSignIn` (popup/redirect are browser concepts), `usePhoneSignIn` (reCAPTCHA needs the DOM), and `useEmailLinkSignIn`'s email persistence (uses `localStorage`; a pluggable storage option is planned). The `react-native-firebase` native SDK is a different import surface and is not supported.
-
-Not in `/auth` yet: multi-factor auth (TOTP/SMS enrolment and resolution) and multi-tenancy — planned for a later minor. The Admin SDK is server-side and out of scope.
 
 ## Contributing
 

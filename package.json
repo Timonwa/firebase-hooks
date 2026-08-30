@@ -1,6 +1,6 @@
 {
   "name": "@timonwa/firebase-hooks",
-  "version": "0.1.0",
+  "version": "0.0.0",
   "description": "Typed React hooks for every Firebase Auth client flow — email/password, OAuth, email link, phone, anonymous; password, email, profile, and provider-linking management. Server-session integration via optional callbacks.",
   "keywords": [
     "react",
