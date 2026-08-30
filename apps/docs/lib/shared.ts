@@ -2,7 +2,10 @@
 // one in the repo rather than a number that needs remembering at release time.
 import pkg from '@timonwa/firebase-hooks/package.json' with { type: 'json' };
 
-export const appName = '@timonwa/firebase-hooks';
+// Display name for chrome that a human reads; the scoped name is what search
+// engines index, so it lives in titles and install snippets instead.
+export const appName = 'Firebase Hooks';
+export const packageName = '@timonwa/firebase-hooks';
 export const packageVersion = pkg.version;
 export const npmUrl = 'https://www.npmjs.com/package/@timonwa/firebase-hooks';
 

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { appName, npmUrl, packageVersion } from '@/lib/shared';
+import { npmUrl, packageName, packageVersion } from '@/lib/shared';
 
 const HIGHLIGHTS = [
   {
@@ -52,7 +52,7 @@ export default function HomePage() {
             rel="noreferrer noopener"
             className="px-2 py-2.5 text-sm font-medium text-fd-muted-foreground transition-colors hover:text-fd-foreground"
           >
-            {appName} ↗
+            {packageName} ↗
           </a>
         </div>
 
