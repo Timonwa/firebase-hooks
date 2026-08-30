@@ -35,7 +35,8 @@ import {
   useResolvedConfig,
 } from "./_shared";
 
-interface UseUpdateEmailOptionsProps extends HookErrorOptions {
+export interface UseUpdateEmailOptionsProps extends HookErrorOptions {
+  /** Where the emailed link points back to. Overrides the provider; `null` opts out. */
   actionCodeSettings?: ActionCodeSettings | null;
 }
 

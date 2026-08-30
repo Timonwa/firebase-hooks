@@ -23,7 +23,11 @@ import {
   useResolvedConfig,
 } from "./_shared";
 
-interface UseLogoutOptionsProps extends HookErrorOptions {
+export interface UseLogoutOptionsProps extends HookErrorOptions {
+  /**
+   * Runs before Firebase clears the session — clear your server session here.
+   * Throwing leaves the user signed in. Overrides the provider; `null` opts out.
+   */
   onBeforeSignOut?: (() => void | Promise<void>) | null;
 }
 

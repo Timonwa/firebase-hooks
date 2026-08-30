@@ -38,8 +38,16 @@ import {
   useResolvedConfig,
 } from "./_shared";
 
-interface UseSignupOptionsProps extends HookErrorOptions {
+export interface UseSignupOptionsProps extends HookErrorOptions {
+  /**
+   * Send the verification email once the account is created.
+   * @defaultValue true
+   */
   sendVerificationEmail?: boolean;
+  /**
+   * Called with a freshly minted ID token after sign-in — mint your server
+   * session here. Throwing aborts the flow. Overrides the provider; `null` opts out.
+   */
   onIdToken?: OnIdToken | null;
 }
 

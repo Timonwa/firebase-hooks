@@ -40,8 +40,16 @@ import {
   useResolvedConfig,
 } from "./_shared";
 
-interface UsePhoneSignInOptionsProps extends HookErrorOptions {
+export interface UsePhoneSignInOptionsProps extends HookErrorOptions {
+  /**
+   * Size of the managed reCAPTCHA widget.
+   * @defaultValue "invisible"
+   */
   recaptchaSize?: "invisible" | "normal";
+  /**
+   * Called with a freshly minted ID token after sign-in — mint your server
+   * session here. Throwing aborts the flow. Overrides the provider; `null` opts out.
+   */
   onIdToken?: OnIdToken | null;
 }
 

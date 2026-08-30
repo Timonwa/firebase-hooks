@@ -30,7 +30,11 @@ import {
   useAuthTask,
 } from "./_shared";
 
-interface UseDeleteAccountOptionsProps extends HookErrorOptions {
+export interface UseDeleteAccountOptionsProps extends HookErrorOptions {
+  /**
+   * Runs while the user is still authenticated — clean up server-side data
+   * here. Throwing aborts the deletion.
+   */
   onBeforeDelete?: (user: User) => void | Promise<void>;
 }
 

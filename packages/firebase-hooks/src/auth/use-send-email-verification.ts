@@ -24,7 +24,8 @@ import {
   useResolvedConfig,
 } from "./_shared";
 
-interface UseSendEmailVerificationOptionsProps extends HookErrorOptions {
+export interface UseSendEmailVerificationOptionsProps extends HookErrorOptions {
+  /** Where the emailed link points back to. Overrides the provider; `null` opts out. */
   actionCodeSettings?: ActionCodeSettings | null;
 }
 

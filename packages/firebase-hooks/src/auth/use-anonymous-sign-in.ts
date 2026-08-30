@@ -29,7 +29,11 @@ import {
   useResolvedConfig,
 } from "./_shared";
 
-interface UseAnonymousSignInOptionsProps extends HookErrorOptions {
+export interface UseAnonymousSignInOptionsProps extends HookErrorOptions {
+  /**
+   * Called with a freshly minted ID token after sign-in — mint your server
+   * session here. Throwing aborts the flow. Overrides the provider; `null` opts out.
+   */
   onIdToken?: OnIdToken | null;
 }
 

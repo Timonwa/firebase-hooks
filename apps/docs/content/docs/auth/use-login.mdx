@@ -1,0 +1,38 @@
+---
+title: useLogin
+description: Email/password sign-in, with your server session minted in the same call.
+---
+
+`useLogin` runs the whole email/password sign-in flow: it signs in with Firebase, then hands you a freshly minted ID token so you can create your server session before the user ever reaches a protected page.
+
+## Usage
+
+```tsx
+import { useLogin } from "@timonwa/firebase-hooks/auth";
+import { auth } from "@/lib/firebase";
+
+function LoginForm() {
+  const { login, loading, error } = useLogin(auth, {
+    onIdToken: (idToken) => createSession(idToken),
+  });
+
+  async function onSubmit(email: string, password: string) {
+    const result = await login(email, password);
+    if (result.success) router.push("/dashboard");
+  }
+}
+```
+
+## Options
+
+<AutoTypeTable path="../../packages/firebase-hooks/src/auth/use-login.ts" name="UseLoginOptionsProps" />
+
+## Returns
+
+`login(email, password)` resolves to a [`HookResult`](/docs/core/errors) — `{ success: true, user, credential }` on success, or `{ success: false, error, code, cause }` on failure. It never throws.
+
+The hook also exposes `loading` and `error` for rendering.
+
+## Notes
+
+`onIdToken` runs **after** Firebase signs the user in, with a fresh token. Throwing inside it aborts the flow and surfaces the error like any other failure — so a server session that fails to mint doesn't leave the user in a half-signed-in state.

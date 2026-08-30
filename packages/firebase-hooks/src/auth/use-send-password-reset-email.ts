@@ -29,7 +29,8 @@ import {
   useResolvedConfig,
 } from "./_shared";
 
-interface UseSendPasswordResetEmailOptionsProps extends HookErrorOptions {
+export interface UseSendPasswordResetEmailOptionsProps extends HookErrorOptions {
+  /** Where the emailed link points back to. Overrides the provider; `null` opts out. */
   actionCodeSettings?: ActionCodeSettings | null;
 }
 

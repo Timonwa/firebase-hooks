@@ -48,10 +48,20 @@ import {
   useResolvedConfig,
 } from "./_shared";
 
-interface UseEmailLinkSignInOptionsProps extends HookErrorOptions {
+export interface UseEmailLinkSignInOptionsProps extends HookErrorOptions {
+  /** Where the emailed link points back to. Overrides the provider; `null` opts out. */
   actionCodeSettings?: ActionCodeSettings | null;
+  /**
+   * localStorage key holding the address between sending and completing the link.
+   * @defaultValue "emailForSignIn"
+   */
   storageKey?: string;
+  /** Replace the sender — e.g. your own API emails the link instead of Firebase. */
   sendLink?: (email: string) => Promise<void>;
+  /**
+   * Called with a freshly minted ID token after sign-in — mint your server
+   * session here. Throwing aborts the flow. Overrides the provider; `null` opts out.
+   */
   onIdToken?: OnIdToken | null;
 }
 

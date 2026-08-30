@@ -32,7 +32,11 @@ import {
 
 type VerifyEmailStatusType = "processing" | "success" | "failed";
 
-interface UseVerifyEmailOptionsProps extends HookErrorOptions {
+export interface UseVerifyEmailOptionsProps extends HookErrorOptions {
+  /**
+   * Runs after the code is applied and the token refreshed — refresh your
+   * server session here.
+   */
   onVerified?: (user: User | null) => void | Promise<void>;
 }
 
