@@ -36,3 +36,22 @@ jobs:
       # a real consumer would under every module resolution mode.
       - run: pnpm check:publish
       - run: pnpm check:exports
+
+  # Separate from verify: a broken docs build must never gate a release, and the
+  # release job runs verify on the same push.
+  docs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: ./.github/actions/setup
+
+      # The docs site resolves the library through its exports map, so dist has
+      # to exist before Next can compile a page that imports it.
+      - run: pnpm build
+
+      - run: pnpm --filter docs typecheck
+      - run: pnpm --filter docs build
