@@ -1,45 +1,54 @@
 # docs
 
-This is a Next.js application generated with
-[Create Fumadocs](https://github.com/fuma-nama/fumadocs).
-
-Run development server:
+The documentation site for [`@timonwa/firebase-hooks`](../../packages/firebase-hooks), built with [Fumadocs](https://fumadocs.dev) on Next.js.
 
 ```bash
-npm run dev
-# or
-pnpm dev
-# or
-yarn dev
+pnpm install          # from the repo root
+pnpm build            # build the library first — the site imports it via its exports map
+pnpm --filter docs dev
 ```
 
-Open http://localhost:3000 with your browser to see the result.
+Open <http://localhost:3000>.
 
-## Explore
+## Environment
 
-In the project, you can see:
+| Variable               | Required | What it's for                                                 |
+| ---------------------- | -------- | ------------------------------------------------------------- |
+| `NEXT_PUBLIC_SITE_URL` | No       | Absolute origin for canonicals, the sitemap and OG image URLs |
 
-- `lib/source.ts`: Code for content source adapter, [`loader()`](https://fumadocs.dev/docs/headless/source-api) provides the interface to access your content.
-- `lib/layout.shared.tsx`: Shared options for layouts, optional but preferred to keep.
+**Nothing to configure on Vercel.** The origin resolves from `VERCEL_PROJECT_PRODUCTION_URL`, which Vercel sets automatically. Set `NEXT_PUBLIC_SITE_URL` only once a custom domain points at the site.
 
-| Route                     | Description                                            |
-| ------------------------- | ------------------------------------------------------ |
-| `app/(home)`              | The route group for your landing page and other pages. |
-| `app/docs`                | The documentation layout and pages.                    |
-| `app/api/search/route.ts` | The Route Handler for search.                          |
+Locally the origin falls back to `http://localhost:3000`. If your dev server picks a different port, OG image URLs will point at a port nothing is serving and link previews will fail to load the image — set `NEXT_PUBLIC_SITE_URL=http://localhost:3001` in `.env.local` to match.
 
-### Fumadocs MDX
+## Layout
 
-Collections are defined with the [Macro API](https://fumadocs.dev/docs/mdx/macro) in `lib/source.ts`.
+| Path                    | What it is                                                                   |
+| ----------------------- | ---------------------------------------------------------------------------- |
+| `content/docs/`         | The MDX pages; `meta.json` per folder controls nav order                     |
+| `lib/source.ts`         | Content source adapter — the nav, sitemap and OG routes all read from it     |
+| `lib/site.ts`           | Site config: origin, description, author, whether the env is indexable       |
+| `lib/seo.ts`            | `buildMetadata()` — every page's canonical, OG, Twitter and robots           |
+| `lib/schema.ts`         | JSON-LD graph, anchored by stable `@id`                                      |
+| `lib/layout.shared.tsx` | Nav title, version pill, and the nav links                                   |
+| `app/og/`               | OG image routes — `/og` for the home page, `/og/docs/*` prerendered per page |
+| `app/(home)/`           | Landing page and its footer                                                  |
+| `app/docs/`             | Documentation layout and pages                                               |
 
-Read the [Introduction](https://fumadocs.dev/docs/mdx) for further details.
+## Writing a page
 
-## Learn More
+Add an `.mdx` file under `content/docs/`, then list it in that folder's `meta.json`. An `index.mdx` becomes the folder's own page and should **not** be listed.
 
-To learn more about Next.js and Fumadocs, take a look at the following
-resources:
+Options tables generate from the library's TSDoc rather than being hand-written:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js
-  features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-- [Fumadocs](https://fumadocs.dev) - learn about Fumadocs
+```mdx
+<AutoTypeTable
+  path="../../packages/firebase-hooks/src/auth/use-login.ts"
+  name="UseLoginOptionsProps"
+/>
+```
+
+The interface must be exported, and each field needs a TSDoc line — an undocumented field renders an empty description cell.
+
+## Formatting
+
+This app is formatted by **Prettier**, not Biome — `pnpm --filter docs lint:fix`. Biome owns `packages/` and the repo root; the two scopes don't overlap.

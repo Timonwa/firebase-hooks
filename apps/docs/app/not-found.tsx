@@ -2,6 +2,7 @@ import { ArrowRight, BookOpen, Home } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { buildMetadata } from '@/lib/seo';
+import { appName, packageName } from '@/lib/shared';
 
 export const metadata: Metadata = buildMetadata({
   title: 'Page not found',
@@ -28,13 +29,23 @@ export default function NotFound() {
   return (
     <main className="flex flex-1 flex-col items-center justify-center px-6 py-24">
       <div className="w-full max-w-lg">
-        <p className="text-fd-primary font-mono text-sm font-medium">404</p>
+        {/* Names the project up front: a 404 is often someone's first page on a
+            site, arriving from a stale link with no idea where they landed. */}
+        <Link
+          href="/"
+          className="text-fd-muted-foreground hover:text-fd-foreground inline-flex items-center gap-2 text-sm transition-colors"
+        >
+          <span className="bg-fd-primary size-1.5 rounded-full" />
+          <span className="font-mono">{packageName}</span>
+        </Link>
+
+        <p className="text-fd-primary mt-8 font-mono text-sm font-medium">404</p>
         <h1 className="mt-3 text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
           That page doesn’t exist
         </h1>
         <p className="text-fd-muted-foreground mt-3 text-pretty">
           The link may be out of date, or the page moved when the docs were reorganised.
-          Here’s where most people are headed.
+          You’re on the {appName} documentation — here’s where most people are headed.
         </p>
 
         <div className="mt-8 flex flex-col gap-3">

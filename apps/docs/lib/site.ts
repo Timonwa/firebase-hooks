@@ -9,7 +9,10 @@ const resolvedUrl =
   process.env.NEXT_PUBLIC_SITE_URL ??
   (process.env.VERCEL_PROJECT_PRODUCTION_URL
     ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-    : 'http://localhost:3000');
+    : // Honours PORT so `PORT=3001 pnpm dev` still produces working OG URLs.
+      // Next choosing its own port when 3000 is taken does not set PORT, so in
+      // that case set NEXT_PUBLIC_SITE_URL to match.
+      `http://localhost:${process.env.PORT ?? 3000}`);
 
 /**
  * Only the production deployment is indexable. Preview and local builds emit
