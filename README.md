@@ -15,15 +15,15 @@ Each hook runs one flow end to end. It holds its own loading, error, and success
 
 Zero dependencies — `firebase` and `react` are peers.
 
-## Features
+## Why this package
 
-- **Each hook covers a whole flow.** `useEmailLinkSignIn` reports `needsEmail` when it needs the address, so you render the input in your own UI. `usePhoneSignIn` creates and cleans up the reCAPTCHA verifier. `useOAuthSignIn` finishes a redirect sign-in when the page returns. `useVerifyEmail` reports how far the code got.
+- **Each hook covers a whole flow, not one Firebase call.** `useEmailLinkSignIn` reports `needsEmail` when it needs the address, so you render the input in your own UI. `usePhoneSignIn` creates and cleans up the reCAPTCHA verifier. `useOAuthSignIn` finishes a redirect sign-in when the page returns. `useVerifyEmail` reports how far the code got.
 - **Server sessions built in.** `onIdToken` hands you a fresh ID token after every sign-in — trade it for a session cookie in one line. `onBeforeSignOut` runs before Firebase clears the session, so a failed teardown leaves the user signed in.
-- **Every action returns a result.** `{ success: true, ... }` or `{ success: false, error, code, cause }`, so a failed call is a value you read.
+- **Every action returns a result.** `{ success: true, ... }` or `{ success: false, error, code, cause }`, so a failed call is a value you read, not an exception you catch.
 - **Firebase's own data, unmodified.** Sign-ins return the raw `UserCredential`; failures carry Firebase's error code and the original error. Message formatting is opt-in.
 - **Automatic reauthentication.** Pass `currentPassword` to a sensitive operation and the hook handles the recent-sign-in check; omit it and `auth/requires-recent-login` reaches you.
 - **Configure once or per call.** Session callbacks, action-code settings, error wording, and the `onError` observer live on the provider; any hook can override them or opt out with `null`.
-- **Typed, tested, ESM + CJS.** The `"use client"` banner tells React Server Component frameworks where the client boundary is.
+- **Typed, tested, ESM + CJS.** Built against Firebase 11/12 and React 18/19. The `"use client"` banner tells React Server Component frameworks where the client boundary is.
 
 ## Quickstart
 
@@ -52,12 +52,15 @@ function LoginForm() {
 
 ## Services
 
-| Service   | Import                              | Status      |
-| --------- | ----------------------------------- | ----------- |
-| Core      | `@timonwa/firebase-hooks`           | Available   |
-| Auth      | `@timonwa/firebase-hooks/auth`      | Available   |
-| Firestore | `@timonwa/firebase-hooks/firestore` | Coming soon |
-| Storage   | `@timonwa/firebase-hooks/storage`   | Coming soon |
+| Service         | Import                              | Status      |
+| --------------- | ----------------------------------- | ----------- |
+| Core            | `@timonwa/firebase-hooks`           | Available   |
+| Auth            | `@timonwa/firebase-hooks/auth`      | Available   |
+| Firestore       | `@timonwa/firebase-hooks/firestore` | Coming soon |
+| Storage         | `@timonwa/firebase-hooks/storage`   | Coming soon |
+| Cloud Functions | `@timonwa/firebase-hooks/functions` | Coming soon |
+
+The most-used services ship first; more (Realtime Database, Remote Config, Cloud Messaging, and others) may follow once these land.
 
 Each service is its own import, so an app only carries the services it uses. The root holds what every service shares — `formatFirebaseError`, `getFirebaseErrorCode`, and the `HookResult` types.
 
@@ -66,7 +69,7 @@ import { formatFirebaseError, getFirebaseErrorCode } from "@timonwa/firebase-hoo
 import { AuthProvider, useLogin, AUTH_ERROR_MESSAGES } from "@timonwa/firebase-hooks/auth";
 ```
 
-The hook reference below covers Auth.
+The [hook reference](#hook-reference) at the end of this page covers Auth.
 
 ## How every hook works
 
@@ -150,13 +153,27 @@ Plain React hooks with no framework imports, so they run anywhere React runs. Th
 
 Not in Auth yet: multi-factor auth (TOTP/SMS enrolment and resolution) and multi-tenancy — planned for a later minor. The Admin SDK is server-side and out of scope.
 
-## Provider and state
+## Contributing
+
+Bug reports and PRs welcome — see [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## License
+
+[MIT](LICENSE)
+
+---
+
+## Hook reference
+
+A documentation site is in progress. Until it ships, the complete Auth reference lives here — every export, its signature, and a working example.
+
+### Provider and state
 
 | Export | What it does |
 | --- | --- |
 | [`AuthProvider` / `useAuth`](#authprovider--useauth) | Live Firebase user + custom claims for the whole tree |
 
-### AuthProvider / useAuth
+#### AuthProvider / useAuth
 
 ```ts
 AuthProvider(props: {
@@ -180,7 +197,7 @@ const { firebaseUser, claims, isAuthenticated, isLoading } = useAuth();
 if (claims?.isAdmin) showAdminNav();
 ```
 
-## Signing in and out
+### Signing in and out
 
 | Hook | What it does |
 | --- | --- |
@@ -193,7 +210,7 @@ if (claims?.isAdmin) showAdminNav();
 | [`usePhoneSignIn`](#usephonesignin) | SMS code sign-in with managed reCAPTCHA |
 | [`useSignup`](#usesignup) | Email/password signup with profile + verification email |
 
-### useAnonymousSignIn
+#### useAnonymousSignIn
 
 ```ts
 useAnonymousSignIn(auth, options?: { onIdToken?; formatErrorMessage? }):
@@ -207,7 +224,7 @@ const { signIn } = useAnonymousSignIn(auth);
 <button onClick={signIn}>Continue as guest</button>;
 ```
 
-### useCustomTokenSignIn
+#### useCustomTokenSignIn
 
 ```ts
 useCustomTokenSignIn(auth, options?: { onIdToken?; formatErrorMessage? }):
@@ -222,7 +239,7 @@ const { token } = await fetchCustomTokenFromYourApi();
 await signIn(token);
 ```
 
-### useEmailLinkSignIn
+#### useEmailLinkSignIn
 
 ```ts
 useEmailLinkSignIn(auth, options?: {
@@ -248,7 +265,7 @@ const result = await completeSignIn(window.location.href);
 if (!result.success && result.needsEmail) showEmailConfirmField();
 ```
 
-### useLogin
+#### useLogin
 
 ```ts
 useLogin(auth, options?: { onIdToken?; formatErrorMessage? }):
@@ -263,7 +280,7 @@ const result = await login(email, password);
 if (result.success) router.push("/dashboard");
 ```
 
-### useLogout
+#### useLogout
 
 ```ts
 useLogout(auth, options?: { onBeforeSignOut?: () => void | Promise<void>; formatErrorMessage? }):
@@ -277,7 +294,7 @@ const { logout, loading } = useLogout(auth, { onBeforeSignOut: clearSession });
 <button onClick={logout} disabled={loading}>Sign out</button>;
 ```
 
-### useOAuthSignIn
+#### useOAuthSignIn
 
 ```ts
 useOAuthSignIn(auth, options?: { onIdToken?; formatErrorMessage? }):
@@ -293,7 +310,7 @@ const { signIn, loading, error } = useOAuthSignIn(auth, { onIdToken: createSessi
 <button onClick={() => signIn(new GoogleAuthProvider())}>Continue with Google</button>;
 ```
 
-### usePhoneSignIn
+#### usePhoneSignIn
 
 ```ts
 usePhoneSignIn(auth, options?: { recaptchaSize?: "invisible" | "normal"; onIdToken?; formatErrorMessage? }): {
@@ -313,7 +330,7 @@ await sendCode("+2348012345678", "recaptcha-container");
 const result = await confirmCode(smsCode);
 ```
 
-### useSignup
+#### useSignup
 
 ```ts
 useSignup(auth, options?: { sendVerificationEmail?: boolean /* default: true */; onIdToken?; formatErrorMessage? }):
@@ -328,7 +345,7 @@ const result = await signup(email, password, { displayName: fullName });
 if (result.success) router.push("/verify-email");
 ```
 
-## Password flows
+### Password flows
 
 | Hook | What it does |
 | --- | --- |
@@ -336,7 +353,7 @@ if (result.success) router.push("/verify-email");
 | [`useSendPasswordResetEmail`](#usesendpasswordresetemail) | The "forgot password" email |
 | [`useUpdatePassword`](#useupdatepassword) | Change password, reauthentication built in |
 
-### useConfirmPasswordReset
+#### useConfirmPasswordReset
 
 ```ts
 useConfirmPasswordReset(auth, options?): {
@@ -354,7 +371,7 @@ const check = await verifyCode(oobCode); // { success: true, email: "a@b.c" }
 await confirm(oobCode, newPassword);
 ```
 
-### useSendPasswordResetEmail
+#### useSendPasswordResetEmail
 
 ```ts
 useSendPasswordResetEmail(auth, options?: { actionCodeSettings?; formatErrorMessage? }):
@@ -369,7 +386,7 @@ await send(email);
 {success && <p>If an account exists for {email}, a reset link is on its way.</p>}
 ```
 
-### useUpdatePassword
+#### useUpdatePassword
 
 ```ts
 useUpdatePassword(auth, options?): {
@@ -386,7 +403,7 @@ await update({ newPassword, currentPassword }); // reauthenticates first
 await update({ newPassword });                  // no reauth — your call
 ```
 
-## Email flows
+### Email flows
 
 | Hook | What it does |
 | --- | --- |
@@ -394,7 +411,7 @@ await update({ newPassword });                  // no reauth — your call
 | [`useUpdateEmail`](#useupdateemail) | Change email via verify-before-update, reauth built in |
 | [`useVerifyEmail`](#useverifyemail) | Apply the emailed verification code on mount |
 
-### useSendEmailVerification
+#### useSendEmailVerification
 
 ```ts
 useSendEmailVerification(auth, options?: { actionCodeSettings?; formatErrorMessage? }):
@@ -408,7 +425,7 @@ const { send, loading, success } = useSendEmailVerification(auth);
 <button onClick={send} disabled={loading}>Resend verification email</button>;
 ```
 
-### useUpdateEmail
+#### useUpdateEmail
 
 ```ts
 useUpdateEmail(auth, options?: { actionCodeSettings?; formatErrorMessage? }):
@@ -424,7 +441,7 @@ await update({ newEmail });                  // OAuth account
 {success && <p>Check {newEmail} to confirm the change.</p>}
 ```
 
-### useVerifyEmail
+#### useVerifyEmail
 
 ```ts
 useVerifyEmail(auth, oobCode: string | null, options?: { onVerified?: (user: User | null) => void | Promise<void>; formatErrorMessage? }):
@@ -440,7 +457,7 @@ if (status === "failed") return <ErrorState message={error} />;
 return <SuccessState />;
 ```
 
-## Account, profile, and linking
+### Account, profile, and linking
 
 | Hook | What it does |
 | --- | --- |
@@ -450,7 +467,7 @@ return <SuccessState />;
 | [`useUnlinkProvider`](#useunlinkprovider) | Remove a sign-in method |
 | [`useUpdateProfile`](#useupdateprofile) | Display name and photo URL |
 
-### useDeleteAccount
+#### useDeleteAccount
 
 ```ts
 useDeleteAccount(auth, options?: { onBeforeDelete?: (user: User) => void | Promise<void>; formatErrorMessage? }):
@@ -467,7 +484,7 @@ const result = await deleteAccount({ currentPassword });
 if (result.success) router.push("/goodbye");
 ```
 
-### useLinkProvider
+#### useLinkProvider
 
 ```ts
 useLinkProvider(auth, options?): {
@@ -485,7 +502,7 @@ await linkWithProvider(new GoogleAuthProvider()); // guest -> Google account
 await linkWithPassword(email, password);          // guest -> email/password account
 ```
 
-### useReauthenticate
+#### useReauthenticate
 
 ```ts
 useReauthenticate(auth, options?): {
@@ -503,7 +520,7 @@ const check = await reauthenticateWithPassword(currentPassword);
 if (check.success) await performSensitiveOperation();
 ```
 
-### useUnlinkProvider
+#### useUnlinkProvider
 
 ```ts
 useUnlinkProvider(auth, options?):
@@ -517,7 +534,7 @@ const { unlinkProvider } = useUnlinkProvider(auth);
 await unlinkProvider("google.com");
 ```
 
-### useUpdateProfile
+#### useUpdateProfile
 
 ```ts
 useUpdateProfile(auth, options?):
@@ -530,11 +547,3 @@ Updates the signed-in user's display name and/or photo URL. No reauthentication 
 const { update, loading } = useUpdateProfile(auth);
 await update({ displayName: fullName, photoURL: avatarUrl });
 ```
-
-## Contributing
-
-Bug reports and PRs welcome — see [CONTRIBUTING.md](CONTRIBUTING.md).
-
-## License
-
-[MIT](LICENSE)

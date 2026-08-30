@@ -13,7 +13,7 @@ pnpm verify   # typecheck, lint, test, build, publint, attw — the same gate CI
 
 ## What gets accepted
 
-- **Firebase Auth client-SDK flows any React app can use.** Nothing tied to a product or a framework (no `next/*` imports). `firebase` and `react` stay peer dependencies; the Admin SDK is server-side and out of scope.
+- **Firebase client-SDK flows any React app can use.** The Services table in the README tracks what's live and what's next; a new service starts as its own folder and subpath entry. Nothing tied to a product or a framework (no `next/*` imports). `firebase` and `react` stay peer dependencies; the Admin SDK is server-side and out of scope.
 - **Server integration through optional callbacks only** (`onIdToken`, `onBeforeSignOut`, …) — never a required action protocol or a result envelope a consumer must implement. Throwing inside a callback aborts the flow.
 - **Nothing hard-coded.** Storage keys, `actionCodeSettings`, and error wording are parameters with sensible defaults.
 - **Client hooks only.** This package is client-side by design; everything ships behind a `"use client"` banner.
@@ -21,9 +21,9 @@ pnpm verify   # typecheck, lint, test, build, publint, attw — the same gate CI
 ## Adding a hook
 
 - **One folder per service** (`src/core/`, `src/auth/`, later `src/firestore/`, `src/storage/`), each with its own `index.ts` entry barrel. **One file per hook**, kebab-cased after it — `src/auth/use-login.ts`. Start the file with a `"use client"` directive and a JSDoc block; the JSDoc is what editors show, so keep it agreeing with the README. Internals a service shares live in that folder's `_shared.ts` and never reach the barrel.
-- **Follow the shared contract.** `auth: Auth | null` first argument; actions resolve to `AuthResult` and never throw (`useAuthTask` gives you the skeleton); sensitive operations reauthenticate first.
+- **Follow the shared contract.** `auth: Auth | null` first argument; actions resolve to `HookResult` and never throw (`useAuthTask` gives you the skeleton); sensitive operations reauthenticate first.
 - **Export it explicitly** from its service's entry barrel (`src/auth/index.ts` for auth), one line per file, alphabetical. The root entry (`src/core/index.ts`) carries only the service-agnostic core — nothing service-specific is ever added to it; a new service gets a new folder + subpath entry.
-- **Document it in `README.md` in the same change** — the README is the only documentation. Add the hook to its group's table and give it a section (signature, options with defaults, example), alphabetical within the group.
+- **Document it in `README.md` in the same change** — until the docs site ships, the README's [hook reference](README.md#hook-reference) is the only documentation. Add the hook to its group's table and give it a section (signature, options with defaults, example), alphabetical within the group.
 - **A hook ships with its test file beside it** (`src/auth/use-login.test.tsx`), importing through that service's barrel. Shared fakes and builders live in that folder's `_test-helpers` file (never exported from the barrel); cross-cutting behaviour — the error model, formatter precedence, global config inheritance, the `onError` observer — lives in `src/auth/auth-provider.test.tsx`; the `firebase/auth` mock lives in the root `__mocks__/` directory, activated per file with a bare `vi.mock("firebase/auth")`. What's under test is the hook's orchestration (ordering, callbacks, error paths), not Firebase. Cover the edges: the null `auth`, the throwing callback, the signed-out user.
 
 ## Submitting a change
