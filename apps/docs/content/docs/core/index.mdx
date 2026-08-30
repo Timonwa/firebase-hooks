@@ -1,0 +1,35 @@
+---
+title: Core
+description: What every service shares — the result shape, error formatting, and the types behind both.
+---
+
+Core is the service-agnostic layer. Nothing here is specific to Auth, and nothing service-specific is ever added to it — so when Firestore and Storage land, they return the same result shape and format errors the same way.
+
+```ts
+import {
+  formatFirebaseError,
+  getFirebaseErrorCode,
+  type HookResult,
+} from "@timonwa/firebase-hooks";
+```
+
+Note the import path: the **root** entry, not `/auth`. Anything shared lives here; anything belonging to one service ships with that service's import.
+
+<Cards>
+  <Card title="HookResult" href="/docs/core/hook-result">
+    The shape every action resolves to — `{ success: true, ... }` or `{ success: false, error, code, cause }` — and how TypeScript narrows on it.
+  </Card>
+  <Card title="formatFirebaseError" href="/docs/core/format-firebase-error">
+    Opt-in message formatting, reading a raw Firebase code, and replacing the shipped wording with your own or another language.
+  </Card>
+</Cards>
+
+## What lives where
+
+| Export | Import | Why |
+| --- | --- | --- |
+| `HookResult`, `HookErrorOptions`, `HookErrorContext` | root | Every service resolves to the same shape |
+| `formatFirebaseError`, `getFirebaseErrorCode` | root | Firebase error codes are namespaced per service, but parsed identically |
+| `AUTH_ERROR_MESSAGES` | `/auth` | The message catalogue is specific to `auth/*` codes |
+
+Each service ships its own catalogue alongside its hooks — `FIRESTORE_ERROR_MESSAGES` with the Firestore hooks, and so on. That way an app importing only Auth never carries Firestore's copy.
