@@ -3,7 +3,7 @@
   <b>Typed React hooks for Firebase — one hook per flow, with its state, errors, and callbacks handled.</b>
   <br/><br/>
 
-<a href="https://www.npmjs.com/package/@timonwa/firebase-hooks"><img alt="npm" src="https://img.shields.io/npm/v/%40timonwa%2Ffirebase-hooks?style=flat-square&label=npm" /></a> <a href="./LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue?style=flat-square" /></a> <a href="https://github.com/Timonwa/firebase-hooks/blob/main/CONTRIBUTING.md"><img alt="PRs welcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen?style=flat-square" /></a> <a href="https://www.timonwa.com/support"><img alt="Support" src="https://img.shields.io/badge/Support-%E2%9D%A4-ea4aaa?style=flat-square&logo=githubsponsors&logoColor=white" /></a>
+<a href="https://firebase-hooks-timonwa-projects.vercel.app/docs"><img alt="Docs" src="https://img.shields.io/badge/docs-live-7C6BF5?style=flat-square" /></a> <a href="https://www.npmjs.com/package/@timonwa/firebase-hooks"><img alt="npm" src="https://img.shields.io/npm/v/%40timonwa%2Ffirebase-hooks?style=flat-square&label=npm" /></a> <a href="./LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue?style=flat-square" /></a> <a href="https://github.com/Timonwa/firebase-hooks/blob/main/CONTRIBUTING.md"><img alt="PRs welcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen?style=flat-square" /></a> <a href="https://www.timonwa.com/support"><img alt="Support" src="https://img.shields.io/badge/Support-%E2%9D%A4-ea4aaa?style=flat-square&logo=githubsponsors&logoColor=white" /></a>
 </div>
 
 ---
@@ -70,7 +70,7 @@ import {
 } from "@timonwa/firebase-hooks/auth";
 ```
 
-Every hook has its own page — signature, options, and a worked example — in the [documentation](https://github.com/Timonwa/firebase-hooks/tree/main/apps/docs/content/docs).
+Every hook has its own page — signature, options, and a worked example — in the [documentation](https://firebase-hooks-timonwa-projects.vercel.app/docs).
 
 ## How every hook works
 
