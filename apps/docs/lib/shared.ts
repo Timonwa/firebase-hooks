@@ -8,6 +8,10 @@ export const appName = 'Firebase Hooks';
 export const packageName = '@timonwa/firebase-hooks';
 export const packageVersion = pkg.version;
 export const npmUrl = 'https://www.npmjs.com/package/@timonwa/firebase-hooks';
+// Matches the first entry in .github/FUNDING.yml.
+export const supportUrl = 'https://github.com/sponsors/Timonwa';
+export const authorUrl = 'https://links.timonwa.com';
+export const authorName = 'Timonwa';
 
 export const docsRoute = '/docs';
 export const docsImageRoute = '/og/docs';

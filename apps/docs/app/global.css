@@ -78,6 +78,58 @@ html > body[data-scroll-locked] {
   color: var(--color-fd-primary-foreground);
 }
 
+/* Landing-page surfaces. Defined once here rather than repeated inline, so the
+   radius, border weight and elevation stay one system. Light comes from above:
+   the shadow falls below and the border is lighter at the top. */
+@utility surface {
+  border: 1px solid var(--color-fd-border);
+  border-radius: 0.75rem;
+  background-color: var(--color-fd-card);
+  box-shadow: 0 1px 2px oklch(0% 0 0 / 0.04);
+}
+
+@utility surface-raised {
+  border: 1px solid var(--color-fd-border);
+  border-radius: 0.75rem;
+  background-color: var(--color-fd-card);
+  box-shadow:
+    0 1px 2px oklch(0% 0 0 / 0.04),
+    0 8px 24px -12px oklch(0% 0 0 / 0.12);
+}
+
+/* Icon container. Tinted rather than filled, so six of them in a grid read as
+   quiet supporting marks instead of six competing colour blocks. */
+@utility icon-tile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.625rem;
+  color: var(--color-fd-primary);
+  background-color: color-mix(in oklch, var(--color-fd-primary) 12%, transparent);
+}
+
+/* The hero's dot grid — the one decorative signature on the page. Masked so it
+   fades out rather than ending on a hard edge.
+
+   Each mode gets its own strength: a dark dot on a light background reads far
+   fainter than a light dot on a dark one at the same mix, so a single value
+   leaves the grid invisible in light mode. */
+:root {
+  --dot-grid-color: color-mix(in oklch, var(--color-fd-foreground) 30%, transparent);
+}
+
+.dark {
+  --dot-grid-color: color-mix(in oklch, var(--color-fd-foreground) 20%, transparent);
+}
+
+@utility dot-grid {
+  background-image: radial-gradient(var(--dot-grid-color) 1.2px, transparent 1.2px);
+  background-size: 22px 22px;
+  mask-image: radial-gradient(ellipse 85% 70% at 50% 0%, black, transparent 80%);
+}
+
 /* Geist Mono renders wide at the inherited size; the small step down keeps an
    inline `useEmailLinkSignIn` from outrunning the prose around it. */
 code {
