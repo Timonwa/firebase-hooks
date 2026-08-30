@@ -20,11 +20,11 @@ pnpm verify   # typecheck, lint, test, build, publint, attw — the same gate CI
 
 ## Adding a hook
 
-- **One folder per service** (`src/core/`, `src/auth/`, later `src/firestore/`, `src/storage/`), each with its own `index.ts` entry barrel and its own test file. **One file per hook**, kebab-cased after it — `src/auth/use-login.ts`. Start the file with a `"use client"` directive and a JSDoc block; the JSDoc is what editors show, so keep it agreeing with the README. Internals a service shares live in that folder's `_shared.ts` and never reach the barrel.
+- **One folder per service** (`src/core/`, `src/auth/`, later `src/firestore/`, `src/storage/`), each with its own `index.ts` entry barrel. **One file per hook**, kebab-cased after it — `src/auth/use-login.ts`. Start the file with a `"use client"` directive and a JSDoc block; the JSDoc is what editors show, so keep it agreeing with the README. Internals a service shares live in that folder's `_shared.ts` and never reach the barrel.
 - **Follow the shared contract.** `auth: Auth | null` first argument; actions resolve to `AuthResult` and never throw (`useAuthTask` gives you the skeleton); sensitive operations reauthenticate first.
 - **Export it explicitly** from its service's entry barrel (`src/auth/index.ts` for auth), one line per file, alphabetical. The root entry (`src/core/index.ts`) carries only the service-agnostic core — nothing service-specific is ever added to it; a new service gets a new folder + subpath entry.
 - **Document it in `README.md` in the same change** — the README is the only documentation. Add the hook to its group's table and give it a section (signature, options with defaults, example), alphabetical within the group.
-- **Tests live beside their service** (`src/auth/auth.test.tsx`, `src/core/core.test.ts`) and go through that service's barrel and mock `firebase/auth` — what's under test is the hook's orchestration (ordering, callbacks, error paths), not Firebase. Cover the edges: the null `auth`, the throwing callback, the signed-out user.
+- **A hook ships with its test file beside it** (`src/auth/use-login.test.tsx`), importing through that service's barrel. Shared fakes and builders live in that folder's `_test-helpers` file (never exported from the barrel); cross-cutting behaviour — the error model, formatter precedence, global config inheritance, the `onError` observer — lives in `src/auth/auth-provider.test.tsx`; the `firebase/auth` mock lives in the root `__mocks__/` directory, activated per file with a bare `vi.mock("firebase/auth")`. What's under test is the hook's orchestration (ordering, callbacks, error paths), not Firebase. Cover the edges: the null `auth`, the throwing callback, the signed-out user.
 
 ## Submitting a change
 
