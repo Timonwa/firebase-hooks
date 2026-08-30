@@ -1,11 +1,19 @@
 # @timonwa/firebase-hooks
 
-Typed React hooks for every Firebase Auth client flow — email/password, OAuth, email link, phone, anonymous, and custom-token sign-in; password, email, profile, and provider-linking management. Your server session integrates through optional callbacks, so the hooks work for any backend or none. Zero dependencies — `firebase` and `react` are peers.
+Typed React hooks for Firebase, one entry per service. **Auth ships first** — every client sign-in flow, plus password, email, profile, and provider management — with Firestore and Storage next. Zero dependencies; `firebase` and `react` are peers.
 
 [![npm](https://img.shields.io/npm/v/@timonwa/firebase-hooks)](https://www.npmjs.com/package/@timonwa/firebase-hooks)
 [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-timonwa-FFDD00?logo=buymeacoffee&logoColor=black)](https://www.buymeacoffee.com/timonwa)
 
-Ships ESM and CJS with type declarations and a `"use client"` banner, so React Server Component frameworks (Next.js App Router, etc.) get a clear client-boundary error instead of a cryptic hooks crash.
+## Features
+
+- **Whole flows, not primitives.** `useEmailLinkSignIn` gives you `needsEmail` so you render your own input instead of `window.prompt`. `usePhoneSignIn` creates and cleans up the reCAPTCHA verifier. `useOAuthSignIn` finishes a redirect sign-in when the page returns. `useVerifyEmail` reports where the code-application got to.
+- **Server sessions built in.** `onIdToken` hands you a fresh ID token after every sign-in — trade it for a session cookie in one line. `onBeforeSignOut` runs before Firebase clears the session, so a failed teardown leaves the user signed in.
+- **Actions never throw.** Every one resolves to `{ success: true, ... }` or `{ success: false, error, code, cause }`.
+- **Firebase's own data, unmodified.** Sign-ins return the raw `UserCredential`; failures carry Firebase's error code and the original error. Message formatting is opt-in.
+- **Automatic reauthentication.** Pass `currentPassword` to a sensitive operation and the hook handles the recent-sign-in check; omit it and `auth/requires-recent-login` reaches you.
+- **Configure once or per call.** Session callbacks, action-code settings, error wording, and the `onError` observer live on `AuthProvider`; any hook can override them or opt out with `null`.
+- **Typed, tested, ESM + CJS.** The `"use client"` banner means React Server Component frameworks give a clear boundary error rather than a cryptic hooks crash.
 
 ## Quickstart
 
@@ -42,16 +50,17 @@ import { AuthProvider, useLogin, AUTH_ERROR_MESSAGES } from "@timonwa/firebase-h
 // coming: "@timonwa/firebase-hooks/firestore", "@timonwa/firebase-hooks/storage"
 ```
 
+Everything documented below is the `/auth` entry. Firestore and Storage will document their own.
+
 ## How every hook works
 
-The same contract everywhere, so learning one hook is learning them all:
+One contract, so learning one hook is learning them all:
 
 - **`auth` is the first argument** — your Firebase `Auth` instance, or `null` while it initialises. No global, no hidden singleton; calling an action before `auth` exists fails cleanly with `{ success: false, error }`.
-- **Actions never throw.** Every action resolves to `HookResult`: `{ success: true, ...data }` or `{ success: false, error, code, cause }` — and the hook's `error` state carries the same message for rendering.
-- **`onIdToken` is where your server session plugs in.** After a successful sign-in the hook fetches a fresh ID token and calls `onIdToken(idToken, user)` — exchange it for a session cookie there. Throw inside the callback to abort the whole flow; the error surfaces like any other. Set it **once on `AuthProvider`** and every sign-in hook inherits it; a hook's own option overrides the global, and an explicit `null` opts a single flow out. No backend? Omit it everywhere.
-- **Raw is never gated behind our processing.** Failures carry three layers: `error` (the message — raw by default, formatted only if you opt in), `code` (Firebase's raw error code, e.g. `"auth/invalid-credential"`), and `cause` (the complete untouched error object). If a formatter is ever wrong — or throws — `code` and `cause` still hold everything Firebase said. See [Error handling](#error-handling).
-- **Sensitive operations reauthenticate first.** Pass `currentPassword` to `useUpdatePassword`, `useUpdateEmail`, or `useDeleteAccount` and they run Firebase's required recent-sign-in check internally; omit it and the operation runs directly — `useReauthenticate` exposes the same dance for custom flows.
-- **App-wide policies live once on `AuthProvider`.** `onIdToken`, `onBeforeSignOut`, `actionCodeSettings`, `formatErrorMessage`, and the `onError` observer can all be set globally; hooks inherit them, a hook's own option overrides, and `null` opts out per flow:
+- **Every action resolves to `HookResult`** — `{ success: true, ...data }` or `{ success: false, error, code, cause }`. The hook's `error` state carries the same message for rendering, and `loading` and `success` track the action. See [Error handling](#error-handling).
+- **`onIdToken(idToken, user)` runs after a successful sign-in**, with a freshly minted token. Throw inside it to abort the flow; the error surfaces like any other.
+- **`currentPassword` triggers reauthentication** in `useUpdatePassword`, `useUpdateEmail`, and `useDeleteAccount`. `useReauthenticate` exposes the same step for custom flows.
+- **Provider options are defaults, hook options win.** `onIdToken`, `onBeforeSignOut`, `actionCodeSettings`, `formatErrorMessage`, and the `onError` observer can all be set once on `AuthProvider`; a hook's own option overrides the provider, and an explicit `null` opts that flow out entirely:
 
 ```tsx
 <AuthProvider
@@ -500,7 +509,7 @@ Plain React hooks, no framework imports — they run anywhere React runs: Next.j
 
 **React Native / Expo** (with the Firebase **web** SDK): the email/password, anonymous, custom-token, logout, password, email, profile, reauthentication, and linking hooks work as-is. Web-only by nature: `useOAuthSignIn` (popup/redirect are browser concepts), `usePhoneSignIn` (reCAPTCHA needs the DOM), and `useEmailLinkSignIn`'s email persistence (uses `localStorage`; a pluggable storage option is planned). The `react-native-firebase` native SDK is a different import surface and is not supported.
 
-Not covered (yet): multi-factor auth (TOTP/SMS enrolment and resolution) and multi-tenancy — planned for a later minor. The Admin SDK is server-side and out of scope.
+Not in `/auth` yet: multi-factor auth (TOTP/SMS enrolment and resolution) and multi-tenancy — planned for a later minor. The Admin SDK is server-side and out of scope.
 
 ## Contributing
 
