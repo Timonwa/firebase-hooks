@@ -7,6 +7,22 @@ Typed React hooks for every Firebase Auth client flow — email/password, OAuth,
 
 Ships ESM and CJS with type declarations and a `"use client"` banner, so React Server Component frameworks (Next.js App Router, etc.) get a clear client-boundary error instead of a cryptic hooks crash.
 
+## Design
+
+A handful of decisions shape every hook here. They are what the package is for, and knowing them means the rest of the API holds no surprises.
+
+**Flows arrive finished.** The awkward middle of a Firebase Auth flow lives inside the hook rather than in your component. `useEmailLinkSignIn` reports `needsEmail` so you render your own input instead of calling `window.prompt`. `usePhoneSignIn` creates the reCAPTCHA verifier, hands you `codeSent`, and clears the verifier on unmount. `useOAuthSignIn` finishes a redirect sign-in when the page comes back. `useVerifyEmail` runs the apply-the-code state machine and tells you where it got to.
+
+**Your server session is part of signing in.** `onIdToken` fires with a fresh ID token after every successful sign-in, so trading it for a session cookie is one line — set once on `AuthProvider`, inherited by every sign-in hook. `onBeforeSignOut` runs *before* Firebase clears the client session, so if your session teardown fails the user stays signed in rather than stranded half-way. Both are optional: omit them and the hooks are plain client-side auth.
+
+**Failures are values.** No action throws. Every one resolves to `{ success: true, … }` or `{ success: false, error, code, cause }`, so a form submit needs no `try`/`catch` and no error boundary.
+
+**Nothing stands between you and Firebase.** A successful sign-in hands back Firebase's untouched `UserCredential` next to the `user`. A failure carries Firebase's own error code and the entire original error as `cause`, and `error` is Firebase's own message unless you ask for formatting. If the wording layer is ever wrong, or throws, everything Firebase said is still right there.
+
+**The policy is yours.** `currentPassword` is optional on every sensitive operation: pass it and the hook reauthenticates for you, omit it and Firebase's `auth/requires-recent-login` reaches you to handle your own way. The same holds for the reCAPTCHA size, whether signup sends a verification email, where action links point, and how errors are worded — set them per hook, set them once on the provider, or opt one flow out with `null`.
+
+**One entry per service.** `/auth` is the auth surface; the root is the shared core. An auth-only app never carries code for services it does not use, and services added later cannot disturb what you already import.
+
 ## Quickstart
 
 ```bash
@@ -44,14 +60,13 @@ import { AuthProvider, useLogin, AUTH_ERROR_MESSAGES } from "@timonwa/firebase-h
 
 ## How every hook works
 
-The same contract everywhere, so learning one hook is learning them all:
+One contract, so learning one hook is learning them all:
 
 - **`auth` is the first argument** — your Firebase `Auth` instance, or `null` while it initialises. No global, no hidden singleton; calling an action before `auth` exists fails cleanly with `{ success: false, error }`.
-- **Actions never throw.** Every action resolves to `HookResult`: `{ success: true, ...data }` or `{ success: false, error, code, cause }` — and the hook's `error` state carries the same message for rendering.
-- **`onIdToken` is where your server session plugs in.** After a successful sign-in the hook fetches a fresh ID token and calls `onIdToken(idToken, user)` — exchange it for a session cookie there. Throw inside the callback to abort the whole flow; the error surfaces like any other. Set it **once on `AuthProvider`** and every sign-in hook inherits it; a hook's own option overrides the global, and an explicit `null` opts a single flow out. No backend? Omit it everywhere.
-- **Raw is never gated behind our processing.** Failures carry three layers: `error` (the message — raw by default, formatted only if you opt in), `code` (Firebase's raw error code, e.g. `"auth/invalid-credential"`), and `cause` (the complete untouched error object). If a formatter is ever wrong — or throws — `code` and `cause` still hold everything Firebase said. See [Error handling](#error-handling).
-- **Sensitive operations reauthenticate first.** Pass `currentPassword` to `useUpdatePassword`, `useUpdateEmail`, or `useDeleteAccount` and they run Firebase's required recent-sign-in check internally; omit it and the operation runs directly — `useReauthenticate` exposes the same dance for custom flows.
-- **App-wide policies live once on `AuthProvider`.** `onIdToken`, `onBeforeSignOut`, `actionCodeSettings`, `formatErrorMessage`, and the `onError` observer can all be set globally; hooks inherit them, a hook's own option overrides, and `null` opts out per flow:
+- **Every action resolves to `HookResult`** — `{ success: true, ...data }` or `{ success: false, error, code, cause }`. The hook's `error` state carries the same message for rendering, and `loading` and `success` track the action. See [Error handling](#error-handling).
+- **`onIdToken(idToken, user)` runs after a successful sign-in**, with a freshly minted token. Throw inside it to abort the flow; the error surfaces like any other.
+- **`currentPassword` triggers reauthentication** in `useUpdatePassword`, `useUpdateEmail`, and `useDeleteAccount`. `useReauthenticate` exposes the same step for custom flows.
+- **Provider options are defaults, hook options win.** `onIdToken`, `onBeforeSignOut`, `actionCodeSettings`, `formatErrorMessage`, and the `onError` observer can all be set once on `AuthProvider`; a hook's own option overrides the provider, and an explicit `null` opts that flow out entirely:
 
 ```tsx
 <AuthProvider
