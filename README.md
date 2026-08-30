@@ -3,7 +3,7 @@
   <b>Typed React hooks for Firebase — one hook per flow, with its state, errors, and callbacks handled.</b>
   <br/><br/>
 
-<a href="https://www.npmjs.com/package/@timonwa/firebase-hooks"><img alt="npm" src="https://img.shields.io/npm/v/%40timonwa%2Ffirebase-hooks?style=flat-square&label=npm" /></a> <a href="./LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue?style=flat-square" /></a> <a href="CONTRIBUTING.md"><img alt="PRs welcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen?style=flat-square" /></a> <a href="https://www.timonwa.com/support"><img alt="Support" src="https://img.shields.io/badge/Support-%E2%9D%A4-ea4aaa?style=flat-square&logo=githubsponsors&logoColor=white" /></a>
+<a href="https://www.npmjs.com/package/@timonwa/firebase-hooks"><img alt="npm" src="https://img.shields.io/npm/v/%40timonwa%2Ffirebase-hooks?style=flat-square&label=npm" /></a> <a href="./LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue?style=flat-square" /></a> <a href="https://github.com/Timonwa/firebase-hooks/blob/main/CONTRIBUTING.md"><img alt="PRs welcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen?style=flat-square" /></a> <a href="https://www.timonwa.com/support"><img alt="Support" src="https://img.shields.io/badge/Support-%E2%9D%A4-ea4aaa?style=flat-square&logo=githubsponsors&logoColor=white" /></a>
 </div>
 
 ---
@@ -159,7 +159,7 @@ Not in Auth yet: multi-factor auth (TOTP/SMS enrolment and resolution) and multi
 
 ## Contributing
 
-Bug reports and PRs welcome — see [CONTRIBUTING.md](CONTRIBUTING.md).
+Bug reports and PRs welcome — see [CONTRIBUTING.md](https://github.com/Timonwa/firebase-hooks/blob/main/CONTRIBUTING.md).
 
 ## License
 

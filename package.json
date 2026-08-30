@@ -23,7 +23,8 @@
     "check:exports": "pnpm --filter @timonwa/firebase-hooks check:exports",
     "check:publish": "pnpm --filter @timonwa/firebase-hooks check:publish",
     "verify": "pnpm typecheck && pnpm lint && pnpm test && pnpm build && pnpm check:publish && pnpm check:exports",
-    "release": "pnpm build && changeset publish",
+    "prerelease:readme": "cp README.md packages/firebase-hooks/README.md",
+    "release": "pnpm prerelease:readme && pnpm build && changeset publish",
     "prepare": "husky"
   },
   "devDependencies": {
