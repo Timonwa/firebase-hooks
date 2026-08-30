@@ -1,0 +1,83 @@
+---
+title: formatFirebaseError
+description: Opt-in message formatting, and reading a raw Firebase error code.
+---
+
+Both live on the root import, because every service shares them.
+
+```ts
+import { formatFirebaseError, getFirebaseErrorCode } from "@timonwa/firebase-hooks";
+```
+
+## formatFirebaseError
+
+```ts
+formatFirebaseError(
+  error: unknown,
+  options?: { messages?: Record<string, string>; fallback?: string },
+): string
+```
+
+Resolves in a fixed order:
+
+1. **A match in `messages` wins.** Keyed by Firebase code.
+2. **An unmapped Firebase error keeps Firebase's own words, with the framing stripped.** `"Firebase: The email address is badly formatted. (auth/invalid-email)."` becomes `"The email address is badly formatted."`
+3. **Anything else passes through raw** — so an error thrown from your own `onIdToken` arrives exactly as you threw it.
+
+```ts
+formatFirebaseError(error, { messages: AUTH_ERROR_MESSAGES });
+```
+
+Nothing is formatted unless you ask. With no configuration, `error` is whatever Firebase produced.
+
+## getFirebaseErrorCode
+
+```ts
+getFirebaseErrorCode(error: unknown): string | null
+```
+
+Pulls the code out of an unknown error, or returns `null` if it isn't a Firebase error.
+
+```ts
+if (getFirebaseErrorCode(err) === "auth/too-many-requests") startCooldown();
+```
+
+You rarely need it on results — `code` is already there. It's for errors caught elsewhere.
+
+## AUTH_ERROR_MESSAGES
+
+Ships with the auth import, not the root:
+
+```ts
+import { AUTH_ERROR_MESSAGES } from "@timonwa/firebase-hooks/auth";
+```
+
+A curated `auth/*` catalogue written to be security-conscious — credential failures never reveal whether an account exists.
+
+Spread and override it for your own voice or another language:
+
+```ts
+formatFirebaseError(e, {
+  messages: {
+    ...AUTH_ERROR_MESSAGES,
+    "auth/invalid-credential": "Email ou mot de passe incorrect.",
+  },
+});
+```
+
+Future services ship their own catalogue with their own import — `FIRESTORE_ERROR_MESSAGES` with the Firestore hooks, and so on.
+
+## Applying it everywhere
+
+Set it once on the provider and every hook below inherits it:
+
+```tsx
+<AuthProvider
+  auth={auth}
+  formatErrorMessage={(e) => formatFirebaseError(e, { messages: AUTH_ERROR_MESSAGES })}
+>
+  {children}
+</AuthProvider>
+```
+
+If your formatter throws, `error` falls back to the raw message — the failure still reaches you.

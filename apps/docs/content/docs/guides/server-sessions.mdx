@@ -1,0 +1,67 @@
+---
+title: Server sessions
+description: Trade a fresh ID token for your own session cookie, and tear it down before sign-out.
+---
+
+Firebase signs users in on the client. If your server needs to know who they are, it needs its own session — usually a cookie minted from a Firebase ID token. This package builds that handoff into the sign-in flow rather than leaving it to a `useEffect`.
+
+## Minting on sign-in
+
+`onIdToken` runs after a successful sign-in with a freshly minted token.
+
+```tsx
+const { login } = useLogin(auth, {
+  onIdToken: async (idToken, user) => {
+    await fetch("/api/session", {
+      method: "POST",
+      body: JSON.stringify({ idToken }),
+    });
+  },
+});
+```
+
+It runs as part of the flow, not after it. **Throwing inside it aborts the sign-in** and surfaces the error like any other failure — so a user never lands on a protected page with a Firebase session but no server session.
+
+Every sign-in hook accepts it: [`useLogin`](/docs/auth/use-login), [`useSignup`](/docs/auth/use-signup), [`useOAuthSignIn`](/docs/auth/use-oauth-sign-in), [`useEmailLinkSignIn`](/docs/auth/use-email-link-sign-in), [`usePhoneSignIn`](/docs/auth/use-phone-sign-in), [`useAnonymousSignIn`](/docs/auth/use-anonymous-sign-in), and [`useCustomTokenSignIn`](/docs/auth/use-custom-token-sign-in).
+
+## Tearing down on sign-out
+
+`onBeforeSignOut` runs **first**, before Firebase clears anything.
+
+```tsx
+const { logout } = useLogout(auth, {
+  onBeforeSignOut: () => fetch("/api/session", { method: "DELETE" }),
+});
+```
+
+If that call throws, the Firebase session is left intact and the user can retry. The alternative — clearing Firebase first — can strand a live server session with no way to reach it.
+
+## Setting it once
+
+Both callbacks can live on the provider, so individual hooks need no wiring:
+
+```tsx
+<AuthProvider
+  auth={auth}
+  onIdToken={(idToken) => createSession(idToken)}
+  onBeforeSignOut={() => clearSession()}
+>
+  {children}
+</AuthProvider>;
+
+const { login } = useLogin(auth); // session minting inherited
+```
+
+A hook's own option overrides the provider, and `null` opts that hook out.
+
+## Refreshing after verification
+
+[`useVerifyEmail`](/docs/auth/use-verify-email) reloads the user and refreshes the token after applying the code, then runs `onVerified` — the right place to refresh a server session whose claims just changed.
+
+```tsx
+useVerifyEmail(auth, oobCode, { onVerified: refreshSession });
+```
+
+## Verifying on the server
+
+Verifying the token is the Firebase Admin SDK's job, and it's server-side by design — out of scope for this package. `onIdToken` gets you the token; what you do with it is yours.

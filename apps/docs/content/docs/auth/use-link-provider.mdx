@@ -1,0 +1,21 @@
+---
+title: useLinkProvider
+description: Add a sign-in method to the current user.
+---
+
+```tsx
+const { linkWithProvider, linkWithPassword } = useLinkProvider(auth);
+
+await linkWithProvider(new GoogleAuthProvider()); // guest -> Google account
+await linkWithPassword(email, password);          // guest -> email/password account
+```
+
+## Returns
+
+`linkWithProvider(provider)` links an OAuth provider via popup. `linkWithPassword(email, password)` links an email/password credential.
+
+Both resolve to `{ success: true, user, credential }` or a failure result. Also exposes `loading` and `error`.
+
+## Upgrading a guest
+
+The classic use: turn an anonymous user from [`useAnonymousSignIn`](/docs/auth/use-anonymous-sign-in) into a real account **without losing their data**. The uid stays the same, so everything they created still belongs to them.

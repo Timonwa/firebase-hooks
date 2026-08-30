@@ -1,0 +1,27 @@
+---
+title: useSignup
+description: Email/password signup with optional profile and a verification email.
+---
+
+The standard client-side signup: create the account, set the optional profile, send the verification email (on by default), then run `onIdToken`.
+
+```tsx
+const { signup, loading, error } = useSignup(auth, { onIdToken: createSession });
+
+const result = await signup(email, password, { displayName: fullName });
+if (result.success) router.push("/verify-email");
+```
+
+## Returns
+
+`signup(email, password, profile?)` resolves to `{ success: true, user, credential }` or a failure result. Also exposes `loading` and `error`.
+
+`profile` takes `displayName` and `photoURL`, both optional.
+
+## Notes
+
+Server-first signups — where your API creates the record and the client signs in afterwards — should compose [`useLogin`](/docs/auth/use-login) instead.
+
+## Options
+
+<AutoTypeTable path="../../packages/firebase-hooks/src/auth/use-signup.ts" name="UseSignupOptionsProps" />

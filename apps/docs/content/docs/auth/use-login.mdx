@@ -29,7 +29,7 @@ function LoginForm() {
 
 ## Returns
 
-`login(email, password)` resolves to a [`HookResult`](/docs/core/errors) — `{ success: true, user, credential }` on success, or `{ success: false, error, code, cause }` on failure. It never throws.
+`login(email, password)` resolves to a [`HookResult`](/docs/core/hook-result) — `{ success: true, user, credential }` on success, or `{ success: false, error, code, cause }` on failure. It never throws.
 
 The hook also exposes `loading` and `error` for rendering.
 

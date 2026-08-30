@@ -1,0 +1,62 @@
+---
+title: AuthProvider / useAuth
+description: Live Firebase user and custom claims for the whole tree, plus app-wide defaults.
+---
+
+Two things in one: the live user for your component tree, and the place app-wide defaults live.
+
+Hooks work with no provider at all — it's additive, not required.
+
+```tsx
+<AuthProvider auth={auth}>{children}</AuthProvider>;
+
+const { firebaseUser, claims, isAuthenticated, isLoading } = useAuth();
+if (claims?.isAdmin) showAdminNav();
+```
+
+## useAuth
+
+| Field | Type | What it is |
+| --- | --- | --- |
+| `firebaseUser` | `User \| null` | The live Firebase user |
+| `claims` | `Record<string, unknown> \| null` | Custom claims from the ID token |
+| `isAuthenticated` | `boolean` | Whether a user is signed in |
+| `isLoading` | `boolean` | True only until Firebase's first callback |
+
+## Claims update without a reload
+
+The provider subscribes to `onIdTokenChanged`, not `onAuthStateChanged`. So `firebaseUser` and `claims` update on sign-in, sign-out, **and token refreshes** — meaning a custom-claim change like a role update propagates on its own.
+
+`isLoading` is true only until the first callback, which is how you tell "signed out" from "not yet known".
+
+## App-wide defaults
+
+Set these once and every hook below inherits them:
+
+```tsx
+<AuthProvider
+  auth={auth}
+  onIdToken={(idToken) => createSession(idToken)}
+  onBeforeSignOut={() => clearSession()}
+  actionCodeSettings={{ url: `${origin}/auth/action`, handleCodeInApp: true }}
+  formatErrorMessage={(e) => formatFirebaseError(e, { messages: AUTH_ERROR_MESSAGES })}
+  onError={(error, { action, code }) => track("auth_error", { action, code })}
+>
+  {children}
+</AuthProvider>
+```
+
+A hook's own option overrides the provider, and an explicit `null` opts that flow out entirely.
+
+| Prop | What it does |
+| --- | --- |
+| `auth` | Your `Auth` instance, or `null` while it initialises |
+| `onIdToken` | Inherited by every sign-in hook |
+| `onBeforeSignOut` | Inherited by [`useLogout`](/docs/auth/use-logout) |
+| `actionCodeSettings` | Inherited by every emailed link |
+| `formatErrorMessage` | Inherited by every hook — see [Error handling](/docs/guides/error-handling) |
+| `onError` | Fire-and-forget observer for every failure |
+
+## Your own user record
+
+Server-fetched user records are an app concern. Layer your own provider on top of this one rather than expecting this one to fetch them.

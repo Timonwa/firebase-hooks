@@ -1,0 +1,32 @@
+---
+title: usePhoneSignIn
+description: SMS code sign-in with a managed reCAPTCHA verifier.
+---
+
+Two steps: `sendCode` verifies the caller through reCAPTCHA and texts the code, `confirmCode` completes the sign-in.
+
+```tsx
+const { sendCode, confirmCode, codeSent } = usePhoneSignIn(auth, { onIdToken: createSession });
+
+<div id="recaptcha-container" />;
+
+await sendCode("+2348012345678", "recaptcha-container");
+// after the user types the SMS code:
+const result = await confirmCode(smsCode);
+```
+
+## Returns
+
+`sendCode(phoneNumber, recaptchaContainer)` resolves to `{ success: true }` or a failure result. The container is an element id or the element itself, and must be empty.
+
+`confirmCode(code)` resolves to `{ success: true, user, credential }` or a failure result.
+
+`codeSent` flips true after a successful send. Also exposes `loading` and `error`.
+
+## The reCAPTCHA verifier
+
+Created and cleaned up for you — you never construct a `RecaptchaVerifier`. Choose `recaptchaSize: "invisible"` (the default) or `"normal"` for the visible widget.
+
+## Options
+
+<AutoTypeTable path="../../packages/firebase-hooks/src/auth/use-phone-sign-in.ts" name="UsePhoneSignInOptionsProps" />

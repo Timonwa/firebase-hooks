@@ -1,0 +1,37 @@
+---
+title: SSR and server components
+description: Where the client boundary is, and why a null auth is always safe.
+---
+
+Every hook here is a client hook, and the built output carries a `"use client"` banner.
+
+In React Server Component frameworks you import from this package inside client components with no extra ceremony. Importing from a server component fails with the framework's own boundary error rather than a cryptic hooks error — that's what the banner buys you.
+
+## A null `auth` is safe
+
+Firebase usually initialises in an effect or a provider, so there's a window where you have no `Auth` instance. Passing `null` through it is fine:
+
+- State hooks report signed-out/loading.
+- Actions fail cleanly with `{ success: false, error, code, cause }`.
+
+Nothing throws, so you don't need to guard every call site.
+
+```tsx
+const { login } = useLogin(auth); // auth may be null — calling login just fails cleanly
+```
+
+## Distinguishing "signed out" from "not yet known"
+
+[`useAuth`](/docs/auth/auth-provider) exposes `isLoading`, true only until Firebase's first callback. Without it, a signed-in user flashes a signed-out UI on every load.
+
+```tsx
+const { firebaseUser, isLoading } = useAuth();
+if (isLoading) return <Spinner />;
+return firebaseUser ? <Dashboard /> : <SignIn />;
+```
+
+## Server-rendered user state
+
+This package reads auth on the client. If you need the user during SSR, that comes from your own session cookie and the Admin SDK, not from here — see [Server sessions](/docs/guides/server-sessions).
+
+Layer your own provider on top of this one for server-fetched user records.

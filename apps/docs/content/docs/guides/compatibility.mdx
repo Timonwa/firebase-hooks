@@ -1,0 +1,36 @@
+---
+title: Compatibility
+description: Where these hooks run, what works on React Native, and what isn't covered yet.
+---
+
+## Frameworks
+
+Plain React hooks with no framework imports, so they run anywhere React runs:
+
+- **Next.js** — App Router or Pages Router
+- **React Router / Remix**
+- **TanStack Start**, **Waku**, **Gatsby**
+- **Vite / CRA** single-page apps
+- **Astro** React islands
+
+## React Native and Expo
+
+Works with the Firebase **web** SDK. These hooks run as-is:
+
+email/password, anonymous, custom token, logout, password flows, email flows, profile, reauthentication, and provider linking.
+
+Three are web-only by nature:
+
+| Hook | Why |
+| --- | --- |
+| [`useOAuthSignIn`](/docs/auth/use-oauth-sign-in) | Popup and redirect are browser concepts |
+| [`usePhoneSignIn`](/docs/auth/use-phone-sign-in) | reCAPTCHA needs the DOM |
+| [`useEmailLinkSignIn`](/docs/auth/use-email-link-sign-in) | Email persistence uses `localStorage` — a pluggable storage option is planned |
+
+The `react-native-firebase` native SDK is a different import surface and isn't supported.
+
+## Not covered yet
+
+- **Multi-factor auth** — TOTP and SMS enrolment/resolution. Planned for a later minor.
+- **Multi-tenancy** — planned.
+- **The Admin SDK** — server-side by design, out of scope.

@@ -1,0 +1,20 @@
+---
+title: useUnlinkProvider
+description: Remove a sign-in method.
+---
+
+```tsx
+const { unlinkProvider } = useUnlinkProvider(auth);
+
+await unlinkProvider("google.com");
+```
+
+## Returns
+
+`unlinkProvider(providerId)` resolves to `{ success: true, user, credential }` or a failure result. Also exposes `loading` and `error`.
+
+Provider ids are Firebase's own: `"google.com"`, `"password"`, `"github.com"`, and so on.
+
+## Notes
+
+Firebase refuses to unlink the last remaining method, so an account can't be locked out this way. That refusal arrives as a normal failure result.

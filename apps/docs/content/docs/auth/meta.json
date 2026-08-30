@@ -1,0 +1,29 @@
+{
+  "title": "Auth",
+  "pages": [
+    "auth-provider",
+    "---Signing in and out---",
+    "use-login",
+    "use-signup",
+    "use-logout",
+    "use-oauth-sign-in",
+    "use-email-link-sign-in",
+    "use-phone-sign-in",
+    "use-anonymous-sign-in",
+    "use-custom-token-sign-in",
+    "---Passwords---",
+    "use-send-password-reset-email",
+    "use-confirm-password-reset",
+    "use-update-password",
+    "---Email---",
+    "use-send-email-verification",
+    "use-verify-email",
+    "use-update-email",
+    "---Account and linking---",
+    "use-update-profile",
+    "use-delete-account",
+    "use-reauthenticate",
+    "use-link-provider",
+    "use-unlink-provider"
+  ]
+}
