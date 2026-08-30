@@ -27,7 +27,9 @@ describe("useLogin", () => {
   });
 
   it("a throwing onIdToken aborts the flow and surfaces the error", async () => {
-    vi.mocked(signInWithEmailAndPassword).mockResolvedValue({ user: makeUser() } as never);
+    vi.mocked(signInWithEmailAndPassword).mockResolvedValue({
+      user: makeUser(),
+    } as never);
     const { result } = renderHook(() =>
       useLogin(makeAuth(), {
         onIdToken: () => {

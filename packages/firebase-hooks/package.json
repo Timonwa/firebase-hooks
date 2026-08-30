@@ -1,0 +1,88 @@
+{
+  "name": "@timonwa/firebase-hooks",
+  "version": "0.1.0",
+  "description": "Typed React hooks for Firebase — one hook per flow, with its state, errors, and callbacks handled. Every action returns a result you can branch on, and each service is its own import, so an app only carries what it uses.",
+  "keywords": [
+    "react",
+    "hooks",
+    "react-hooks",
+    "firebase",
+    "firebase-auth",
+    "firestore",
+    "firebase-storage",
+    "cloud-functions",
+    "authentication",
+    "oauth",
+    "typescript"
+  ],
+  "license": "MIT",
+  "author": "Timonwa Akintokun",
+  "homepage": "https://github.com/Timonwa/firebase-hooks#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Timonwa/firebase-hooks.git"
+  },
+  "bugs": "https://github.com/Timonwa/firebase-hooks/issues",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./auth": {
+      "import": {
+        "types": "./dist/auth.d.mts",
+        "default": "./dist/auth.mjs"
+      },
+      "require": {
+        "types": "./dist/auth.d.cts",
+        "default": "./dist/auth.cjs"
+      }
+    }
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "check:exports": "attw --pack . --profile node16",
+    "check:publish": "publint",
+    "verify": "pnpm typecheck && pnpm test && pnpm build && pnpm check:publish && pnpm check:exports"
+  },
+  "peerDependencies": {
+    "firebase": "^11.0.0 || ^12.0.0",
+    "react": "^18.0.0 || ^19.0.0"
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.5",
+    "@testing-library/react": "^16.3.0",
+    "@types/react": "^19.2.18",
+    "firebase": "^12.18.0",
+    "jsdom": "^28.0.0",
+    "publint": "^0.3.23",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "tsdown": "^0.22.14",
+    "typescript": "^5.9.3",
+    "unrun": "^0.3.1",
+    "vitest": "^4.1.10"
+  }
+}

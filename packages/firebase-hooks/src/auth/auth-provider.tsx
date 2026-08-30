@@ -28,8 +28,20 @@
 
 "use client";
 
-import { type ActionCodeSettings, type Auth, onIdTokenChanged, type User } from "firebase/auth";
-import { createContext, type ReactNode, useContext, useEffect, useMemo, useState } from "react";
+import {
+  type ActionCodeSettings,
+  type Auth,
+  onIdTokenChanged,
+  type User,
+} from "firebase/auth";
+import {
+  createContext,
+  type ReactNode,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { AuthConfigContext, type HookErrorContext, type OnIdToken } from "./_shared";
 
 interface AuthContextValueProps {
@@ -95,14 +107,25 @@ export function AuthProvider({
   }, [auth]);
 
   const config = useMemo(
-    () => ({ formatErrorMessage, onIdToken, onBeforeSignOut, actionCodeSettings, onError }),
+    () => ({
+      formatErrorMessage,
+      onIdToken,
+      onBeforeSignOut,
+      actionCodeSettings,
+      onError,
+    }),
     [formatErrorMessage, onIdToken, onBeforeSignOut, actionCodeSettings, onError],
   );
 
   return (
     <AuthConfigContext.Provider value={config}>
       <AuthContext.Provider
-        value={{ firebaseUser, claims, isAuthenticated: firebaseUser !== null, isLoading }}
+        value={{
+          firebaseUser,
+          claims,
+          isAuthenticated: firebaseUser !== null,
+          isLoading,
+        }}
       >
         {children}
       </AuthContext.Provider>

@@ -11,6 +11,8 @@ pnpm install
 pnpm verify   # typecheck, lint, test, build, publint, attw — the same gate CI runs
 ```
 
+This is a pnpm workspace. The published package lives in `packages/firebase-hooks/`, and every root script delegates to it, so `pnpm test` and `pnpm build` work from the repo root. **Paths below are relative to `packages/firebase-hooks/`.**
+
 ## What gets accepted
 
 - **Firebase client-SDK flows any React app can use.** The Services table in the README tracks what's live and what's next; a new service starts as its own folder and subpath entry. Nothing tied to a product or a framework (no `next/*` imports). `firebase` and `react` stay peer dependencies; the Admin SDK is server-side and out of scope.
@@ -24,7 +26,7 @@ pnpm verify   # typecheck, lint, test, build, publint, attw — the same gate CI
 - **Follow the shared contract.** `auth: Auth | null` first argument; actions resolve to `HookResult` and never throw (`useAuthTask` gives you the skeleton); sensitive operations reauthenticate first.
 - **Export it explicitly** from its service's entry barrel (`src/auth/index.ts` for auth), one line per file, alphabetical. The root entry (`src/core/index.ts`) carries only the service-agnostic core — nothing service-specific is ever added to it; a new service gets a new folder + subpath entry.
 - **Document it in `README.md` in the same change** — until the docs site ships, the README's [hook reference](README.md#hook-reference) is the only documentation. Add the hook to its group's table and give it a section (signature, options with defaults, example), alphabetical within the group.
-- **A hook ships with its test file beside it** (`src/auth/use-login.test.tsx`), importing through that service's barrel. Shared fakes and builders live in that folder's `_test-helpers` file (never exported from the barrel); cross-cutting behaviour — the error model, formatter precedence, global config inheritance, the `onError` observer — lives in `src/auth/auth-provider.test.tsx`; the `firebase/auth` mock lives in the root `__mocks__/` directory, activated per file with a bare `vi.mock("firebase/auth")`. What's under test is the hook's orchestration (ordering, callbacks, error paths), not Firebase. Cover the edges: the null `auth`, the throwing callback, the signed-out user.
+- **A hook ships with its test file beside it** (`src/auth/use-login.test.tsx`), importing through that service's barrel. Shared fakes and builders live in that folder's `_test-helpers` file (never exported from the barrel); cross-cutting behaviour — the error model, formatter precedence, global config inheritance, the `onError` observer — lives in `src/auth/auth-provider.test.tsx`; the `firebase/auth` mock lives in the package's `__mocks__/` directory, activated per file with a bare `vi.mock("firebase/auth")`. What's under test is the hook's orchestration (ordering, callbacks, error paths), not Firebase. Cover the edges: the null `auth`, the throwing callback, the signed-out user.
 
 ## Submitting a change
 

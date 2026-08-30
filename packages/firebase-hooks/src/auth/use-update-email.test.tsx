@@ -17,7 +17,9 @@ describe("useUpdateEmail", () => {
       order.push("reauth");
       return undefined as never;
     });
-    vi.mocked(verifyBeforeUpdateEmail).mockImplementation(async () => void order.push("verify"));
+    vi.mocked(verifyBeforeUpdateEmail).mockImplementation(
+      async () => void order.push("verify"),
+    );
     const user = makeUser();
     const { result } = renderHook(() => useUpdateEmail(makeAuth(user)));
     await act(async () => {

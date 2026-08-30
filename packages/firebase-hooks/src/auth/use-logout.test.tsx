@@ -40,9 +40,12 @@ describe("useLogout", () => {
   it("an explicit null opts out of the provider's onBeforeSignOut", async () => {
     const globalClear = vi.fn();
     const wrapper = withAuthProvider({ auth: makeAuth(), onBeforeSignOut: globalClear });
-    const { result } = renderHook(() => useLogout(makeAuth(), { onBeforeSignOut: null }), {
-      wrapper,
-    });
+    const { result } = renderHook(
+      () => useLogout(makeAuth(), { onBeforeSignOut: null }),
+      {
+        wrapper,
+      },
+    );
     let outcome: Awaited<ReturnType<typeof result.current.logout>> | undefined;
     await act(async () => {
       outcome = await result.current.logout();

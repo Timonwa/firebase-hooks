@@ -20,7 +20,10 @@ describe("useUpdatePassword", () => {
     vi.mocked(updatePassword).mockImplementation(async () => void order.push("update"));
     const { result } = renderHook(() => useUpdatePassword(makeAuth(makeUser())));
     await act(async () => {
-      await result.current.update({ newPassword: "new-pw", currentPassword: "current-pw" });
+      await result.current.update({
+        newPassword: "new-pw",
+        currentPassword: "current-pw",
+      });
     });
     expect(order).toEqual(["reauth", "update"]);
     expect(result.current.success).toBe(true);

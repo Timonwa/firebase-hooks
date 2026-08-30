@@ -60,7 +60,9 @@ describe("useLinkProvider", () => {
       code: "auth/credential-already-in-use",
       cause: firebaseError,
     });
-    expect(result.current.error).toBe("Firebase: Error (auth/credential-already-in-use).");
+    expect(result.current.error).toBe(
+      "Firebase: Error (auth/credential-already-in-use).",
+    );
   });
 
   it("requires a signed-in user", async () => {

@@ -1,6 +1,8 @@
 node_modules/
 dist/
 coverage/
+.next/
+.source/
 *.tsbuildinfo
 .DS_Store
 .turbo/

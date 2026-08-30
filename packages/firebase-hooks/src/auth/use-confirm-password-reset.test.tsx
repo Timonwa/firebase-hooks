@@ -22,7 +22,11 @@ describe("useConfirmPasswordReset", () => {
     await act(async () => {
       await result.current.confirm("oob-1", "new-pw");
     });
-    expect(confirmPasswordReset).toHaveBeenCalledWith(expect.anything(), "oob-1", "new-pw");
+    expect(confirmPasswordReset).toHaveBeenCalledWith(
+      expect.anything(),
+      "oob-1",
+      "new-pw",
+    );
     expect(result.current.success).toBe(true);
   });
 
@@ -47,7 +51,10 @@ describe("useConfirmPasswordReset", () => {
 
   it("a failed confirm keeps success false", async () => {
     vi.mocked(confirmPasswordReset).mockRejectedValue(
-      new FakeFirebaseError("auth/weak-password", "Firebase: Error (auth/weak-password)."),
+      new FakeFirebaseError(
+        "auth/weak-password",
+        "Firebase: Error (auth/weak-password).",
+      ),
     );
     const { result } = renderHook(() => useConfirmPasswordReset(makeAuth()));
     let outcome: Awaited<ReturnType<typeof result.current.confirm>> | undefined;
@@ -61,7 +68,10 @@ describe("useConfirmPasswordReset", () => {
 
   it("resetState clears the error for a retry", async () => {
     vi.mocked(confirmPasswordReset).mockRejectedValue(
-      new FakeFirebaseError("auth/weak-password", "Firebase: Error (auth/weak-password)."),
+      new FakeFirebaseError(
+        "auth/weak-password",
+        "Firebase: Error (auth/weak-password).",
+      ),
     );
     const { result } = renderHook(() => useConfirmPasswordReset(makeAuth()));
     await act(async () => {

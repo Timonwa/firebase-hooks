@@ -49,7 +49,9 @@ describe("useAnonymousSignIn", () => {
       code: "auth/admin-restricted-operation",
       cause: firebaseError,
     });
-    expect(result.current.error).toBe("Firebase: Error (auth/admin-restricted-operation).");
+    expect(result.current.error).toBe(
+      "Firebase: Error (auth/admin-restricted-operation).",
+    );
     expect(result.current.loading).toBe(false);
   });
 });

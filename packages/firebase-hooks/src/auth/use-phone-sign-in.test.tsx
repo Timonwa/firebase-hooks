@@ -1,7 +1,12 @@
 import { act, renderHook } from "@testing-library/react";
 import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { FakeFirebaseError, makeAuth, makeUser, withAuthProvider } from "./_test-helpers.js";
+import {
+  FakeFirebaseError,
+  makeAuth,
+  makeUser,
+  withAuthProvider,
+} from "./_test-helpers.js";
 import { usePhoneSignIn } from "./index.js";
 
 vi.mock("firebase/auth");

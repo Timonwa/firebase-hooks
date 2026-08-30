@@ -1,7 +1,12 @@
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { getRedirectResult, signInWithPopup, signInWithRedirect } from "firebase/auth";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { FakeFirebaseError, makeAuth, makeUser, withAuthProvider } from "./_test-helpers.js";
+import {
+  FakeFirebaseError,
+  makeAuth,
+  makeUser,
+  withAuthProvider,
+} from "./_test-helpers.js";
 import { useOAuthSignIn } from "./index.js";
 
 vi.mock("firebase/auth");
@@ -31,7 +36,7 @@ describe("useOAuthSignIn", () => {
     expect(getRedirectResult).toHaveBeenCalledTimes(1);
   });
 
-  it("method: \"redirect\" navigates away instead of opening the popup", async () => {
+  it('method: "redirect" navigates away instead of opening the popup', async () => {
     const provider = { providerId: "google.com" } as never;
     const { result } = renderHook(() => useOAuthSignIn(makeAuth()));
     let outcome: Awaited<ReturnType<typeof result.current.signIn>> | undefined;

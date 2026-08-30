@@ -11,7 +11,12 @@ import {
 } from "firebase/auth";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { formatFirebaseError } from "../core/index.js";
-import { FakeFirebaseError, makeAuth, makeUser, withAuthProvider } from "./_test-helpers.js";
+import {
+  FakeFirebaseError,
+  makeAuth,
+  makeUser,
+  withAuthProvider,
+} from "./_test-helpers.js";
 import {
   AUTH_ERROR_MESSAGES,
   useAuth,
@@ -151,7 +156,10 @@ describe("formatter precedence", () => {
 
 describe("AUTH_ERROR_MESSAGES catalogue", () => {
   it("a mapped code returns the catalogue copy", () => {
-    const err = new FakeFirebaseError("auth/invalid-credential", "Firebase: Error (auth/invalid-credential).");
+    const err = new FakeFirebaseError(
+      "auth/invalid-credential",
+      "Firebase: Error (auth/invalid-credential).",
+    );
     expect(formatFirebaseError(err, { messages: AUTH_ERROR_MESSAGES })).toBe(
       "Incorrect email or password.",
     );
@@ -172,7 +180,9 @@ describe("global config on AuthProvider", () => {
     expect(globalOnIdToken).toHaveBeenCalledWith("id-token-123", user);
 
     globalOnIdToken.mockClear();
-    const optedOut = renderHook(() => useLogin(makeAuth(), { onIdToken: null }), { wrapper });
+    const optedOut = renderHook(() => useLogin(makeAuth(), { onIdToken: null }), {
+      wrapper,
+    });
     await act(async () => {
       await optedOut.result.current.login("a@b.c", "pw");
     });
@@ -195,11 +205,17 @@ describe("global config on AuthProvider", () => {
   it("actionCodeSettings flows from the provider into email sends", async () => {
     const settings = { url: "https://app/handler", handleCodeInApp: true };
     const wrapper = withAuthProvider({ auth: makeAuth(), actionCodeSettings: settings });
-    const { result } = renderHook(() => useSendPasswordResetEmail(makeAuth()), { wrapper });
+    const { result } = renderHook(() => useSendPasswordResetEmail(makeAuth()), {
+      wrapper,
+    });
     await act(async () => {
       await result.current.send("a@b.c");
     });
-    expect(sendPasswordResetEmail).toHaveBeenCalledWith(expect.anything(), "a@b.c", settings);
+    expect(sendPasswordResetEmail).toHaveBeenCalledWith(
+      expect.anything(),
+      "a@b.c",
+      settings,
+    );
   });
 });
 
@@ -241,7 +257,9 @@ describe("global onError observer", () => {
   });
 
   it("is not called on success", async () => {
-    vi.mocked(signInWithEmailAndPassword).mockResolvedValue({ user: makeUser() } as never);
+    vi.mocked(signInWithEmailAndPassword).mockResolvedValue({
+      user: makeUser(),
+    } as never);
     const onError = vi.fn();
     const wrapper = withAuthProvider({ auth: makeAuth(), onError });
     const { result } = renderHook(() => useLogin(makeAuth()), { wrapper });

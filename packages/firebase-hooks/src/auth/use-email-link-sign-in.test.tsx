@@ -1,5 +1,9 @@
 import { act, renderHook } from "@testing-library/react";
-import { isSignInWithEmailLink, sendSignInLinkToEmail, signInWithEmailLink } from "firebase/auth";
+import {
+  isSignInWithEmailLink,
+  sendSignInLinkToEmail,
+  signInWithEmailLink,
+} from "firebase/auth";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   FakeFirebaseError,
@@ -36,7 +40,11 @@ describe("useEmailLinkSignIn", () => {
     await act(async () => {
       await result.current.completeSignIn("https://app/cb?oobCode=x");
     });
-    expect(signInWithEmailLink).toHaveBeenCalledWith(expect.anything(), "a@b.c", expect.any(String));
+    expect(signInWithEmailLink).toHaveBeenCalledWith(
+      expect.anything(),
+      "a@b.c",
+      expect.any(String),
+    );
     expect(window.localStorage.getItem("emailForSignIn")).toBe(null);
   });
 
@@ -72,7 +80,11 @@ describe("useEmailLinkSignIn", () => {
     await act(async () => {
       outcome = await result.current.sendLink("a@b.c");
     });
-    expect(sendSignInLinkToEmail).toHaveBeenCalledWith(expect.anything(), "a@b.c", settings);
+    expect(sendSignInLinkToEmail).toHaveBeenCalledWith(
+      expect.anything(),
+      "a@b.c",
+      settings,
+    );
     expect(window.localStorage.getItem("emailForSignIn")).toBe("a@b.c");
     expect(outcome?.success).toBe(true);
   });

@@ -1,5 +1,9 @@
 import { act, renderHook } from "@testing-library/react";
-import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+  updateProfile,
+} from "firebase/auth";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { FakeFirebaseError, makeAuth, makeUser } from "./_test-helpers.js";
 import { useSignup } from "./index.js";
@@ -23,8 +27,12 @@ describe("useSignup", () => {
   });
 
   it("skips the verification mail when disabled", async () => {
-    vi.mocked(createUserWithEmailAndPassword).mockResolvedValue({ user: makeUser() } as never);
-    const { result } = renderHook(() => useSignup(makeAuth(), { sendVerificationEmail: false }));
+    vi.mocked(createUserWithEmailAndPassword).mockResolvedValue({
+      user: makeUser(),
+    } as never);
+    const { result } = renderHook(() =>
+      useSignup(makeAuth(), { sendVerificationEmail: false }),
+    );
     await act(async () => {
       await result.current.signup("a@b.c", "pw");
     });
