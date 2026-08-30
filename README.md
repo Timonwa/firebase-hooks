@@ -1,27 +1,19 @@
 # @timonwa/firebase-hooks
 
-Typed React hooks for every Firebase Auth client flow — email/password, OAuth, email link, phone, anonymous, and custom-token sign-in; password, email, profile, and provider-linking management. Your server session integrates through optional callbacks, so the hooks work for any backend or none. Zero dependencies — `firebase` and `react` are peers.
+Typed React hooks for Firebase, one entry per service. **Auth ships first** — every client sign-in flow, plus password, email, profile, and provider management — with Firestore and Storage next. Zero dependencies; `firebase` and `react` are peers.
 
 [![npm](https://img.shields.io/npm/v/@timonwa/firebase-hooks)](https://www.npmjs.com/package/@timonwa/firebase-hooks)
 [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-timonwa-FFDD00?logo=buymeacoffee&logoColor=black)](https://www.buymeacoffee.com/timonwa)
 
-Ships ESM and CJS with type declarations and a `"use client"` banner, so React Server Component frameworks (Next.js App Router, etc.) get a clear client-boundary error instead of a cryptic hooks crash.
+## Features
 
-## Design
-
-A handful of decisions shape every hook here. They are what the package is for, and knowing them means the rest of the API holds no surprises.
-
-**Flows arrive finished.** The awkward middle of a Firebase Auth flow lives inside the hook rather than in your component. `useEmailLinkSignIn` reports `needsEmail` so you render your own input instead of calling `window.prompt`. `usePhoneSignIn` creates the reCAPTCHA verifier, hands you `codeSent`, and clears the verifier on unmount. `useOAuthSignIn` finishes a redirect sign-in when the page comes back. `useVerifyEmail` runs the apply-the-code state machine and tells you where it got to.
-
-**Your server session is part of signing in.** `onIdToken` fires with a fresh ID token after every successful sign-in, so trading it for a session cookie is one line — set once on `AuthProvider`, inherited by every sign-in hook. `onBeforeSignOut` runs *before* Firebase clears the client session, so if your session teardown fails the user stays signed in rather than stranded half-way. Both are optional: omit them and the hooks are plain client-side auth.
-
-**Failures are values.** No action throws. Every one resolves to `{ success: true, … }` or `{ success: false, error, code, cause }`, so a form submit needs no `try`/`catch` and no error boundary.
-
-**Nothing stands between you and Firebase.** A successful sign-in hands back Firebase's untouched `UserCredential` next to the `user`. A failure carries Firebase's own error code and the entire original error as `cause`, and `error` is Firebase's own message unless you ask for formatting. If the wording layer is ever wrong, or throws, everything Firebase said is still right there.
-
-**The policy is yours.** `currentPassword` is optional on every sensitive operation: pass it and the hook reauthenticates for you, omit it and Firebase's `auth/requires-recent-login` reaches you to handle your own way. The same holds for the reCAPTCHA size, whether signup sends a verification email, where action links point, and how errors are worded — set them per hook, set them once on the provider, or opt one flow out with `null`.
-
-**One entry per service.** `/auth` is the auth surface; the root is the shared core. An auth-only app never carries code for services it does not use, and services added later cannot disturb what you already import.
+- **Whole flows, not primitives.** `useEmailLinkSignIn` gives you `needsEmail` so you render your own input instead of `window.prompt`. `usePhoneSignIn` creates and cleans up the reCAPTCHA verifier. `useOAuthSignIn` finishes a redirect sign-in when the page returns. `useVerifyEmail` reports where the code-application got to.
+- **Server sessions built in.** `onIdToken` hands you a fresh ID token after every sign-in — trade it for a session cookie in one line. `onBeforeSignOut` runs before Firebase clears the session, so a failed teardown leaves the user signed in.
+- **Actions never throw.** Every one resolves to `{ success: true, ... }` or `{ success: false, error, code, cause }`.
+- **Firebase's own data, unmodified.** Sign-ins return the raw `UserCredential`; failures carry Firebase's error code and the original error. Message formatting is opt-in.
+- **Automatic reauthentication.** Pass `currentPassword` to a sensitive operation and the hook handles the recent-sign-in check; omit it and `auth/requires-recent-login` reaches you.
+- **Configure once or per call.** Session callbacks, action-code settings, error wording, and the `onError` observer live on `AuthProvider`; any hook can override them or opt out with `null`.
+- **Typed, tested, ESM + CJS.** The `"use client"` banner means React Server Component frameworks give a clear boundary error rather than a cryptic hooks crash.
 
 ## Quickstart
 
@@ -57,6 +49,8 @@ import { formatFirebaseError, getFirebaseErrorCode } from "@timonwa/firebase-hoo
 import { AuthProvider, useLogin, AUTH_ERROR_MESSAGES } from "@timonwa/firebase-hooks/auth"; // everything Firebase Auth
 // coming: "@timonwa/firebase-hooks/firestore", "@timonwa/firebase-hooks/storage"
 ```
+
+Everything documented below is the `/auth` entry. Firestore and Storage will document their own.
 
 ## How every hook works
 
@@ -515,7 +509,7 @@ Plain React hooks, no framework imports — they run anywhere React runs: Next.j
 
 **React Native / Expo** (with the Firebase **web** SDK): the email/password, anonymous, custom-token, logout, password, email, profile, reauthentication, and linking hooks work as-is. Web-only by nature: `useOAuthSignIn` (popup/redirect are browser concepts), `usePhoneSignIn` (reCAPTCHA needs the DOM), and `useEmailLinkSignIn`'s email persistence (uses `localStorage`; a pluggable storage option is planned). The `react-native-firebase` native SDK is a different import surface and is not supported.
 
-Not covered (yet): multi-factor auth (TOTP/SMS enrolment and resolution) and multi-tenancy — planned for a later minor. The Admin SDK is server-side and out of scope.
+Not in `/auth` yet: multi-factor auth (TOTP/SMS enrolment and resolution) and multi-tenancy — planned for a later minor. The Admin SDK is server-side and out of scope.
 
 ## Contributing
 
