@@ -1,6 +1,6 @@
 {
   "name": "@timonwa/firebase-hooks",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Typed React hooks for Firebase — one hook per flow, with its state, errors, and callbacks handled. Every action returns a result you can branch on, and each service is its own import, so an app only carries what it uses.",
   "keywords": [
     "react",
