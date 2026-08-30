@@ -15,7 +15,17 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { CodeSample } from '@/components/code-sample';
 import { CopyButton } from '@/components/copy-button';
+import type { Metadata } from 'next';
+import { buildMetadata } from '@/lib/seo';
 import { npmUrl, packageName, packageVersion } from '@/lib/shared';
+
+export const metadata: Metadata = buildMetadata({
+  // No `title` key: the home page keeps the root layout's default title rather
+  // than having the template append the package name a second time.
+  description:
+    'Typed React hooks for every Firebase Auth flow — email/password, OAuth, magic link, phone and anonymous sign-in, plus password, email, profile and provider linking. Zero dependencies.',
+  path: '/',
+});
 
 const INSTALL_COMMAND = `pnpm add ${packageName} firebase`;
 
