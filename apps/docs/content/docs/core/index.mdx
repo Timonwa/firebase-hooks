@@ -24,12 +24,4 @@ Note the import path: the **root** entry, not `/auth`. Anything shared lives her
   </Card>
 </Cards>
 
-## What lives where
-
-| Export | Import | Why |
-| --- | --- | --- |
-| `HookResult`, `HookErrorOptions`, `HookErrorContext` | root | Every service resolves to the same shape |
-| `formatFirebaseError`, `getFirebaseErrorCode` | root | Firebase error codes are namespaced per service, but parsed identically |
-| `AUTH_ERROR_MESSAGES` | `/auth` | The message catalogue is specific to `auth/*` codes |
-
-Each service ships its own catalogue alongside its hooks — `FIRESTORE_ERROR_MESSAGES` with the Firestore hooks, and so on. That way an app importing only Auth never carries Firestore's copy.
+One thing that isn't here: the error message catalogues. `AUTH_ERROR_MESSAGES` ships with `/auth`, and each future service brings its own, so an app importing only Auth never carries Firestore's copy.
