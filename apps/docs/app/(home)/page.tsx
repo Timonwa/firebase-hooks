@@ -43,7 +43,7 @@ const FEATURES = [
   {
     icon: KeyRound,
     title: 'Server sessions built in',
-    body: 'onIdToken hands you a fresh ID token as part of the sign-in, not after it. Throw inside it and the sign-in aborts — so nobody reaches a protected page without a server session.',
+    body: 'onIdToken hands you a fresh ID token as part of the sign-in, not after it. Throw inside it and the sign-in aborts, so a user can’t land on a protected page without a server session.',
   },
   {
     icon: PackageOpen,

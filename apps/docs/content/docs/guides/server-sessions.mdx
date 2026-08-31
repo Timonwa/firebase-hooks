@@ -3,7 +3,7 @@ title: Server sessions
 description: Trade a fresh ID token for your own session cookie, and tear it down before sign-out.
 ---
 
-Firebase signs users in on the client. If your server needs to know who they are, it needs its own session — usually a cookie minted from a Firebase ID token. This package builds that handoff into the sign-in flow rather than leaving it to a `useEffect`.
+Firebase signs users in on the client. If your server needs to know who they are, it needs its own session — a cookie minted from a Firebase ID token, for example. This package builds that handoff into the sign-in flow rather than leaving it to a `useEffect`.
 
 ## Minting on sign-in
 

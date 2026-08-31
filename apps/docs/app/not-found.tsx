@@ -45,7 +45,7 @@ export default function NotFound() {
         </h1>
         <p className="text-fd-muted-foreground mt-3 text-pretty">
           The link may be out of date, or the page moved when the docs were reorganised.
-          You’re on the {appName} documentation — here’s where most people are headed.
+          You’re on the {appName} documentation — try one of these.
         </p>
 
         <div className="mt-8 flex flex-col gap-3">
