@@ -27,55 +27,6 @@ importers:
         specifier: ^3.9.6
         version: 3.9.6
 
-  apps/demo:
-    dependencies:
-      '@timonwa/firebase-hooks':
-        specifier: workspace:*
-        version: link:../../packages/firebase-hooks
-      firebase:
-        specifier: ^12.18.0
-        version: 12.18.0
-      lucide-react:
-        specifier: ^1.34.0
-        version: 1.37.0(react@19.2.8)
-      next:
-        specifier: 16.3.3
-        version: 16.3.3(@types/node@26.4.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
-      react:
-        specifier: ^19.2.8
-        version: 19.2.8
-      react-dom:
-        specifier: ^19.2.8
-        version: 19.2.8(react@19.2.8)
-    devDependencies:
-      '@tailwindcss/postcss':
-        specifier: ^4.3.3
-        version: 4.3.3
-      '@types/node':
-        specifier: ^26.3.0
-        version: 26.4.0
-      '@types/react':
-        specifier: ^19.2.18
-        version: 19.2.18
-      '@types/react-dom':
-        specifier: ^19.2.5
-        version: 19.2.5(@types/react@19.2.18)
-      postcss:
-        specifier: ^8.5.26
-        version: 8.5.26
-      prettier:
-        specifier: ^3.9.6
-        version: 3.9.6
-      prettier-plugin-tailwindcss:
-        specifier: ^0.7.1
-        version: 0.7.4(prettier@3.9.6)
-      tailwindcss:
-        specifier: ^4.3.3
-        version: 4.3.3
-      typescript:
-        specifier: ^6.0.3
-        version: 6.0.3
-
   apps/docs:
     dependencies:
       '@timonwa/firebase-hooks':
@@ -139,6 +90,58 @@ importers:
       prettier-plugin-tailwindcss:
         specifier: ^0.8.1
         version: 0.8.1(prettier@3.9.6)
+      tailwindcss:
+        specifier: ^4.3.3
+        version: 4.3.3
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+
+  apps/playground:
+    dependencies:
+      '@timonwa/firebase-hooks':
+        specifier: workspace:*
+        version: link:../../packages/firebase-hooks
+      firebase:
+        specifier: ^12.18.0
+        version: 12.18.0
+      lucide-react:
+        specifier: ^1.34.0
+        version: 1.37.0(react@19.2.8)
+      next:
+        specifier: 16.3.3
+        version: 16.3.3(@types/node@26.4.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      react:
+        specifier: ^19.2.8
+        version: 19.2.8
+      react-dom:
+        specifier: ^19.2.8
+        version: 19.2.8(react@19.2.8)
+      shiki:
+        specifier: ^4.4.3
+        version: 4.4.3
+    devDependencies:
+      '@tailwindcss/postcss':
+        specifier: ^4.3.3
+        version: 4.3.3
+      '@types/node':
+        specifier: ^26.3.0
+        version: 26.4.0
+      '@types/react':
+        specifier: ^19.2.18
+        version: 19.2.18
+      '@types/react-dom':
+        specifier: ^19.2.5
+        version: 19.2.5(@types/react@19.2.18)
+      postcss:
+        specifier: ^8.5.26
+        version: 8.5.26
+      prettier:
+        specifier: ^3.9.6
+        version: 3.9.6
+      prettier-plugin-tailwindcss:
+        specifier: ^0.7.1
+        version: 0.7.4(prettier@3.9.6)
       tailwindcss:
         specifier: ^4.3.3
         version: 4.3.3

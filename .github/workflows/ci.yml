@@ -56,7 +56,7 @@ jobs:
       - run: pnpm --filter docs typecheck
       - run: pnpm --filter docs build
 
-      # The demo links the library the same way a consumer does, so a broken
-      # export surfaces here before anyone installs it.
-      - run: pnpm --filter demo typecheck
-      - run: pnpm --filter demo build
+      # The playground links the library the same way a consumer does, so a
+      # broken export surfaces here before anyone installs it.
+      - run: pnpm --filter playground typecheck
+      - run: pnpm --filter playground build

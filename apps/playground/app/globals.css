@@ -1,0 +1,63 @@
+@import 'tailwindcss';
+
+/* Same palette as the docs site, so the two read as one product: violet accent
+   with neutrals carrying a trace of the accent hue rather than being flat grey. */
+@theme {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  --color-bg: oklch(99.4% 0.002 285);
+  --color-fg: oklch(19% 0.014 285);
+  --color-muted: oklch(52% 0.016 285);
+  --color-surface: oklch(98.4% 0.003 285);
+  --color-line: oklch(89% 0.008 285);
+  --color-accent: oklch(56% 0.19 285);
+  --color-accent-fg: oklch(99% 0.002 285);
+  --color-danger: oklch(58% 0.21 25);
+}
+
+/* Driven by the system preference rather than a class, so every surface flips
+   together. Mixing this with Tailwind's `dark:` variants is what left the forms
+   dark on a light page. */
+@media (prefers-color-scheme: dark) {
+  @theme {
+    --color-bg: oklch(15.2% 0.012 285);
+    --color-fg: oklch(94% 0.004 285);
+    --color-muted: oklch(70.5% 0.014 285);
+    --color-surface: oklch(18% 0.013 285);
+    --color-line: oklch(32% 0.016 285);
+    /* Lighter than the light-mode violet: the same value fails contrast on dark. */
+    --color-accent: oklch(75% 0.145 285);
+    --color-accent-fg: oklch(16% 0.02 285);
+    --color-danger: oklch(70% 0.17 25);
+  }
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-fg);
+}
+
+@utility surface {
+  border: 1px solid var(--color-line);
+  border-radius: 0.75rem;
+  background-color: var(--color-surface);
+}
+
+/* Shiki emits both themes as custom properties; these pick the right one so the
+   code follows the same system preference as everything else. */
+.shiki-block pre {
+  margin: 0;
+  padding: 1rem;
+  background-color: transparent !important;
+}
+
+.shiki-block code span {
+  color: var(--shiki-light);
+}
+
+@media (prefers-color-scheme: dark) {
+  .shiki-block code span {
+    color: var(--shiki-dark);
+  }
+}
