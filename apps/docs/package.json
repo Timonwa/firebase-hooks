@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@timonwa/firebase-hooks": "workspace:*",
+    "@vercel/analytics": "^2.0.1",
     "cnfast": "^0.1.0",
     "firebase": "^12.18.0",
     "fumadocs-core": "16.15.4",
