@@ -1,3 +1,4 @@
+import { Analytics } from '@vercel/analytics/next';
 import { RootProvider } from 'fumadocs-ui/provider/next';
 import './global.css';
 import type { Metadata } from 'next';
@@ -22,6 +23,11 @@ export const metadata: Metadata = {
   },
   authors: [{ name: siteConfig.author, url: siteConfig.socials[0] }],
   creator: siteConfig.author,
+  // Google Search Console ownership check. Public by design — it proves control of the
+  // site, it grants nothing.
+  verification: {
+    google: 'O-sqozPAg0xCaOeVyHDEaf0hcHrCrMEkOK0E_0TGBCo',
+  },
   keywords: [
     'react',
     'firebase',
@@ -43,6 +49,8 @@ export default function Layout({ children }: LayoutProps<'/'>) {
       <body className="flex min-h-screen flex-col font-sans antialiased">
         <RootProvider>{children}</RootProvider>
         <JsonLd data={siteGraph()} />
+        {/* No-ops outside a Vercel deployment, so local runs send nothing. */}
+        <Analytics />
       </body>
     </html>
   );
