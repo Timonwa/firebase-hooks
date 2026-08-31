@@ -26,6 +26,7 @@ export function websiteSchema() {
     name: siteConfig.name,
     description: siteConfig.description,
     inLanguage: 'en',
+    image: absolute('/icon-512.png'),
     publisher: { '@id': PERSON_ID },
   };
 }
@@ -42,6 +43,7 @@ export function softwareSchema() {
     description: siteConfig.description,
     url: siteConfig.url,
     codeRepository: 'https://github.com/Timonwa/firebase-hooks',
+    image: absolute('/icon-512.png'),
     programmingLanguage: 'TypeScript',
     runtimePlatform: 'React',
     license: 'https://opensource.org/licenses/MIT',

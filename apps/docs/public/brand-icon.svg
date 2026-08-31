@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-label="Firebase Hooks">
+<!-- firebase-hooks brand mark. Hook glyph on a violet tile.
+     Brand colour #6E5BDD = oklch(56% 0.19 285), the docs site's light-mode primary.
+     Geometry: 32-unit grid, tile radius 7 (ratio 7/32), glyph stroke 4,
+     arc radius 4.5 = half the 9-unit shank span. Round caps and joins. -->
+  <path d="M20 8 V18 A4.5 4.5 0 0 1 11 18 V16.5" fill="none" stroke="#6E5BDD" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
