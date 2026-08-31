@@ -5,6 +5,11 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { Button, Field } from '@/components/controls';
 import { useFirebase } from '@/components/firebase-provider';
+import {
+  hookSnippet,
+  useActionCodeSettings,
+  useErrorFormat,
+} from '@/components/hook-options';
 import { HookSection } from '@/components/hook-section';
 import { NeedsConfig } from '@/components/needs-config';
 import { PageIntro } from '@/components/page-intro';
@@ -29,16 +34,30 @@ export default function EmailPage() {
 type WithAuth = { auth: Parameters<typeof useUpdateEmail>[0] };
 
 function SendVerification({ auth }: WithAuth) {
-  const { send, loading, error, success } = useSendEmailVerification(auth);
+  const errorFormat = useErrorFormat();
+  const actionCodeSettings = useActionCodeSettings();
+  const { send, loading, error, success } = useSendEmailVerification(auth, {
+    actionCodeSettings: actionCodeSettings.value,
+    formatErrorMessage: errorFormat.value,
+  });
   const [result, setResult] = useState<unknown>();
 
   return (
     <HookSection
       hook="useSendEmailVerification"
       why="The resend button. Firebase rate-limits these hard, so the loading and success flags are what you build the cooldown around."
-      snippet={`const { send, loading, success } = useSendEmailVerification(auth);
-
-<button onClick={send} disabled={loading}>Resend</button>;`}
+      snippet={hookSnippet({
+        hook: 'useSendEmailVerification',
+        returns: 'send, loading, success',
+        lines: [actionCodeSettings.line, errorFormat.line],
+        body: '<button onClick={send} disabled={loading}>Resend</button>;',
+      })}
+      options={
+        <>
+          {actionCodeSettings.control}
+          {errorFormat.control}
+        </>
+      }
       form={
         <>
           <Button disabled={loading} onClick={async () => setResult(await send())}>
@@ -88,7 +107,12 @@ if (status === "processing") return <Spinner />;`}
 }
 
 function UpdateEmail({ auth }: WithAuth) {
-  const { update, loading, error, success } = useUpdateEmail(auth);
+  const errorFormat = useErrorFormat();
+  const actionCodeSettings = useActionCodeSettings();
+  const { update, loading, error, success } = useUpdateEmail(auth, {
+    actionCodeSettings: actionCodeSettings.value,
+    formatErrorMessage: errorFormat.value,
+  });
   const [newEmail, setNewEmail] = useState('');
   const [currentPassword, setCurrentPassword] = useState('');
   const [result, setResult] = useState<unknown>();
@@ -104,8 +128,19 @@ function UpdateEmail({ auth }: WithAuth) {
           this distinction prevents.
         </>
       }
-      snippet={`await update({ newEmail, currentPassword });
-// success === true → "check <newEmail> to confirm"`}
+      snippet={hookSnippet({
+        hook: 'useUpdateEmail',
+        returns: 'update, loading, error, success',
+        lines: [actionCodeSettings.line, errorFormat.line],
+        body: `await update({ newEmail, currentPassword });
+// success === true → "check <newEmail> to confirm"`,
+      })}
+      options={
+        <>
+          {actionCodeSettings.control}
+          {errorFormat.control}
+        </>
+      }
       form={
         <>
           <Field

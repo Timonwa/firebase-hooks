@@ -12,8 +12,15 @@ import {
 } from '@timonwa/firebase-hooks/auth';
 import { GithubAuthProvider, GoogleAuthProvider } from 'firebase/auth';
 import { useState } from 'react';
-import { Button, Field } from '@/components/controls';
+import { Button, Field, Select } from '@/components/controls';
 import { useFirebase } from '@/components/firebase-provider';
+import {
+  hookSnippet,
+  useBooleanOption,
+  useErrorFormat,
+  useFlowCallback,
+  useStringOption,
+} from '@/components/hook-options';
 import { HookSection } from '@/components/hook-section';
 import { NeedsConfig } from '@/components/needs-config';
 import { PageIntro } from '@/components/page-intro';
@@ -43,7 +50,17 @@ export default function SigningInPage() {
 type WithAuth = { auth: Parameters<typeof useLogin>[0] };
 
 function Login({ auth }: WithAuth) {
-  const { login, loading, error } = useLogin(auth);
+  const errorFormat = useErrorFormat();
+  const onIdToken = useFlowCallback({
+    name: 'onIdToken',
+    signature: '(idToken)',
+    body: 'createSession(idToken)',
+    throwsHint: 'Sign-in aborts — the result comes back as a failure.',
+  });
+  const { login, loading, error } = useLogin(auth, {
+    formatErrorMessage: errorFormat.value,
+    onIdToken: onIdToken.value,
+  });
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [result, setResult] = useState<unknown>();
@@ -60,12 +77,19 @@ function Login({ auth }: WithAuth) {
           server session.
         </>
       }
-      snippet={`const { login, loading, error } = useLogin(auth, {
-  onIdToken: (idToken) => createSession(idToken),
-});
-
-const result = await login(email, password);
-if (result.success) router.push("/dashboard");`}
+      snippet={hookSnippet({
+        hook: 'useLogin',
+        returns: 'login, loading, error',
+        lines: [onIdToken.line, errorFormat.line],
+        body: `const result = await login(email, password);
+if (result.success) router.push("/dashboard");`,
+      })}
+      options={
+        <>
+          {onIdToken.control}
+          {errorFormat.control}
+        </>
+      }
       form={
         <>
           <Field label="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
@@ -91,7 +115,23 @@ if (result.success) router.push("/dashboard");`}
 }
 
 function Signup({ auth }: WithAuth) {
-  const { signup, loading, error } = useSignup(auth);
+  const errorFormat = useErrorFormat();
+  const sendVerificationEmail = useBooleanOption({
+    name: 'sendVerificationEmail',
+    defaultValue: true,
+    hint: 'Off, and the account is created without the email going out.',
+  });
+  const onIdToken = useFlowCallback({
+    name: 'onIdToken',
+    signature: '(idToken)',
+    body: 'createSession(idToken)',
+    throwsHint: 'Signup aborts after the account exists — try signing in with it.',
+  });
+  const { signup, loading, error } = useSignup(auth, {
+    sendVerificationEmail: sendVerificationEmail.value,
+    formatErrorMessage: errorFormat.value,
+    onIdToken: onIdToken.value,
+  });
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
@@ -103,13 +143,23 @@ function Signup({ auth }: WithAuth) {
       why={
         <>
           Three Firebase calls in the right order — create the account, set the profile,
-          send the verification email — behind one call. Set{' '}
-          <code>sendVerificationEmail: false</code> if you'd rather send it yourself.
+          send the verification email — behind one call. Turn{' '}
+          <code>sendVerificationEmail</code> off in Options to send it yourself.
         </>
       }
-      snippet={`const { signup } = useSignup(auth, { onIdToken: createSession });
-
-await signup(email, password, { displayName });`}
+      snippet={hookSnippet({
+        hook: 'useSignup',
+        returns: 'signup, loading, error',
+        lines: [sendVerificationEmail.line, onIdToken.line, errorFormat.line],
+        body: 'await signup(email, password, { displayName });',
+      })}
+      options={
+        <>
+          {sendVerificationEmail.control}
+          {onIdToken.control}
+          {errorFormat.control}
+        </>
+      }
       form={
         <>
           <Field label="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
@@ -144,7 +194,16 @@ await signup(email, password, { displayName });`}
 }
 
 function Logout({ auth }: WithAuth) {
-  const { logout, loading, error } = useLogout(auth);
+  const errorFormat = useErrorFormat();
+  const onBeforeSignOut = useFlowCallback({
+    name: 'onBeforeSignOut',
+    body: 'clearSession()',
+    throwsHint: 'You stay signed in — check the sidebar, the session is still there.',
+  });
+  const { logout, loading, error } = useLogout(auth, {
+    formatErrorMessage: errorFormat.value,
+    onBeforeSignOut: onBeforeSignOut.value,
+  });
   const [result, setResult] = useState<unknown>();
 
   return (
@@ -157,9 +216,18 @@ function Logout({ auth }: WithAuth) {
           — rather than being stranded signed-out locally but still live on your server.
         </>
       }
-      snippet={`const { logout } = useLogout(auth, {
-  onBeforeSignOut: () => clearSession(),
-});`}
+      snippet={hookSnippet({
+        hook: 'useLogout',
+        returns: 'logout, loading, error',
+        lines: [onBeforeSignOut.line, errorFormat.line],
+        body: 'await logout();',
+      })}
+      options={
+        <>
+          {onBeforeSignOut.control}
+          {errorFormat.control}
+        </>
+      }
       form={
         <Button
           variant="secondary"
@@ -177,7 +245,17 @@ function Logout({ auth }: WithAuth) {
 }
 
 function OAuth({ auth }: WithAuth) {
-  const { signIn, loading, error } = useOAuthSignIn(auth);
+  const errorFormat = useErrorFormat();
+  const onIdToken = useFlowCallback({
+    name: 'onIdToken',
+    signature: '(idToken)',
+    body: 'createSession(idToken)',
+    throwsHint: 'Aborts on the popup path and on the redirect path alike.',
+  });
+  const { signIn, loading, error } = useOAuthSignIn(auth, {
+    formatErrorMessage: errorFormat.value,
+    onIdToken: onIdToken.value,
+  });
   const [result, setResult] = useState<unknown>();
 
   return (
@@ -190,10 +268,19 @@ function OAuth({ auth }: WithAuth) {
           , so you don't write a second handler on the page the user comes back to.
         </>
       }
-      snippet={`const { signIn } = useOAuthSignIn(auth, { onIdToken: createSession });
-
-await signIn(new GoogleAuthProvider());
-await signIn(new GoogleAuthProvider(), { method: "redirect" });`}
+      snippet={hookSnippet({
+        hook: 'useOAuthSignIn',
+        returns: 'signIn, loading, error',
+        lines: [onIdToken.line, errorFormat.line],
+        body: `await signIn(new GoogleAuthProvider());
+await signIn(new GoogleAuthProvider(), { method: "redirect" });`,
+      })}
+      options={
+        <>
+          {onIdToken.control}
+          {errorFormat.control}
+        </>
+      }
       form={
         <div className="flex flex-wrap gap-2">
           <Button
@@ -230,14 +317,27 @@ await signIn(new GoogleAuthProvider(), { method: "redirect" });`}
 function EmailLink({ auth }: WithAuth) {
   const [email, setEmail] = useState('');
   const [result, setResult] = useState<unknown>();
+  const errorFormat = useErrorFormat();
+  const storageKey = useStringOption({
+    name: 'storageKey',
+    defaultValue: 'emailForSignIn',
+    hint: 'The localStorage key holding the address between send and complete.',
+  });
+  const onIdToken = useFlowCallback({
+    name: 'onIdToken',
+    signature: '(idToken)',
+    body: 'createSession(idToken)',
+    throwsHint: 'Aborts on the callback page, not here.',
+  });
+  const returnUrl =
+    typeof window !== 'undefined'
+      ? `${window.location.origin}/auth/callback`
+      : 'http://localhost:3000/auth/callback';
   const { sendLink, loading, error } = useEmailLinkSignIn(auth, {
-    actionCodeSettings: {
-      url:
-        typeof window !== 'undefined'
-          ? `${window.location.origin}/auth/callback`
-          : 'http://localhost:3000/auth/callback',
-      handleCodeInApp: true,
-    },
+    actionCodeSettings: { url: returnUrl, handleCodeInApp: true },
+    storageKey: storageKey.value,
+    formatErrorMessage: errorFormat.value,
+    onIdToken: onIdToken.value,
   });
 
   return (
@@ -254,11 +354,28 @@ function EmailLink({ auth }: WithAuth) {
           .
         </>
       }
-      snippet={`await sendLink(email);
+      snippet={hookSnippet({
+        hook: 'useEmailLinkSignIn',
+        returns: 'sendLink, loading, error',
+        lines: [
+          `actionCodeSettings: { url: "${returnUrl}", handleCodeInApp: true },`,
+          storageKey.line,
+          onIdToken.line,
+          errorFormat.line,
+        ],
+        body: `await sendLink(email);
 
 // on the callback page
 const result = await completeSignIn(window.location.href);
-if (!result.success && result.needsEmail) showEmailField();`}
+if (!result.success && result.needsEmail) showEmailField();`,
+      })}
+      options={
+        <>
+          {storageKey.control}
+          {onIdToken.control}
+          {errorFormat.control}
+        </>
+      }
       form={
         <>
           <Field label="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
@@ -278,8 +395,18 @@ if (!result.success && result.needsEmail) showEmailField();`}
 }
 
 function Phone({ auth }: WithAuth) {
+  const errorFormat = useErrorFormat();
+  const [recaptchaSize, setRecaptchaSize] = useState<'invisible' | 'normal'>('normal');
+  const onIdToken = useFlowCallback({
+    name: 'onIdToken',
+    signature: '(idToken)',
+    body: 'createSession(idToken)',
+    throwsHint: 'Aborts once the code is confirmed.',
+  });
   const { sendCode, confirmCode, codeSent, loading, error } = usePhoneSignIn(auth, {
-    recaptchaSize: 'normal',
+    recaptchaSize,
+    formatErrorMessage: errorFormat.value,
+    onIdToken: onIdToken.value,
   });
   const [phone, setPhone] = useState('');
   const [code, setCode] = useState('');
@@ -296,11 +423,36 @@ function Phone({ auth }: WithAuth) {
           you pick instead, which is easier to repeat.
         </>
       }
-      snippet={`const { sendCode, confirmCode, codeSent } = usePhoneSignIn(auth);
-
-<div id="recaptcha-container" />;
+      snippet={hookSnippet({
+        hook: 'usePhoneSignIn',
+        returns: 'sendCode, confirmCode, codeSent',
+        lines: [
+          recaptchaSize === 'invisible' ? null : `recaptchaSize: "${recaptchaSize}",`,
+          onIdToken.line,
+          errorFormat.line,
+        ],
+        body: `<div id="recaptcha-container" />;
 await sendCode("+2348012345678", "recaptcha-container");
-await confirmCode(smsCode);`}
+await confirmCode(smsCode);`,
+      })}
+      options={
+        <>
+          <Select
+            label="recaptchaSize"
+            hint="Invisible solves itself unless Google wants a challenge; normal always shows the widget."
+            value={recaptchaSize}
+            onChange={(event) =>
+              setRecaptchaSize(event.target.value as 'invisible' | 'normal')
+            }
+            options={[
+              { value: 'normal', label: 'normal' },
+              { value: 'invisible', label: 'invisible (the default)' },
+            ]}
+          />
+          {onIdToken.control}
+          {errorFormat.control}
+        </>
+      }
       form={
         <>
           <Field
@@ -340,7 +492,17 @@ await confirmCode(smsCode);`}
 }
 
 function Anonymous({ auth }: WithAuth) {
-  const { signIn, loading, error } = useAnonymousSignIn(auth);
+  const errorFormat = useErrorFormat();
+  const onIdToken = useFlowCallback({
+    name: 'onIdToken',
+    signature: '(idToken)',
+    body: 'createSession(idToken)',
+    throwsHint: 'The guest session is not created.',
+  });
+  const { signIn, loading, error } = useAnonymousSignIn(auth, {
+    formatErrorMessage: errorFormat.value,
+    onIdToken: onIdToken.value,
+  });
   const [result, setResult] = useState<unknown>();
 
   return (
@@ -352,9 +514,18 @@ function Anonymous({ auth }: WithAuth) {
           uid survives, so everything they created while anonymous still belongs to them.
         </>
       }
-      snippet={`const { signIn } = useAnonymousSignIn(auth);
-
-await signIn();`}
+      snippet={hookSnippet({
+        hook: 'useAnonymousSignIn',
+        returns: 'signIn, loading, error',
+        lines: [onIdToken.line, errorFormat.line],
+        body: 'await signIn();',
+      })}
+      options={
+        <>
+          {onIdToken.control}
+          {errorFormat.control}
+        </>
+      }
       form={
         <Button disabled={loading} onClick={async () => setResult(await signIn())}>
           {loading ? 'Signing in…' : 'Continue as guest'}
@@ -368,7 +539,17 @@ await signIn();`}
 }
 
 function CustomToken({ auth }: WithAuth) {
-  const { signIn, loading, error } = useCustomTokenSignIn(auth);
+  const errorFormat = useErrorFormat();
+  const onIdToken = useFlowCallback({
+    name: 'onIdToken',
+    signature: '(idToken)',
+    body: 'createSession(idToken)',
+    throwsHint: 'The exchange is rolled back into a failed result.',
+  });
+  const { signIn, loading, error } = useCustomTokenSignIn(auth, {
+    formatErrorMessage: errorFormat.value,
+    onIdToken: onIdToken.value,
+  });
   const [token, setToken] = useState('');
   const [result, setResult] = useState<unknown>();
 
@@ -376,8 +557,19 @@ function CustomToken({ auth }: WithAuth) {
     <HookSection
       hook="useCustomTokenSignIn"
       why="Bridges an existing auth system into Firebase — your server mints a token with the Admin SDK, this exchanges it for a Firebase session."
-      snippet={`const { token } = await fetch("/api/firebase-token").then((r) => r.json());
-await signIn(token);`}
+      snippet={hookSnippet({
+        hook: 'useCustomTokenSignIn',
+        returns: 'signIn, loading, error',
+        lines: [onIdToken.line, errorFormat.line],
+        body: `const { token } = await fetch("/api/firebase-token").then((r) => r.json());
+await signIn(token);`,
+      })}
+      options={
+        <>
+          {onIdToken.control}
+          {errorFormat.control}
+        </>
+      }
       form={
         <>
           <Field

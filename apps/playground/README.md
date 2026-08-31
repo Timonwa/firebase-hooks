@@ -53,11 +53,23 @@ Firebase emails links that come back to the app. The playground has a page for e
 
 `/auth/callback` needs no console change — its return URL is passed in code. The other two only come here once the action URL above is set. Opening either page directly says so, since without the code Firebase puts in the URL there's nothing to act on.
 
+## Setting a hook's options
+
+Every hook's own options are controls in its **Options** panel, and the snippet in the middle column rewrites itself as you change them — so the code shown is always the code that produced the result beside it.
+
+Callback options — `onIdToken`, `onBeforeSignOut`, `onBeforeDelete` — can be set to throw. That is the one worth trying deliberately: they run _inside_ the flow, so throwing aborts the operation rather than leaving it half-done.
+
 ## Reading a result
 
-Each hook shows its live `loading` and `error`, then the value the action resolved to. On a failure it also renders the message three ways — Firebase's own, with the framing stripped, and through `AUTH_ERROR_MESSAGES` — all derived from `result.cause`.
+Each hook shows its live `loading` and `error`, then the value the action resolved to. On a failure it also lists what every `formatErrorMessage` setting would have given for that same failure, all derived from `result.cause`.
 
-**Format errors** in the sidebar sets `formatErrorMessage` on the provider. It applies to the next call; a message already on screen keeps what it resolved to.
+The hook resolves `error` once, when it catches, so changing the setting never rewrites a message already on screen — run the call again to see the new one.
+
+## Sidebar settings
+
+**Format errors** sets `formatErrorMessage` on the provider, for every hook at once. Any hook's own Options panel overrides it, which is the precedence rule worth seeing in action.
+
+**Wrap code** soft-wraps every snippet and response instead of scrolling sideways.
 
 ## Scripts
 

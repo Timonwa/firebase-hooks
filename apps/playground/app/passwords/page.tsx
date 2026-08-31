@@ -8,6 +8,11 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { Button, Field } from '@/components/controls';
 import { useFirebase } from '@/components/firebase-provider';
+import {
+  hookSnippet,
+  useActionCodeSettings,
+  useErrorFormat,
+} from '@/components/hook-options';
 import { HookSection } from '@/components/hook-section';
 import { NeedsConfig } from '@/components/needs-config';
 import { PageIntro } from '@/components/page-intro';
@@ -32,7 +37,12 @@ export default function PasswordsPage() {
 type WithAuth = { auth: Parameters<typeof useUpdatePassword>[0] };
 
 function SendReset({ auth }: WithAuth) {
-  const { send, loading, error, success, resetState } = useSendPasswordResetEmail(auth);
+  const errorFormat = useErrorFormat();
+  const actionCodeSettings = useActionCodeSettings();
+  const { send, loading, error, success, resetState } = useSendPasswordResetEmail(auth, {
+    actionCodeSettings: actionCodeSettings.value,
+    formatErrorMessage: errorFormat.value,
+  });
   const [email, setEmail] = useState('');
   const [result, setResult] = useState<unknown>();
 
@@ -46,10 +56,19 @@ function SendReset({ auth }: WithAuth) {
           success message sitting underneath.
         </>
       }
-      snippet={`const { send, success, resetState } = useSendPasswordResetEmail(auth);
-
-await send(email);
-// success === true → "if an account exists, a link is on its way"`}
+      snippet={hookSnippet({
+        hook: 'useSendPasswordResetEmail',
+        returns: 'send, success, resetState',
+        lines: [actionCodeSettings.line, errorFormat.line],
+        body: `await send(email);
+// success === true → "if an account exists, a link is on its way"`,
+      })}
+      options={
+        <>
+          {actionCodeSettings.control}
+          {errorFormat.control}
+        </>
+      }
       form={
         <>
           <Field label="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
@@ -113,7 +132,10 @@ await confirm(oobCode, newPassword);`}
 }
 
 function UpdatePassword({ auth }: WithAuth) {
-  const { update, loading, error, success } = useUpdatePassword(auth);
+  const errorFormat = useErrorFormat();
+  const { update, loading, error, success } = useUpdatePassword(auth, {
+    formatErrorMessage: errorFormat.value,
+  });
   const [newPassword, setNewPassword] = useState('');
   const [currentPassword, setCurrentPassword] = useState('');
   const [result, setResult] = useState<unknown>();
@@ -130,8 +152,14 @@ function UpdatePassword({ auth }: WithAuth) {
           don't want to.
         </>
       }
-      snippet={`await update({ newPassword, currentPassword }); // reauthenticates first
-await update({ newPassword });                  // your own policy`}
+      snippet={hookSnippet({
+        hook: 'useUpdatePassword',
+        returns: 'update, loading, error, success',
+        lines: [errorFormat.line],
+        body: `await update({ newPassword, currentPassword }); // reauthenticates first
+await update({ newPassword });                  // your own policy`,
+      })}
+      options={errorFormat.control}
       form={
         <>
           <Field

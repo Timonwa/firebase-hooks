@@ -12,6 +12,7 @@ import { GoogleAuthProvider } from 'firebase/auth';
 import { useState } from 'react';
 import { Button, Field } from '@/components/controls';
 import { useFirebase } from '@/components/firebase-provider';
+import { hookSnippet, useErrorFormat, useFlowCallback } from '@/components/hook-options';
 import { HookSection } from '@/components/hook-section';
 import { NeedsConfig } from '@/components/needs-config';
 import { PageIntro } from '@/components/page-intro';
@@ -81,7 +82,10 @@ if (claims?.isAdmin) showAdminNav();`}
 }
 
 function Profile({ auth }: WithAuth) {
-  const { update, loading, error, success } = useUpdateProfile(auth);
+  const errorFormat = useErrorFormat();
+  const { update, loading, error, success } = useUpdateProfile(auth, {
+    formatErrorMessage: errorFormat.value,
+  });
   const [displayName, setDisplayName] = useState('');
   const [photoURL, setPhotoURL] = useState('');
   const [result, setResult] = useState<unknown>();
@@ -90,7 +94,13 @@ function Profile({ auth }: WithAuth) {
     <HookSection
       hook="useUpdateProfile"
       why="Firebase treats profile fields as non-sensitive, so this is the one account operation that needs no reauthentication."
-      snippet={`await update({ displayName, photoURL });`}
+      snippet={hookSnippet({
+        hook: 'useUpdateProfile',
+        returns: 'update, loading, error, success',
+        lines: [errorFormat.line],
+        body: 'await update({ displayName, photoURL });',
+      })}
+      options={errorFormat.control}
       form={
         <>
           <Field
@@ -127,8 +137,9 @@ function Profile({ auth }: WithAuth) {
 }
 
 function Reauthenticate({ auth }: WithAuth) {
+  const errorFormat = useErrorFormat();
   const { reauthenticateWithPassword, reauthenticateWithProvider, loading, error } =
-    useReauthenticate(auth);
+    useReauthenticate(auth, { formatErrorMessage: errorFormat.value });
   const [password, setPassword] = useState('');
   const [result, setResult] = useState<unknown>();
 
@@ -142,8 +153,14 @@ function Reauthenticate({ auth }: WithAuth) {
           is how you reauthenticate an OAuth-only account, which has no password to check.
         </>
       }
-      snippet={`const check = await reauthenticateWithPassword(currentPassword);
-if (check.success) await performSensitiveOperation();`}
+      snippet={hookSnippet({
+        hook: 'useReauthenticate',
+        returns: 'reauthenticateWithPassword, reauthenticateWithProvider',
+        lines: [errorFormat.line],
+        body: `const check = await reauthenticateWithPassword(currentPassword);
+if (check.success) await performSensitiveOperation();`,
+      })}
+      options={errorFormat.control}
       form={
         <>
           <Field
@@ -179,7 +196,10 @@ if (check.success) await performSensitiveOperation();`}
 }
 
 function Link({ auth }: WithAuth) {
-  const { linkWithProvider, linkWithPassword, loading, error } = useLinkProvider(auth);
+  const errorFormat = useErrorFormat();
+  const { linkWithProvider, linkWithPassword, loading, error } = useLinkProvider(auth, {
+    formatErrorMessage: errorFormat.value,
+  });
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [result, setResult] = useState<unknown>();
@@ -194,8 +214,14 @@ function Link({ auth }: WithAuth) {
           have to migrate their data to a new account.
         </>
       }
-      snippet={`await linkWithProvider(new GoogleAuthProvider()); // guest → Google
-await linkWithPassword(email, password);          // guest → password`}
+      snippet={hookSnippet({
+        hook: 'useLinkProvider',
+        returns: 'linkWithProvider, linkWithPassword',
+        lines: [errorFormat.line],
+        body: `await linkWithProvider(new GoogleAuthProvider()); // guest → Google
+await linkWithPassword(email, password);          // guest → password`,
+      })}
+      options={errorFormat.control}
       form={
         <>
           <Button
@@ -230,7 +256,10 @@ await linkWithPassword(email, password);          // guest → password`}
 }
 
 function Unlink({ auth }: WithAuth) {
-  const { unlinkProvider, loading, error } = useUnlinkProvider(auth);
+  const errorFormat = useErrorFormat();
+  const { unlinkProvider, loading, error } = useUnlinkProvider(auth, {
+    formatErrorMessage: errorFormat.value,
+  });
   const [providerId, setProviderId] = useState('google.com');
   const [result, setResult] = useState<unknown>();
 
@@ -238,7 +267,13 @@ function Unlink({ auth }: WithAuth) {
     <HookSection
       hook="useUnlinkProvider"
       why="Firebase refuses to unlink the last remaining method, so an account can't be locked out this way — the refusal arrives as an ordinary failure result you can show."
-      snippet={`await unlinkProvider("google.com");`}
+      snippet={hookSnippet({
+        hook: 'useUnlinkProvider',
+        returns: 'unlinkProvider, loading, error',
+        lines: [errorFormat.line],
+        body: 'await unlinkProvider("google.com");',
+      })}
+      options={errorFormat.control}
       form={
         <>
           <Field
@@ -263,11 +298,18 @@ function Unlink({ auth }: WithAuth) {
 }
 
 function DeleteAccount({ auth }: WithAuth) {
+  const errorFormat = useErrorFormat();
+  const onBeforeDelete = useFlowCallback({
+    name: 'onBeforeDelete',
+    signature: '(user)',
+    body: 'deleteUserRecord(user.uid)',
+    throwsHint: 'The account survives — cleanup failing cannot orphan its records.',
+  });
   const [currentPassword, setCurrentPassword] = useState('');
-  const [cleanupRan, setCleanupRan] = useState(false);
   const [result, setResult] = useState<unknown>();
   const { deleteAccount, loading, error } = useDeleteAccount(auth, {
-    onBeforeDelete: () => setCleanupRan(true),
+    formatErrorMessage: errorFormat.value,
+    onBeforeDelete: onBeforeDelete.value,
   });
 
   return (
@@ -280,11 +322,18 @@ function DeleteAccount({ auth }: WithAuth) {
           the deletion, so failed cleanup can't orphan records.
         </>
       }
-      snippet={`const { deleteAccount } = useDeleteAccount(auth, {
-  onBeforeDelete: (user) => deleteUserRecord(user.uid),
-});
-
-await deleteAccount({ currentPassword });`}
+      snippet={hookSnippet({
+        hook: 'useDeleteAccount',
+        returns: 'deleteAccount, loading, error',
+        lines: [onBeforeDelete.line, errorFormat.line],
+        body: 'await deleteAccount({ currentPassword });',
+      })}
+      options={
+        <>
+          {onBeforeDelete.control}
+          {errorFormat.control}
+        </>
+      }
       form={
         <>
           <Field
@@ -304,7 +353,6 @@ await deleteAccount({ currentPassword });`}
           >
             {loading ? 'Deleting…' : 'Delete account'}
           </Button>
-          {cleanupRan ? <p className="text-muted text-sm">onBeforeDelete ran.</p> : null}
         </>
       }
       result={result}

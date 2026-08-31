@@ -13,6 +13,9 @@ type FirebaseContextValue = {
   /** Whether the shipped auth/* catalogue is applied to error messages. */
   formatErrors: boolean;
   setFormatErrors: (value: boolean) => void;
+  /** Soft-wrap every code block on the page rather than scrolling sideways. */
+  wrapCode: boolean;
+  setWrapCode: (value: boolean) => void;
 };
 
 const FirebaseContext = createContext<FirebaseContextValue | null>(null);
@@ -30,11 +33,14 @@ function createAuth(config: PlaygroundConfig | null): Auth | null {
  */
 export function FirebaseProvider({ children }: { children: ReactNode }) {
   const [formatErrors, setFormatErrors] = useState(false);
+  const [wrapCode, setWrapCode] = useState(true);
   const config = getFirebaseConfig();
   const auth = useMemo(() => createAuth(config), [config]);
 
   return (
-    <FirebaseContext.Provider value={{ auth, config, formatErrors, setFormatErrors }}>
+    <FirebaseContext.Provider
+      value={{ auth, config, formatErrors, setFormatErrors, wrapCode, setWrapCode }}
+    >
       {/* Formatting is opt-in: with it off, `error` is Firebase's own message. */}
       <AuthProvider
         auth={auth}
