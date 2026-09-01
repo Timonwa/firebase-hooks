@@ -31,8 +31,8 @@ export function UseUpdatePasswordSection() {
         hook: 'useUpdatePassword',
         returns: 'update, loading, error, success',
         lines: [errorFormat.line],
-        body: `await update({ newPassword, currentPassword }); // reauthenticates first
-await update({ newPassword });                  // your own policy`,
+        body: `await update(newPassword, { currentPassword }); // reauthenticates first
+await update(newPassword);                      // your own policy`,
       })}
       options={errorFormat.control}
       form={
@@ -53,10 +53,10 @@ await update({ newPassword });                  // your own policy`,
             disabled={loading}
             onClick={async () =>
               setResult(
-                await update({
+                await update(
                   newPassword,
-                  ...(currentPassword && { currentPassword }),
-                }),
+                  currentPassword ? { currentPassword } : undefined,
+                ),
               )
             }
           >

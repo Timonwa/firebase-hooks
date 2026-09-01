@@ -23,7 +23,7 @@ describe("useUpdateEmail", () => {
     const user = makeUser();
     const { result } = renderHook(() => useUpdateEmail(makeAuth(user)));
     await act(async () => {
-      await result.current.update({ newEmail: "new@b.c", currentPassword: "current-pw" });
+      await result.current.update("new@b.c", { currentPassword: "current-pw" });
     });
     expect(order).toEqual(["reauth", "verify"]);
     expect(verifyBeforeUpdateEmail).toHaveBeenCalledWith(user, "new@b.c", undefined);
@@ -34,7 +34,7 @@ describe("useUpdateEmail", () => {
     const user = makeUser();
     const { result } = renderHook(() => useUpdateEmail(makeAuth(user)));
     await act(async () => {
-      await result.current.update({ newEmail: "new@b.c" });
+      await result.current.update("new@b.c");
     });
     expect(reauthenticateWithCredential).not.toHaveBeenCalled();
     expect(verifyBeforeUpdateEmail).toHaveBeenCalledWith(user, "new@b.c", undefined);
@@ -47,7 +47,7 @@ describe("useUpdateEmail", () => {
       useUpdateEmail(makeAuth(user), { actionCodeSettings: settings }),
     );
     await act(async () => {
-      await result.current.update({ newEmail: "new@b.c" });
+      await result.current.update("new@b.c");
     });
     expect(verifyBeforeUpdateEmail).toHaveBeenCalledWith(user, "new@b.c", settings);
   });
@@ -61,7 +61,7 @@ describe("useUpdateEmail", () => {
     const { result } = renderHook(() => useUpdateEmail(makeAuth(makeUser())));
     let outcome: Awaited<ReturnType<typeof result.current.update>> | undefined;
     await act(async () => {
-      outcome = await result.current.update({ newEmail: "new@b.c" });
+      outcome = await result.current.update("new@b.c");
     });
     expect(outcome).toMatchObject({
       success: false,
@@ -75,7 +75,7 @@ describe("useUpdateEmail", () => {
     const user = makeUser({ email: null });
     const { result } = renderHook(() => useUpdateEmail(makeAuth(user)));
     await act(async () => {
-      await result.current.update({ newEmail: "new@b.c", currentPassword: "old-pw" });
+      await result.current.update("new@b.c", { currentPassword: "old-pw" });
     });
     expect(result.current.error).toMatch(/no email\/password sign-in/);
     expect(verifyBeforeUpdateEmail).not.toHaveBeenCalled();
@@ -85,7 +85,7 @@ describe("useUpdateEmail", () => {
     const { result } = renderHook(() => useUpdateEmail(makeAuth(null)));
     let outcome: Awaited<ReturnType<typeof result.current.update>> | undefined;
     await act(async () => {
-      outcome = await result.current.update({ newEmail: "new@b.c" });
+      outcome = await result.current.update("new@b.c");
     });
     expect(outcome?.success).toBe(false);
     expect(result.current.error).toMatch(/No user is signed in/);

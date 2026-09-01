@@ -20,10 +20,7 @@ describe("useUpdatePassword", () => {
     vi.mocked(updatePassword).mockImplementation(async () => void order.push("update"));
     const { result } = renderHook(() => useUpdatePassword(makeAuth(makeUser())));
     await act(async () => {
-      await result.current.update({
-        newPassword: "new-pw",
-        currentPassword: "current-pw",
-      });
+      await result.current.update("new-pw", { currentPassword: "current-pw" });
     });
     expect(order).toEqual(["reauth", "update"]);
     expect(result.current.success).toBe(true);
@@ -33,7 +30,7 @@ describe("useUpdatePassword", () => {
     const user = makeUser();
     const { result } = renderHook(() => useUpdatePassword(makeAuth(user)));
     await act(async () => {
-      await result.current.update({ newPassword: "new-pw" });
+      await result.current.update("new-pw");
     });
     expect(reauthenticateWithCredential).not.toHaveBeenCalled();
     expect(updatePassword).toHaveBeenCalledWith(user, "new-pw");
@@ -48,7 +45,7 @@ describe("useUpdatePassword", () => {
     const { result } = renderHook(() => useUpdatePassword(makeAuth(makeUser())));
     let outcome: Awaited<ReturnType<typeof result.current.update>> | undefined;
     await act(async () => {
-      outcome = await result.current.update({ newPassword: "new-pw" });
+      outcome = await result.current.update("new-pw");
     });
     expect(outcome).toMatchObject({
       success: false,
@@ -62,7 +59,7 @@ describe("useUpdatePassword", () => {
     const user = makeUser({ email: null });
     const { result } = renderHook(() => useUpdatePassword(makeAuth(user)));
     await act(async () => {
-      await result.current.update({ newPassword: "new-pw", currentPassword: "old-pw" });
+      await result.current.update("new-pw", { currentPassword: "old-pw" });
     });
     expect(result.current.error).toMatch(/no email\/password sign-in/);
     expect(updatePassword).not.toHaveBeenCalled();
@@ -72,7 +69,7 @@ describe("useUpdatePassword", () => {
     const { result } = renderHook(() => useUpdatePassword(makeAuth(null)));
     let outcome: Awaited<ReturnType<typeof result.current.update>> | undefined;
     await act(async () => {
-      outcome = await result.current.update({ newPassword: "new-pw" });
+      outcome = await result.current.update("new-pw");
     });
     expect(outcome?.success).toBe(false);
     expect(result.current.error).toMatch(/No user is signed in/);

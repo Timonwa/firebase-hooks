@@ -36,7 +36,7 @@ export function UseUpdateEmailSection() {
         hook: 'useUpdateEmail',
         returns: 'update, loading, error, success',
         lines: [actionCodeSettings.line, errorFormat.line],
-        body: `await update({ newEmail, currentPassword });
+        body: `await update(newEmail, { currentPassword });
 // success === true → "check <newEmail> to confirm"`,
       })}
       options={
@@ -62,7 +62,7 @@ export function UseUpdateEmailSection() {
             disabled={loading}
             onClick={async () =>
               setResult(
-                await update({ newEmail, ...(currentPassword && { currentPassword }) }),
+                await update(newEmail, currentPassword ? { currentPassword } : undefined),
               )
             }
           >

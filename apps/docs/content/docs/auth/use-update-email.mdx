@@ -6,8 +6,8 @@ description: Change the email via verify-before-update.
 ```tsx
 const { update, success } = useUpdateEmail();
 
-await update({ newEmail, currentPassword }); // password account
-await update({ newEmail }); // OAuth account
+await update(newEmail, { currentPassword }); // password account
+await update(newEmail); // OAuth account
 
 {
   success && <p>Check {newEmail} to confirm the change.</p>;
@@ -16,7 +16,7 @@ await update({ newEmail }); // OAuth account
 
 ## Returns
 
-`update({ newEmail, currentPassword? })` resolves to `{ success: true }` or a failure result. Also exposes `loading`, `error`, and `success`.
+`update(newEmail, { currentPassword? })` resolves to `{ success: true }` or a failure result. Also exposes `loading`, `error`, and `success`.
 
 ## `success` means "email sent"
 

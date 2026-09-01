@@ -12,9 +12,9 @@
  * @returns `{ update, loading, error, success }`
  *
  * @example
- * const { update, success } = useUpdateEmail(auth);
- * await update({ newEmail, currentPassword }); // password account
- * await update({ newEmail });                  // OAuth account — reauth handled by you
+ * const { update, success } = useUpdateEmail();
+ * await update(newEmail, { currentPassword }); // password account
+ * await update(newEmail);                      // OAuth account — reauth handled by you
  * {success && <p>Check {newEmail} to confirm the change.</p>}
  */
 
@@ -63,13 +63,12 @@ function useUpdateEmailBase(auth: Auth | null, options: UseUpdateEmailOptionsPro
   );
   const [success, setSuccess] = useState(false);
 
-  const update = async ({
-    newEmail,
-    currentPassword,
-  }: {
-    newEmail: string;
-    currentPassword?: string;
-  }): Promise<HookResult> => {
+  // Shaped like the SDK's `verifyBeforeUpdateEmail(user, newEmail, …)` — the
+  // required value leads, and the reauthentication this hook adds goes after.
+  const update = async (
+    newEmail: string,
+    { currentPassword }: { currentPassword?: string } = {},
+  ): Promise<HookResult> => {
     setSuccess(false);
     const result = await run("update-email", "Failed to update email", async () => {
       const user = requireCurrentUser(auth);

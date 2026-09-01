@@ -9,9 +9,9 @@
  * @returns `{ update, loading, error, success }`
  *
  * @example
- * const { update, loading, error, success } = useUpdatePassword(auth);
- * await update({ newPassword, currentPassword }); // reauthenticates first
- * await update({ newPassword });                  // no reauth — your call
+ * const { update, loading, error, success } = useUpdatePassword();
+ * await update(newPassword, { currentPassword }); // reauthenticates first
+ * await update(newPassword);                      // no reauth — your call
  */
 
 "use client";
@@ -45,13 +45,13 @@ function useUpdatePasswordBase(auth: Auth | null, options: HookErrorOptions) {
   const { loading, error, run } = useAuthTask(options);
   const [success, setSuccess] = useState(false);
 
-  const update = async ({
-    newPassword,
-    currentPassword,
-  }: {
-    newPassword: string;
-    currentPassword?: string;
-  }): Promise<HookResult> => {
+  // Shaped like the SDK's `updatePassword(user, newPassword)` — the required
+  // value leads, and the reauthentication this hook adds on top goes in the
+  // options bag after it.
+  const update = async (
+    newPassword: string,
+    { currentPassword }: { currentPassword?: string } = {},
+  ): Promise<HookResult> => {
     setSuccess(false);
     const result = await run("update-password", "Failed to update password", async () => {
       const user = requireCurrentUser(auth);
