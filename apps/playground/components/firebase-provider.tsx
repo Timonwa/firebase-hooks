@@ -4,8 +4,9 @@ import { formatFirebaseError } from '@timonwa/firebase-hooks';
 import { AUTH_ERROR_MESSAGES, AuthProvider } from '@timonwa/firebase-hooks/auth';
 import { getApps, initializeApp } from 'firebase/app';
 import { type Auth, getAuth } from 'firebase/auth';
-import { createContext, type ReactNode, useContext, useMemo, useState } from 'react';
+import { createContext, type ReactNode, useContext, useMemo } from 'react';
 import { type PlaygroundConfig, getFirebaseConfig } from '@/lib/firebase-config';
+import { useStoredState } from '@/lib/use-stored-state';
 
 type FirebaseContextValue = {
   auth: Auth | null;
@@ -32,8 +33,10 @@ function createAuth(config: PlaygroundConfig | null): Auth | null {
  * That removes the loading state the old paste-into-the-browser flow needed.
  */
 export function FirebaseProvider({ children }: { children: ReactNode }) {
-  const [formatErrors, setFormatErrors] = useState(false);
-  const [wrapCode, setWrapCode] = useState(true);
+  // Kept across refreshes: these are how you set the playground up to work,
+  // and losing them on every reload made them feel broken.
+  const [formatErrors, setFormatErrors] = useStoredState('playground-format-errors', false);
+  const [wrapCode, setWrapCode] = useStoredState('playground-wrap-code', true);
   const config = getFirebaseConfig();
   const auth = useMemo(() => createAuth(config), [config]);
 
