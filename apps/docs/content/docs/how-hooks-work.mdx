@@ -13,6 +13,8 @@ Your Firebase `Auth` instance, or `null` while it initialises. No global, no hid
 const { login } = useLogin(auth);
 ```
 
+`auth` comes from the `firebase` package, not this one — `getAuth(initializeApp(config))`, created once in your app and imported where you need it. [Getting started](/docs/getting-started) has the file in full. Every snippet in these docs that says `auth` means that object.
+
 Passing `null` is always safe. State hooks report signed-out/loading, and actions fail cleanly with `{ success: false, error, code, cause }` instead of throwing — which matters during SSR hydration and while Firebase boots.
 
 ## Every action resolves to a result
