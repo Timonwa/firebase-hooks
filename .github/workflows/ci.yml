@@ -26,10 +26,13 @@ jobs:
 
       - uses: ./.github/actions/setup
 
+      # Build first: `typecheck` is recursive, and the apps resolve the library
+      # through its exports map, so dist has to exist before they compile.
+      - run: pnpm build
+
       - run: pnpm typecheck
       - run: pnpm lint
       - run: pnpm test
-      - run: pnpm build
 
       # The two checks that catch a package which builds fine but cannot be
       # imported: publint validates the manifest, attw resolves the types the way
@@ -37,9 +40,9 @@ jobs:
       - run: pnpm check:publish
       - run: pnpm check:exports
 
-  # Separate from verify: a broken docs build must never gate a release, and the
+  # Separate from verify: a broken app build must never gate a release, and the
   # release job runs verify on the same push.
-  docs:
+  apps:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -55,3 +58,8 @@ jobs:
 
       - run: pnpm --filter docs typecheck
       - run: pnpm --filter docs build
+
+      # The playground links the library the same way a consumer does, so a
+      # broken export surfaces here before anyone installs it.
+      - run: pnpm --filter playground typecheck
+      - run: pnpm --filter playground build

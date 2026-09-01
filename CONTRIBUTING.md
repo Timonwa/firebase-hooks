@@ -27,7 +27,23 @@ This is a pnpm workspace. The published package lives in `packages/firebase-hook
 - **Options go in an exported `Use<Name>OptionsProps` interface** extending `HookErrorOptions`, with a TSDoc line on every field it declares itself (and `@defaultValue` where there is one). The docs site generates its options table from that interface, so an undocumented field ships an empty cell. Exported for the generator's sake — keep it out of the barrel, so the published types don't change.
 - **Export it explicitly** from its service's entry barrel (`src/auth/index.ts` for auth), one line per file, alphabetical. The root entry (`src/core/index.ts`) carries only the service-agnostic core — nothing service-specific is ever added to it; a new service gets a new folder + subpath entry.
 - **Document it in the same change** — add a page under `apps/docs/content/docs/auth/` and list it in that folder's `meta.json`. Follow the shape of the existing pages: prose intro, example, `## Returns`, then `<AutoTypeTable>` for the options. The table generates from the option interface's TSDoc, so document each field there rather than hand-writing a table.
+- **Add it to the playground in the same change** — a section component under `apps/playground/components/<service>/`, rendered from that service's page, and its name in the right group in `apps/playground/lib/hooks-map.ts` so it appears in the sidebar. See below.
 - **A hook ships with its test file beside it** (`src/auth/use-login.test.tsx`), importing through that service's barrel. Shared fakes and builders live in that folder's `_test-helpers` file (never exported from the barrel); cross-cutting behaviour — the error model, formatter precedence, global config inheritance, the `onError` observer — lives in `src/auth/auth-provider.test.tsx`; the `firebase/auth` mock lives in the package's `__mocks__/` directory, activated per file with a bare `vi.mock("firebase/auth")`. What's under test is the hook's orchestration (ordering, callbacks, error paths), not Firebase. Cover the edges: the null `auth`, the throwing callback, the signed-out user.
+
+## Running it against a real project
+
+Unit tests mock `firebase/auth`, so they prove the orchestration and nothing about Firebase itself. `apps/playground/` is where you check the other half: a local Next app that runs every hook against a live project, one page per group, with the hook's `loading`, `error`, and resolved value shown beside each form.
+
+It is never deployed — it exists so you can exercise a change before opening the PR. Bring your own Firebase project; `apps/playground/README.md` covers the `.env.local` values and the console settings each flow needs.
+
+```bash
+pnpm build                      # the playground resolves the library through its exports map
+pnpm --filter playground dev
+```
+
+Because it imports `@timonwa/firebase-hooks` the way a consumer does, a broken export or a missing subpath entry fails here rather than after publish — which is why CI builds it on every PR. Rebuild the library after changing it; the playground reads `dist`, not `src`.
+
+Each hook is its own section component, one file per hook, rendered from its service's page — so a service page is a list of imports and a new hook is a new file rather than an edit to a growing one. The component renders a `<HookSection>`: the hook's name, a sentence on why it exists, the snippet, the form, and the hook's own `loading`/`error`/result passed straight through. Anything about running it locally goes in the playground's own README, not this file.
 
 ## Submitting a change
 

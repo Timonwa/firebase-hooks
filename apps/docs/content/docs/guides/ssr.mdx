@@ -9,7 +9,7 @@ In React Server Component frameworks you import from this package inside client 
 
 ## A null `auth` is safe
 
-Firebase usually initialises in an effect or a provider, so there's a window where you have no `Auth` instance. Passing `null` through it is fine:
+Where Firebase initialises in an effect or a provider, there's a window with no `Auth` instance. Passing `null` through it is fine:
 
 - State hooks report signed-out/loading.
 - Actions fail cleanly with `{ success: false, error, code, cause }`.
