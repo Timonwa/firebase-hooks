@@ -1,5 +1,6 @@
 'use client';
 
+import { type LucideIcon, Moon, Monitor, Sun } from 'lucide-react';
 import { createContext, type ReactNode, useContext, useEffect, useState } from 'react';
 
 export type Theme = 'light' | 'dark' | 'system';
@@ -73,38 +74,32 @@ export function useTheme() {
   return context;
 }
 
-const OPTIONS: { value: Theme; label: string; icon: string }[] = [
-  { value: 'light', label: 'Light', icon: '☀' },
-  { value: 'dark', label: 'Dark', icon: '☾' },
-  { value: 'system', label: 'System', icon: '◐' },
+/** Cycle order, so one button covers all three. */
+const CYCLE: { value: Theme; label: string; Icon: LucideIcon }[] = [
+  { value: 'light', label: 'Light', Icon: Sun },
+  { value: 'dark', label: 'Dark', Icon: Moon },
+  { value: 'system', label: 'System', Icon: Monitor },
 ];
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
 
+  const index = CYCLE.findIndex((entry) => entry.value === theme);
+  const current = CYCLE[index === -1 ? 2 : index];
+  const next = CYCLE[(index + 1) % CYCLE.length];
+  const { Icon } = current;
+
   return (
-    <div
-      className="border-line flex gap-0.5 rounded-md border p-0.5"
-      role="group"
-      aria-label="Theme"
+    <button
+      type="button"
+      onClick={() => setTheme(next.value)}
+      // The icon alone can't say what a click will do, so the label carries
+      // both the current state and the next one.
+      aria-label={`Theme: ${current.label.toLowerCase()}. Switch to ${next.label.toLowerCase()}.`}
+      title={`Theme: ${current.label} → ${next.label}`}
+      className="text-muted hover:text-fg hover:bg-fg/5 grid size-8 place-items-center rounded-md transition-colors"
     >
-      {OPTIONS.map((option) => (
-        <button
-          key={option.value}
-          type="button"
-          onClick={() => setTheme(option.value)}
-          aria-pressed={theme === option.value}
-          title={option.label}
-          className={`flex-1 rounded px-2 py-1 text-xs transition-colors ${
-            theme === option.value
-              ? 'bg-accent text-accent-fg'
-              : 'text-muted hover:text-fg'
-          }`}
-        >
-          <span aria-hidden>{option.icon}</span>
-          <span className="sr-only">{option.label}</span>
-        </button>
-      ))}
-    </div>
+      <Icon className="size-4" strokeWidth={1.75} aria-hidden />
+    </button>
   );
 }

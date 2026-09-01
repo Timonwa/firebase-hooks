@@ -14,6 +14,10 @@
   --color-accent: oklch(56% 0.19 285);
   --color-accent-fg: oklch(99% 0.002 285);
   --color-danger: oklch(58% 0.21 25);
+
+  /* One curve for everything that moves: fast out of the gate, settling at the
+     end, so panels feel like they were already on their way. */
+  --ease-panel: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* One switch for the whole page: `data-theme` on <html>, resolved before paint
@@ -40,6 +44,28 @@
 body {
   background-color: var(--color-bg);
   color: var(--color-fg);
+}
+
+/* Popovers grow from the corner they're anchored to, so the panel reads as
+   coming out of its trigger rather than appearing over it. */
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: translateY(-0.25rem) scale(0.98);
+  }
+}
+
+@utility animate-pop {
+  animation: pop 150ms var(--ease-panel);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 @utility surface {
