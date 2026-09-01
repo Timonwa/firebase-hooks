@@ -4,7 +4,7 @@ description: Remove a sign-in method.
 ---
 
 ```tsx
-const { unlinkProvider } = useUnlinkProvider(auth);
+const { unlinkProvider } = useUnlinkProvider();
 
 await unlinkProvider('google.com');
 ```

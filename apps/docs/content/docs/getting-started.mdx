@@ -25,7 +25,7 @@ Requires **React 18 or 19** and **Firebase 11 or 12**. Both are peer dependencie
 
 ## Create your Auth instance
 
-Every hook takes a Firebase `Auth` instance as its first argument. That object comes from the `firebase` package, not from this one — you create it once and import it wherever you need it. There's no global and no hidden singleton.
+Every hook needs a Firebase `Auth` instance. That object comes from the `firebase` package, not from this one — you create it once and import it wherever you need it. There is no global and no hidden singleton.
 
 ```ts title="lib/firebase.ts"
 import { getApps, initializeApp } from 'firebase/app';
@@ -48,29 +48,9 @@ Those four values come from the Firebase console under **Project settings → Yo
 
 `auth` is what the rest of this page means whenever it says `auth`.
 
-## Sign a user in
-
-```tsx
-import { useLogin } from '@timonwa/firebase-hooks/auth';
-import { auth } from '@/lib/firebase';
-
-function LoginForm() {
-  const { login, loading, error } = useLogin(auth, {
-    onIdToken: (idToken) => createSession(idToken), // mint your server session here
-  });
-
-  async function onSubmit(email: string, password: string) {
-    const result = await login(email, password);
-    if (result.success) router.push('/dashboard');
-  }
-}
-```
-
-`login` resolves to a result rather than throwing, so a failed sign-in is a value you read.
-
 ## Add the provider
 
-`AuthProvider` does two jobs. The first is the one you'll want first: it watches Firebase for you, so any component can ask who is signed in and re-render when that changes.
+Wrap your app once. `AuthProvider` watches Firebase for you, so any component can ask who is signed in and re-render when that changes — and every hook below it takes its `auth` and its defaults from here.
 
 ```tsx
 import { AuthProvider } from '@timonwa/firebase-hooks/auth';
@@ -93,7 +73,36 @@ function Navbar() {
 
 Without the provider, a sign-in on one page can't tell your navbar on another — nothing is subscribed. `useAuth` is the only hook that requires it, and it throws rather than pretending nobody is signed in.
 
-The second job is app-wide defaults. `onIdToken` above now applies to every sign-in hook, so `useLogin(auth)` mints your server session with nothing else to wire. Every other hook keeps working with no provider at all — the defaults are a convenience, not a requirement.
+## Sign a user in
+
+Nothing to pass: the provider supplies both the instance and the `onIdToken` you set on it.
+
+```tsx
+import { useLogin } from '@timonwa/firebase-hooks/auth';
+
+function LoginForm() {
+  const { login, loading, error } = useLogin();
+
+  async function onSubmit(email: string, password: string) {
+    const result = await login(email, password);
+    if (result.success) router.push('/dashboard');
+  }
+}
+```
+
+`login` resolves to a result rather than throwing, so a failed sign-in is a value you read.
+
+### Without a provider
+
+Every hook except `useAuth` works without one — pass the instance yourself. An explicit `auth` also wins over the provider's, which is how you reach a second Firebase project:
+
+```tsx
+import { auth } from '@/lib/firebase';
+
+const { login } = useLogin(auth, {
+  onIdToken: (idToken) => createSession(idToken),
+});
+```
 
 <Cards>
   <Card title="How every hook works" href="/docs/how-hooks-work">

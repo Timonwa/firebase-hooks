@@ -6,7 +6,7 @@ description: The resend-verification-email button.
 Sends, or re-sends, the verification email to the signed-in user.
 
 ```tsx
-const { send, loading, success } = useSendEmailVerification(auth);
+const { send, loading, success } = useSendEmailVerification();
 
 <button onClick={send} disabled={loading}>
   Resend verification email

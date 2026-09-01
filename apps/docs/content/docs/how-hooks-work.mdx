@@ -5,17 +5,29 @@ description: One contract, so learning one hook is learning them all.
 
 Every hook in this package follows the same shape. Once you've used one, the rest are predictable.
 
-## `auth` is the first argument
+## Every hook needs an `Auth` instance
 
-Your Firebase `Auth` instance, or `null` while it initialises. No global, no hidden singleton.
+Below an [`AuthProvider`](/docs/auth/auth-provider) the hooks take its `auth`, so there's nothing to pass:
+
+```tsx
+const { login } = useLogin();
+const { signup } = useSignup({ sendVerificationEmail: false });
+```
+
+You can still pass one explicitly, and it wins over the provider's. That's what a second Firebase project needs, and it's the only option if you're not using a provider at all:
 
 ```tsx
 const { login } = useLogin(auth);
+const { login } = useLogin(auth, { onIdToken: createSession });
 ```
 
-`auth` comes from the `firebase` package, not this one — `getAuth(initializeApp(config))`, created once in your app and imported where you need it. [Getting started](/docs/getting-started) has the file in full. Every snippet in these docs that says `auth` means that object.
+`auth` comes from the `firebase` package, not this one — `getAuth(initializeApp(config))`, created once in your app and imported where you need it. [Getting started](/docs/getting-started) has the file in full.
 
-Passing `null` is always safe. State hooks report signed-out/loading, and actions fail cleanly with `{ success: false, error, code, cause }` instead of throwing — which matters during SSR hydration and while Firebase boots.
+Passing `null` is always safe, and it never means "use the provider's". It means the instance isn't ready: state hooks report loading, and actions fail cleanly with `{ success: false, error, code, cause }` rather than throwing. That distinction is what lets you hold a hook back while Firebase boots without it quietly running against the provider's instance instead.
+
+```tsx
+const { login } = useLogin(auth); // auth may still be null here — fine
+```
 
 ## Every action resolves to a result
 
@@ -42,7 +54,7 @@ See [Error handling](/docs/guides/error-handling) for the full model.
 With a freshly minted token, so you can trade it for a server session. Throwing inside it aborts the flow, and the error surfaces like any other failure.
 
 ```tsx
-const { login } = useLogin(auth, {
+const { login } = useLogin({
   onIdToken: (idToken, user) => createSession(idToken),
 });
 ```
@@ -66,6 +78,6 @@ A hook's own option overrides the provider, and an explicit `null` opts that flo
   {children}
 </AuthProvider>;
 
-const { login } = useLogin(auth); // inherits session minting
-const { login } = useLogin(auth, { onIdToken: null }); // opts out
+const { login } = useLogin(); // inherits session minting
+const { login } = useLogin({ onIdToken: null }); // opts out
 ```

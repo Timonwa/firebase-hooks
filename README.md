@@ -31,14 +31,24 @@ npm install @timonwa/firebase-hooks firebase
 
 Requires React 18 or 19 and Firebase 11 or 12 (both peer dependencies).
 
+Create your `Auth` instance once with the Firebase SDK, then wrap your app:
+
+```tsx
+import { AuthProvider } from "@timonwa/firebase-hooks/auth";
+import { auth } from "@/lib/firebase"; // getAuth(initializeApp(config))
+
+<AuthProvider auth={auth} onIdToken={(idToken) => createSession(idToken)}>
+  {children}
+</AuthProvider>;
+```
+
+Hooks below it need nothing passed:
+
 ```tsx
 import { useLogin } from "@timonwa/firebase-hooks/auth";
-import { auth } from "@/lib/firebase"; // your initialised Auth instance
 
 function LoginForm() {
-  const { login, loading, error } = useLogin(auth, {
-    onIdToken: (idToken) => createSession(idToken), // mint your server session here
-  });
+  const { login, loading, error } = useLogin();
 
   async function onSubmit(email: string, password: string) {
     const result = await login(email, password);
@@ -46,6 +56,8 @@ function LoginForm() {
   }
 }
 ```
+
+The provider is optional for everything except `useAuth` — pass your own instance instead (`useLogin(auth)`) and it wins over the provider's.
 
 ## Services
 
@@ -76,7 +88,7 @@ Every hook has its own page — signature, options, and a worked example — in 
 
 One contract, so learning one hook is learning them all:
 
-- **`auth` is the first argument** — your Firebase `Auth` instance, or `null` while it initialises. No global, no hidden singleton; calling an action before `auth` exists fails cleanly with `{ success: false, error }`.
+- **Every hook needs an `Auth` instance** — taken from `AuthProvider`, or passed in as the first argument to override it. No global, no hidden singleton. Passing `null` means "not ready yet", never "use the provider's", so an action called before `auth` exists fails cleanly with `{ success: false, error }`.
 - **Every action resolves to `HookResult`** — `{ success: true, ...data }` or `{ success: false, error, code, cause }`. The hook's `error` state carries the same message for rendering, and `loading` and `success` track the action. See [Error handling](#error-handling).
 - **`onIdToken(idToken, user)` runs after a successful sign-in**, with a freshly minted token. Throw inside it to abort the flow; the error surfaces like any other.
 - **`currentPassword` triggers reauthentication** in `useUpdatePassword`, `useUpdateEmail`, and `useDeleteAccount`. `useReauthenticate` exposes the same step for custom flows.
@@ -93,7 +105,7 @@ One contract, so learning one hook is learning them all:
   {children}
 </AuthProvider>;
 
-const { login } = useLogin(auth); // session minting inherited — nothing to wire
+const { login } = useLogin(); // auth and session minting inherited — nothing to wire
 ```
 
 ## Error handling

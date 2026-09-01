@@ -6,7 +6,7 @@ description: Sign in with a server-minted custom token.
 For bridging your own auth system into Firebase. Your server mints the token with the Admin SDK's `createCustomToken`.
 
 ```tsx
-const { signIn } = useCustomTokenSignIn(auth);
+const { signIn } = useCustomTokenSignIn();
 
 const { token } = await fetchCustomTokenFromYourApi();
 await signIn(token);
