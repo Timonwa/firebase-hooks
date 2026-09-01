@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import type { ReactNode } from 'react';
 import { AppSidebar } from '@/components/app-sidebar';
 import { FirebaseProvider } from '@/components/firebase-provider';
+import { ThemeProvider, themeScript } from '@/components/theme';
+import { TopBar } from '@/components/top-bar';
 import './globals.css';
 
 const geistSans = Geist({ subsets: ['latin'], variable: '--font-geist-sans' });
@@ -23,15 +25,26 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       className={`${geistSans.variable} ${geistMono.variable}`}
       suppressHydrationWarning
     >
+      <head>
+        {/* Sets data-theme before the first paint. */}
+        {/* biome-ignore lint/security/noDangerouslySetInnerHtml: a constant in
+            this repo, not user input. */}
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body className="font-sans antialiased">
-        <FirebaseProvider>
-          <div className="flex min-h-dvh flex-col lg:flex-row">
-            <AppSidebar />
-            <main className="min-w-0 flex-1 px-6 py-8 lg:px-10">
-              <div className="mx-auto w-full max-w-4xl">{children}</div>
-            </main>
-          </div>
-        </FirebaseProvider>
+        <ThemeProvider>
+          <FirebaseProvider>
+            <div className="flex min-h-dvh flex-col lg:flex-row">
+              <AppSidebar />
+              <div className="flex min-w-0 flex-1 flex-col">
+                <TopBar />
+                <main className="px-6 py-8 lg:px-10">
+                  <div className="mx-auto w-full max-w-4xl">{children}</div>
+                </main>
+              </div>
+            </div>
+          </FirebaseProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

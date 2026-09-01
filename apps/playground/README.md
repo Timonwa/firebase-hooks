@@ -1,6 +1,6 @@
 # Hook playground
 
-Runs every hook in [`@timonwa/firebase-hooks`](../../packages/firebase-hooks) against a live Firebase project, one page per group, with the response and hook state shown beside each form.
+Runs every hook in [`@timonwa/firebase-hooks`](../../packages/firebase-hooks) against a live Firebase project, one page per service, with the response and hook state shown beside each form.
 
 ## Setup
 
@@ -65,11 +65,19 @@ Each hook shows its live `loading` and `error`, then the value the action resolv
 
 The hook resolves `error` once, when it catches, so changing the setting never rewrites a message already on screen — run the call again to see the new one.
 
-## Sidebar settings
+## Page settings
 
-**Format errors** sets `formatErrorMessage` on the provider, for every hook at once. Any hook's own Options panel overrides it, which is the precedence rule worth seeing in action.
+In the bar across the top of every page:
+
+**Format errors** sets `formatErrorMessage` on the provider, for every hook at once. A hook whose own `formatErrorMessage` is left unset follows this; setting it in that hook's Options overrides it. That precedence is the thing worth seeing in action.
 
 **Wrap code** soft-wraps every snippet and response instead of scrolling sideways.
+
+**Theme** is light, dark, or whatever the system is set to.
+
+## Adding a hook to it
+
+One file per hook under `components/auth/`, exporting a `<Use…Section>`, rendered from `app/auth/page.tsx` and listed in `lib/hooks-map.ts` so it reaches the sidebar. A new service is a new folder, a new page at `/[slug]`, and one more entry in that map — the shell reads it and needs no other change.
 
 ## Scripts
 

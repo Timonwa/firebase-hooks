@@ -28,7 +28,11 @@ const ERROR_FORMATS: Record<
   ErrorFormat,
   { label: string; value: ((error: unknown) => string) | undefined; line: string | null }
 > = {
-  inherit: { label: 'inherit from the provider', value: undefined, line: null },
+  inherit: {
+    label: 'not set — follows “Format errors” above',
+    value: undefined,
+    line: null,
+  },
   stripped: {
     label: 'formatFirebaseError',
     value: stripped,
@@ -51,7 +55,7 @@ export function useErrorFormat() {
     control: (
       <Select
         label="formatErrorMessage"
-        hint="Set on the hook, this beats the provider. Cause a failure to see it."
+        hint="Setting it here overrides the provider for this hook only. Cause a failure to see it."
         value={format}
         onChange={(event) => setFormat(event.target.value as ErrorFormat)}
         options={Object.entries(ERROR_FORMATS).map(([value, { label }]) => ({
@@ -171,7 +175,7 @@ export function useActionCodeSettings(path = '/auth/action') {
         value={mode}
         onChange={(event) => setMode(event.target.value as ActionCodeMode)}
         options={[
-          { value: 'inherit', label: 'inherit from the provider' },
+          { value: 'inherit', label: 'not set — follows the provider' },
           { value: 'app', label: `come back to ${path}` },
           { value: 'off', label: 'null — opt out, use Firebase’s page' },
         ]}

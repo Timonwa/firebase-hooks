@@ -16,21 +16,25 @@
   --color-danger: oklch(58% 0.21 25);
 }
 
-/* Driven by the system preference rather than a class, so every surface flips
-   together. Mixing this with Tailwind's `dark:` variants is what left the forms
-   dark on a light page. */
-@media (prefers-color-scheme: dark) {
-  @theme {
-    --color-bg: oklch(15.2% 0.012 285);
-    --color-fg: oklch(94% 0.004 285);
-    --color-muted: oklch(70.5% 0.014 285);
-    --color-surface: oklch(18% 0.013 285);
-    --color-line: oklch(32% 0.016 285);
-    /* Lighter than the light-mode violet: the same value fails contrast on dark. */
-    --color-accent: oklch(75% 0.145 285);
-    --color-accent-fg: oklch(16% 0.02 285);
-    --color-danger: oklch(70% 0.17 25);
-  }
+/* One switch for the whole page: `data-theme` on <html>, resolved before paint
+   by the script in the layout. Every surface reads these tokens, so mixing in
+   Tailwind's `dark:` variants — which follow the system, not this — is what
+   left the forms dark on a light page. */
+/* Plain declarations rather than a nested `@theme`: the utilities generated
+   above already resolve through `var(--color-*)`, so redefining the variables
+   under a selector is enough to repaint everything. */
+[data-theme='dark'] {
+  --color-bg: oklch(15.2% 0.012 285);
+  --color-fg: oklch(94% 0.004 285);
+  --color-muted: oklch(70.5% 0.014 285);
+  --color-surface: oklch(18% 0.013 285);
+  --color-line: oklch(32% 0.016 285);
+  /* Lighter than the light-mode violet: the same value fails contrast on dark. */
+  --color-accent: oklch(75% 0.145 285);
+  --color-accent-fg: oklch(16% 0.02 285);
+  --color-danger: oklch(70% 0.17 25);
+
+  color-scheme: dark;
 }
 
 body {
@@ -45,7 +49,7 @@ body {
 }
 
 /* Shiki emits both themes as custom properties; these pick the right one so the
-   code follows the same system preference as everything else. */
+   code follows the same switch as everything else. */
 .shiki-block pre {
   margin: 0;
   padding: 1rem;
@@ -56,8 +60,6 @@ body {
   color: var(--shiki-light);
 }
 
-@media (prefers-color-scheme: dark) {
-  .shiki-block code span {
-    color: var(--shiki-dark);
-  }
+[data-theme='dark'] .shiki-block code span {
+  color: var(--shiki-dark);
 }

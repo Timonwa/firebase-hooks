@@ -42,13 +42,13 @@ export function HookSection({
   return (
     <section
       id={toAnchor(hook)}
-      className="border-line grid scroll-mt-6 gap-8 border-b py-10 lg:grid-cols-[1fr_minmax(0,24rem)]"
+      className="border-line grid scroll-mt-24 gap-8 border-b py-10 lg:grid-cols-[1fr_minmax(0,24rem)]"
     >
       {/* Centre — what it is and why it exists. It is the shorter column, so it
           is the one that sticks: the console grows with the result, and a
           sticky element taller than the viewport can never scroll to its own
           bottom. */}
-      <div className="min-w-0 lg:sticky lg:top-6 lg:self-start">
+      <div className="min-w-0 lg:sticky lg:top-24 lg:self-start">
         <div className="flex flex-wrap items-baseline gap-3">
           <h2 className="text-accent font-mono text-lg font-semibold">{hook}</h2>
           <a

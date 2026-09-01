@@ -7,22 +7,22 @@ import { NeedsConfig } from '@/components/needs-config';
 /** Ordered, because on a new project every flow except signup has nothing to act on. */
 const STEPS = [
   {
-    href: '/signing-in#use-signup',
+    href: '/auth#use-signup',
     title: 'Create an account',
     body: 'A new project has no users, so signup is the first thing that can succeed. Everything else acts on an existing account.',
   },
   {
-    href: '/signing-in#use-login',
+    href: '/auth#use-login',
     title: 'Sign in and out',
     body: 'Now that an account exists — plus OAuth, magic link, phone, and guest sessions.',
   },
   {
-    href: '/account',
+    href: '/auth#account-and-linking',
     title: 'Manage the account',
     body: 'Who the current user is, changing their profile, and adding or removing sign-in methods.',
   },
   {
-    href: '/email',
+    href: '/auth#email',
     title: 'Email and password flows',
     body: 'Verification and resets. These arrive by email, so they finish on the page Firebase links back to.',
   },
