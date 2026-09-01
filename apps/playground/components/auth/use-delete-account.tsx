@@ -3,12 +3,10 @@
 import { useDeleteAccount } from '@timonwa/firebase-hooks/auth';
 import { useState } from 'react';
 import { Button, Field } from '@/components/controls';
-import { useFirebase } from '@/components/firebase-provider';
 import { hookSnippet, useErrorFormat, useFlowCallback } from '@/components/hook-options';
 import { HookSection } from '@/components/hook-section';
 
 export function UseDeleteAccountSection() {
-  const { auth } = useFirebase();
   const errorFormat = useErrorFormat();
   const onBeforeDelete = useFlowCallback({
     name: 'onBeforeDelete',
@@ -16,7 +14,7 @@ export function UseDeleteAccountSection() {
     body: 'deleteUserRecord(user.uid)',
     throwsHint: 'The account survives — cleanup failing cannot orphan its records.',
   });
-  const { deleteAccount, loading, error } = useDeleteAccount(auth, {
+  const { deleteAccount, loading, error } = useDeleteAccount({
     formatErrorMessage: errorFormat.value,
     onBeforeDelete: onBeforeDelete.value,
   });

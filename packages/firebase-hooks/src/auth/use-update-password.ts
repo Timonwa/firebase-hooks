@@ -23,10 +23,25 @@ import {
   type HookResult,
   reauthenticateUserWithPassword,
   requireCurrentUser,
+  useAuthArgs,
   useAuthTask,
 } from "./_shared";
 
-export function useUpdatePassword(auth: Auth | null, options: HookErrorOptions = {}) {
+export function useUpdatePassword(
+  options?: HookErrorOptions,
+): ReturnType<typeof useUpdatePasswordBase>;
+export function useUpdatePassword(
+  auth: Auth | null,
+  options?: HookErrorOptions,
+): ReturnType<typeof useUpdatePasswordBase>;
+export function useUpdatePassword(
+  authOrOptions?: Auth | null | HookErrorOptions,
+  maybeOptions?: HookErrorOptions,
+) {
+  return useUpdatePasswordBase(...useAuthArgs(authOrOptions, maybeOptions));
+}
+
+function useUpdatePasswordBase(auth: Auth | null, options: HookErrorOptions) {
   const { loading, error, run } = useAuthTask(options);
   const [success, setSuccess] = useState(false);
 

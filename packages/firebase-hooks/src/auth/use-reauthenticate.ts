@@ -29,10 +29,25 @@ import {
   type HookResult,
   reauthenticateUserWithPassword,
   requireCurrentUser,
+  useAuthArgs,
   useAuthTask,
 } from "./_shared";
 
-export function useReauthenticate(auth: Auth | null, options: HookErrorOptions = {}) {
+export function useReauthenticate(
+  options?: HookErrorOptions,
+): ReturnType<typeof useReauthenticateBase>;
+export function useReauthenticate(
+  auth: Auth | null,
+  options?: HookErrorOptions,
+): ReturnType<typeof useReauthenticateBase>;
+export function useReauthenticate(
+  authOrOptions?: Auth | null | HookErrorOptions,
+  maybeOptions?: HookErrorOptions,
+) {
+  return useReauthenticateBase(...useAuthArgs(authOrOptions, maybeOptions));
+}
+
+function useReauthenticateBase(auth: Auth | null, options: HookErrorOptions) {
   const { loading, error, run } = useAuthTask(options);
 
   const reauthenticateWithPassword = (currentPassword: string): Promise<HookResult> =>

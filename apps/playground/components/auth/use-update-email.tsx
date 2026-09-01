@@ -3,7 +3,6 @@
 import { useUpdateEmail } from '@timonwa/firebase-hooks/auth';
 import { useState } from 'react';
 import { Button, Field } from '@/components/controls';
-import { useFirebase } from '@/components/firebase-provider';
 import {
   hookSnippet,
   useActionCodeSettings,
@@ -12,10 +11,9 @@ import {
 import { HookSection } from '@/components/hook-section';
 
 export function UseUpdateEmailSection() {
-  const { auth } = useFirebase();
   const errorFormat = useErrorFormat();
   const actionCodeSettings = useActionCodeSettings();
-  const { update, loading, error, success } = useUpdateEmail(auth, {
+  const { update, loading, error, success } = useUpdateEmail({
     actionCodeSettings: actionCodeSettings.value,
     formatErrorMessage: errorFormat.value,
   });

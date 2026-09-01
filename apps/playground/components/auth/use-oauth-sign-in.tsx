@@ -10,7 +10,6 @@ import {
 } from 'firebase/auth';
 import { useState } from 'react';
 import { Button, Select } from '@/components/controls';
-import { useFirebase } from '@/components/firebase-provider';
 import { hookSnippet, useErrorFormat, useFlowCallback } from '@/components/hook-options';
 import { HookSection } from '@/components/hook-section';
 
@@ -44,7 +43,6 @@ const PROVIDERS = {
 type ProviderKey = keyof typeof PROVIDERS;
 
 export function UseOAuthSignInSection() {
-  const { auth } = useFirebase();
   const errorFormat = useErrorFormat();
   const onIdToken = useFlowCallback({
     name: 'onIdToken',
@@ -52,7 +50,7 @@ export function UseOAuthSignInSection() {
     body: 'createSession(idToken)',
     throwsHint: 'Aborts on the popup path and on the redirect path alike.',
   });
-  const { signIn, loading, error } = useOAuthSignIn(auth, {
+  const { signIn, loading, error } = useOAuthSignIn({
     formatErrorMessage: errorFormat.value,
     onIdToken: onIdToken.value,
   });

@@ -3,14 +3,12 @@
 import { useUpdateProfile } from '@timonwa/firebase-hooks/auth';
 import { useState } from 'react';
 import { Button, Field } from '@/components/controls';
-import { useFirebase } from '@/components/firebase-provider';
 import { hookSnippet, useErrorFormat } from '@/components/hook-options';
 import { HookSection } from '@/components/hook-section';
 
 export function UseUpdateProfileSection() {
-  const { auth } = useFirebase();
   const errorFormat = useErrorFormat();
-  const { update, loading, error, success } = useUpdateProfile(auth, {
+  const { update, loading, error, success } = useUpdateProfile({
     formatErrorMessage: errorFormat.value,
   });
   const [displayName, setDisplayName] = useState('');

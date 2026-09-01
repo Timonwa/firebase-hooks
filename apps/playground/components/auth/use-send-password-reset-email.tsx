@@ -3,7 +3,6 @@
 import { useSendPasswordResetEmail } from '@timonwa/firebase-hooks/auth';
 import { useState } from 'react';
 import { Button, Field } from '@/components/controls';
-import { useFirebase } from '@/components/firebase-provider';
 import {
   hookSnippet,
   useActionCodeSettings,
@@ -12,10 +11,9 @@ import {
 import { HookSection } from '@/components/hook-section';
 
 export function UseSendPasswordResetEmailSection() {
-  const { auth } = useFirebase();
   const errorFormat = useErrorFormat();
   const actionCodeSettings = useActionCodeSettings();
-  const { send, loading, error, success, resetState } = useSendPasswordResetEmail(auth, {
+  const { send, loading, error, success, resetState } = useSendPasswordResetEmail({
     actionCodeSettings: actionCodeSettings.value,
     formatErrorMessage: errorFormat.value,
   });

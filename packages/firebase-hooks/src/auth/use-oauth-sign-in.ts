@@ -38,6 +38,7 @@ import {
   type OnIdToken,
   requireAuth,
   runOnIdToken,
+  useAuthArgs,
   useAuthTask,
   useResolvedConfig,
 } from "./_shared";
@@ -51,9 +52,20 @@ export interface UseOAuthSignInOptionsProps extends HookErrorOptions {
 }
 
 export function useOAuthSignIn(
+  options?: UseOAuthSignInOptionsProps,
+): ReturnType<typeof useOAuthSignInBase>;
+export function useOAuthSignIn(
   auth: Auth | null,
-  options: UseOAuthSignInOptionsProps = {},
+  options?: UseOAuthSignInOptionsProps,
+): ReturnType<typeof useOAuthSignInBase>;
+export function useOAuthSignIn(
+  authOrOptions?: Auth | null | UseOAuthSignInOptionsProps,
+  maybeOptions?: UseOAuthSignInOptionsProps,
 ) {
+  return useOAuthSignInBase(...useAuthArgs(authOrOptions, maybeOptions));
+}
+
+function useOAuthSignInBase(auth: Auth | null, options: UseOAuthSignInOptionsProps) {
   const { loading, error, run } = useAuthTask(options);
   // getRedirectResult consumes the pending result — guard Strict Mode's double effect.
   const redirectHandledRef = useRef(false);

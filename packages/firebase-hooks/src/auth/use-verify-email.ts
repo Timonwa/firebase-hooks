@@ -26,6 +26,7 @@ import { useEffect, useRef, useState } from "react";
 import {
   getFirebaseErrorCode,
   type HookErrorOptions,
+  useAuthArgs,
   useAuthErrorObserver,
   useErrorMessageResolver,
 } from "./_shared";
@@ -41,9 +42,42 @@ export interface UseVerifyEmailOptionsProps extends HookErrorOptions {
 }
 
 export function useVerifyEmail(
+  oobCode: string | null,
+  options?: UseVerifyEmailOptionsProps,
+): ReturnType<typeof useVerifyEmailBase>;
+export function useVerifyEmail(
   auth: Auth | null,
   oobCode: string | null,
-  options: UseVerifyEmailOptionsProps = {},
+  options?: UseVerifyEmailOptionsProps,
+): ReturnType<typeof useVerifyEmailBase>;
+export function useVerifyEmail(
+  ...args:
+    | [oobCode: string | null, options?: UseVerifyEmailOptionsProps]
+    | [auth: Auth | null, oobCode: string | null, options?: UseVerifyEmailOptionsProps]
+) {
+  // Arity, not just type: `useVerifyEmail(null)` has to mean "no code in the
+  // URL" — the common case, since `searchParams.get()` returns null — while
+  // `useVerifyEmail(null, code)` means auth is still initialising. One argument
+  // is always the code; two are the auth form only when the second could be a
+  // code rather than an options object.
+  const second: unknown = args[1];
+  const withAuth =
+    args.length > 2 ||
+    (args.length === 2 && (typeof second === "string" || second === null));
+
+  const [auth, options] = useAuthArgs<UseVerifyEmailOptionsProps>(
+    withAuth ? (args[0] as Auth | null) : undefined,
+    (withAuth ? args[2] : args[1]) as UseVerifyEmailOptionsProps | undefined,
+  );
+  const oobCode = ((withAuth ? args[1] : args[0]) as string | null) ?? null;
+
+  return useVerifyEmailBase(auth, oobCode, options);
+}
+
+function useVerifyEmailBase(
+  auth: Auth | null,
+  oobCode: string | null,
+  options: UseVerifyEmailOptionsProps,
 ) {
   const [status, setStatus] = useState<VerifyEmailStatusType>("processing");
   const [error, setError] = useState<string | null>(null);

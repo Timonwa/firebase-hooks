@@ -108,13 +108,14 @@ export function AuthProvider({
 
   const config = useMemo(
     () => ({
+      auth,
       formatErrorMessage,
       onIdToken,
       onBeforeSignOut,
       actionCodeSettings,
       onError,
     }),
-    [formatErrorMessage, onIdToken, onBeforeSignOut, actionCodeSettings, onError],
+    [auth, formatErrorMessage, onIdToken, onBeforeSignOut, actionCodeSettings, onError],
   );
 
   return (

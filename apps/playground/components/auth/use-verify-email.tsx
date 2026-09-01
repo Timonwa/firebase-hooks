@@ -15,7 +15,7 @@ export function UseVerifyEmailSection() {
           second run always fails and the user sees an error on a successful verification.
         </>
       }
-      snippet={`const { status, error } = useVerifyEmail(auth, oobCode, {
+      snippet={`const { status, error } = useVerifyEmail(oobCode, {
   onVerified: refreshSession,
 });
 

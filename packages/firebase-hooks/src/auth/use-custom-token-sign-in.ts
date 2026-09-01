@@ -26,6 +26,7 @@ import {
   type OnIdToken,
   requireAuth,
   runOnIdToken,
+  useAuthArgs,
   useAuthTask,
   useResolvedConfig,
 } from "./_shared";
@@ -39,8 +40,22 @@ export interface UseCustomTokenSignInOptionsProps extends HookErrorOptions {
 }
 
 export function useCustomTokenSignIn(
+  options?: UseCustomTokenSignInOptionsProps,
+): ReturnType<typeof useCustomTokenSignInBase>;
+export function useCustomTokenSignIn(
   auth: Auth | null,
-  options: UseCustomTokenSignInOptionsProps = {},
+  options?: UseCustomTokenSignInOptionsProps,
+): ReturnType<typeof useCustomTokenSignInBase>;
+export function useCustomTokenSignIn(
+  authOrOptions?: Auth | null | UseCustomTokenSignInOptionsProps,
+  maybeOptions?: UseCustomTokenSignInOptionsProps,
+) {
+  return useCustomTokenSignInBase(...useAuthArgs(authOrOptions, maybeOptions));
+}
+
+function useCustomTokenSignInBase(
+  auth: Auth | null,
+  options: UseCustomTokenSignInOptionsProps,
 ) {
   const { loading, error, run } = useAuthTask(options);
   const onIdToken = useResolvedConfig("onIdToken", options.onIdToken);

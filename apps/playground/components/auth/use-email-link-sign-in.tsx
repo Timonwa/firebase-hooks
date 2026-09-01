@@ -3,7 +3,6 @@
 import { useEmailLinkSignIn } from '@timonwa/firebase-hooks/auth';
 import { useState } from 'react';
 import { Button, Field } from '@/components/controls';
-import { useFirebase } from '@/components/firebase-provider';
 import {
   hookSnippet,
   useErrorFormat,
@@ -13,7 +12,6 @@ import {
 import { HookSection } from '@/components/hook-section';
 
 export function UseEmailLinkSignInSection() {
-  const { auth } = useFirebase();
   const errorFormat = useErrorFormat();
   const storageKey = useStringOption({
     name: 'storageKey',
@@ -30,7 +28,7 @@ export function UseEmailLinkSignInSection() {
     typeof window !== 'undefined'
       ? `${window.location.origin}/auth/callback`
       : 'http://localhost:3000/auth/callback';
-  const { sendLink, loading, error } = useEmailLinkSignIn(auth, {
+  const { sendLink, loading, error } = useEmailLinkSignIn({
     actionCodeSettings: { url: returnUrl, handleCodeInApp: true },
     storageKey: storageKey.value,
     formatErrorMessage: errorFormat.value,

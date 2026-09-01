@@ -36,6 +36,7 @@ import {
   type OnIdToken,
   requireAuth,
   runOnIdToken,
+  useAuthArgs,
   useAuthTask,
   useResolvedConfig,
 } from "./_shared";
@@ -54,9 +55,20 @@ export interface UsePhoneSignInOptionsProps extends HookErrorOptions {
 }
 
 export function usePhoneSignIn(
+  options?: UsePhoneSignInOptionsProps,
+): ReturnType<typeof usePhoneSignInBase>;
+export function usePhoneSignIn(
   auth: Auth | null,
-  options: UsePhoneSignInOptionsProps = {},
+  options?: UsePhoneSignInOptionsProps,
+): ReturnType<typeof usePhoneSignInBase>;
+export function usePhoneSignIn(
+  authOrOptions?: Auth | null | UsePhoneSignInOptionsProps,
+  maybeOptions?: UsePhoneSignInOptionsProps,
 ) {
+  return usePhoneSignInBase(...useAuthArgs(authOrOptions, maybeOptions));
+}
+
+function usePhoneSignInBase(auth: Auth | null, options: UsePhoneSignInOptionsProps) {
   const { loading, error, run } = useAuthTask(options);
   const onIdToken = useResolvedConfig("onIdToken", options.onIdToken);
   const [codeSent, setCodeSent] = useState(false);

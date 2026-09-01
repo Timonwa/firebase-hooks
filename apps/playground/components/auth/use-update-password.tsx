@@ -3,14 +3,12 @@
 import { useUpdatePassword } from '@timonwa/firebase-hooks/auth';
 import { useState } from 'react';
 import { Button, Field } from '@/components/controls';
-import { useFirebase } from '@/components/firebase-provider';
 import { hookSnippet, useErrorFormat } from '@/components/hook-options';
 import { HookSection } from '@/components/hook-section';
 
 export function UseUpdatePasswordSection() {
-  const { auth } = useFirebase();
   const errorFormat = useErrorFormat();
-  const { update, loading, error, success } = useUpdatePassword(auth, {
+  const { update, loading, error, success } = useUpdatePassword({
     formatErrorMessage: errorFormat.value,
   });
   const [newPassword, setNewPassword] = useState('');

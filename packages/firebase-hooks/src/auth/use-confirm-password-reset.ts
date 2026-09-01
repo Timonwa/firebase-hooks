@@ -22,13 +22,25 @@ import {
   type HookErrorOptions,
   type HookResult,
   requireAuth,
+  useAuthArgs,
   useAuthTask,
 } from "./_shared";
 
 export function useConfirmPasswordReset(
+  options?: HookErrorOptions,
+): ReturnType<typeof useConfirmPasswordResetBase>;
+export function useConfirmPasswordReset(
   auth: Auth | null,
-  options: HookErrorOptions = {},
+  options?: HookErrorOptions,
+): ReturnType<typeof useConfirmPasswordResetBase>;
+export function useConfirmPasswordReset(
+  authOrOptions?: Auth | null | HookErrorOptions,
+  maybeOptions?: HookErrorOptions,
 ) {
+  return useConfirmPasswordResetBase(...useAuthArgs(authOrOptions, maybeOptions));
+}
+
+function useConfirmPasswordResetBase(auth: Auth | null, options: HookErrorOptions) {
   const { loading, error, setError, run } = useAuthTask(options);
   const [success, setSuccess] = useState(false);
 

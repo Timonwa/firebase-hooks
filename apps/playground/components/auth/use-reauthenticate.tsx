@@ -4,15 +4,13 @@ import { useReauthenticate } from '@timonwa/firebase-hooks/auth';
 import { GoogleAuthProvider } from 'firebase/auth';
 import { useState } from 'react';
 import { Button, Field } from '@/components/controls';
-import { useFirebase } from '@/components/firebase-provider';
 import { hookSnippet, useErrorFormat } from '@/components/hook-options';
 import { HookSection } from '@/components/hook-section';
 
 export function UseReauthenticateSection() {
-  const { auth } = useFirebase();
   const errorFormat = useErrorFormat();
   const { reauthenticateWithPassword, reauthenticateWithProvider, loading, error } =
-    useReauthenticate(auth, { formatErrorMessage: errorFormat.value });
+    useReauthenticate({ formatErrorMessage: errorFormat.value });
   const [password, setPassword] = useState('');
   const [result, setResult] = useState<unknown>();
 

@@ -27,10 +27,25 @@ import {
   type HookErrorOptions,
   type HookResult,
   requireCurrentUser,
+  useAuthArgs,
   useAuthTask,
 } from "./_shared";
 
-export function useLinkProvider(auth: Auth | null, options: HookErrorOptions = {}) {
+export function useLinkProvider(
+  options?: HookErrorOptions,
+): ReturnType<typeof useLinkProviderBase>;
+export function useLinkProvider(
+  auth: Auth | null,
+  options?: HookErrorOptions,
+): ReturnType<typeof useLinkProviderBase>;
+export function useLinkProvider(
+  authOrOptions?: Auth | null | HookErrorOptions,
+  maybeOptions?: HookErrorOptions,
+) {
+  return useLinkProviderBase(...useAuthArgs(authOrOptions, maybeOptions));
+}
+
+function useLinkProviderBase(auth: Auth | null, options: HookErrorOptions) {
   const { loading, error, run } = useAuthTask(options);
 
   const linkWithProvider = (

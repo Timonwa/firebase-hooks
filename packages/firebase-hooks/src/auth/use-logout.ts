@@ -19,6 +19,7 @@ import { type Auth, signOut } from "firebase/auth";
 import {
   type HookErrorOptions,
   type HookResult,
+  useAuthArgs,
   useAuthTask,
   useResolvedConfig,
 } from "./_shared";
@@ -31,7 +32,21 @@ export interface UseLogoutOptionsProps extends HookErrorOptions {
   onBeforeSignOut?: (() => void | Promise<void>) | null;
 }
 
-export function useLogout(auth: Auth | null, options: UseLogoutOptionsProps = {}) {
+export function useLogout(
+  options?: UseLogoutOptionsProps,
+): ReturnType<typeof useLogoutBase>;
+export function useLogout(
+  auth: Auth | null,
+  options?: UseLogoutOptionsProps,
+): ReturnType<typeof useLogoutBase>;
+export function useLogout(
+  authOrOptions?: Auth | null | UseLogoutOptionsProps,
+  maybeOptions?: UseLogoutOptionsProps,
+) {
+  return useLogoutBase(...useAuthArgs(authOrOptions, maybeOptions));
+}
+
+function useLogoutBase(auth: Auth | null, options: UseLogoutOptionsProps) {
   const { loading, error, run } = useAuthTask(options);
   const onBeforeSignOut = useResolvedConfig("onBeforeSignOut", options.onBeforeSignOut);
 

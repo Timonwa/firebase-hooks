@@ -18,10 +18,25 @@ import {
   type HookErrorOptions,
   type HookResult,
   requireCurrentUser,
+  useAuthArgs,
   useAuthTask,
 } from "./_shared";
 
-export function useUpdateProfile(auth: Auth | null, options: HookErrorOptions = {}) {
+export function useUpdateProfile(
+  options?: HookErrorOptions,
+): ReturnType<typeof useUpdateProfileBase>;
+export function useUpdateProfile(
+  auth: Auth | null,
+  options?: HookErrorOptions,
+): ReturnType<typeof useUpdateProfileBase>;
+export function useUpdateProfile(
+  authOrOptions?: Auth | null | HookErrorOptions,
+  maybeOptions?: HookErrorOptions,
+) {
+  return useUpdateProfileBase(...useAuthArgs(authOrOptions, maybeOptions));
+}
+
+function useUpdateProfileBase(auth: Auth | null, options: HookErrorOptions) {
   const { loading, error, run } = useAuthTask(options);
   const [success, setSuccess] = useState(false);
 

@@ -31,6 +31,7 @@ import {
   type HookResult,
   reauthenticateUserWithPassword,
   requireCurrentUser,
+  useAuthArgs,
   useAuthTask,
   useResolvedConfig,
 } from "./_shared";
@@ -41,9 +42,20 @@ export interface UseUpdateEmailOptionsProps extends HookErrorOptions {
 }
 
 export function useUpdateEmail(
+  options?: UseUpdateEmailOptionsProps,
+): ReturnType<typeof useUpdateEmailBase>;
+export function useUpdateEmail(
   auth: Auth | null,
-  options: UseUpdateEmailOptionsProps = {},
+  options?: UseUpdateEmailOptionsProps,
+): ReturnType<typeof useUpdateEmailBase>;
+export function useUpdateEmail(
+  authOrOptions?: Auth | null | UseUpdateEmailOptionsProps,
+  maybeOptions?: UseUpdateEmailOptionsProps,
 ) {
+  return useUpdateEmailBase(...useAuthArgs(authOrOptions, maybeOptions));
+}
+
+function useUpdateEmailBase(auth: Auth | null, options: UseUpdateEmailOptionsProps) {
   const { loading, error, run } = useAuthTask(options);
   const actionCodeSettings = useResolvedConfig(
     "actionCodeSettings",

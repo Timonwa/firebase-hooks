@@ -12,7 +12,9 @@ import { useVerifyEmail } from "./index.js";
 vi.mock("firebase/auth");
 
 beforeEach(() => {
-  vi.clearAllMocks();
+  // reset, not clear: clearAllMocks keeps implementations, so a mockRejectedValue
+  // set by one test would still be in place for the next one.
+  vi.resetAllMocks();
 });
 
 describe("useVerifyEmail", () => {
@@ -80,5 +82,46 @@ describe("useVerifyEmail", () => {
       code: "auth/expired-action-code",
       message: "Firebase: Error (auth/expired-action-code).",
     });
+  });
+});
+
+describe("useVerifyEmail argument forms", () => {
+  it("takes just the code, using the provider's auth", async () => {
+    const wrapper = withAuthProvider({ auth: makeAuth() });
+    const { result } = renderHook(() => useVerifyEmail("oob-1"), { wrapper });
+
+    await waitFor(() => expect(result.current.status).toBe("success"));
+    expect(applyActionCode).toHaveBeenCalledWith(expect.anything(), "oob-1");
+  });
+
+  it("takes the code and options, using the provider's auth", async () => {
+    const onVerified = vi.fn();
+    const wrapper = withAuthProvider({ auth: makeAuth() });
+    const { result } = renderHook(() => useVerifyEmail("oob-1", { onVerified }), {
+      wrapper,
+    });
+
+    await waitFor(() => expect(result.current.status).toBe("success"));
+    expect(onVerified).toHaveBeenCalled();
+  });
+
+  it("reads a single null as a missing code, not as a missing auth", () => {
+    // searchParams.get("oobCode") returns null when the parameter is absent,
+    // and that is the far more common reason to pass one. Treating it as auth
+    // would leave the page stuck on "processing" instead of reporting failure.
+    const wrapper = withAuthProvider({ auth: makeAuth() });
+    const { result } = renderHook(() => useVerifyEmail(null), { wrapper });
+
+    expect(result.current.status).toBe("failed");
+    expect(applyActionCode).not.toHaveBeenCalled();
+  });
+
+  it("reads a leading null followed by a code as auth that is not ready", () => {
+    const wrapper = withAuthProvider({ auth: makeAuth() });
+    const { result } = renderHook(() => useVerifyEmail(null, "oob-1"), { wrapper });
+
+    // Still processing: nothing ran, and no failure was reported either.
+    expect(result.current.status).toBe("processing");
+    expect(applyActionCode).not.toHaveBeenCalled();
   });
 });

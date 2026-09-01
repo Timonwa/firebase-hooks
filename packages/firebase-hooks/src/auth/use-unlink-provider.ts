@@ -18,10 +18,25 @@ import {
   type HookErrorOptions,
   type HookResult,
   requireCurrentUser,
+  useAuthArgs,
   useAuthTask,
 } from "./_shared";
 
-export function useUnlinkProvider(auth: Auth | null, options: HookErrorOptions = {}) {
+export function useUnlinkProvider(
+  options?: HookErrorOptions,
+): ReturnType<typeof useUnlinkProviderBase>;
+export function useUnlinkProvider(
+  auth: Auth | null,
+  options?: HookErrorOptions,
+): ReturnType<typeof useUnlinkProviderBase>;
+export function useUnlinkProvider(
+  authOrOptions?: Auth | null | HookErrorOptions,
+  maybeOptions?: HookErrorOptions,
+) {
+  return useUnlinkProviderBase(...useAuthArgs(authOrOptions, maybeOptions));
+}
+
+function useUnlinkProviderBase(auth: Auth | null, options: HookErrorOptions) {
   const { loading, error, run } = useAuthTask(options);
 
   const unlinkProvider = (providerId: string): Promise<HookResult<{ user: User }>> =>

@@ -3,12 +3,10 @@
 import { useCustomTokenSignIn } from '@timonwa/firebase-hooks/auth';
 import { useState } from 'react';
 import { Button, Field } from '@/components/controls';
-import { useFirebase } from '@/components/firebase-provider';
 import { hookSnippet, useErrorFormat, useFlowCallback } from '@/components/hook-options';
 import { HookSection } from '@/components/hook-section';
 
 export function UseCustomTokenSignInSection() {
-  const { auth } = useFirebase();
   const errorFormat = useErrorFormat();
   const onIdToken = useFlowCallback({
     name: 'onIdToken',
@@ -16,7 +14,7 @@ export function UseCustomTokenSignInSection() {
     body: 'createSession(idToken)',
     throwsHint: 'The exchange is rolled back into a failed result.',
   });
-  const { signIn, loading, error } = useCustomTokenSignIn(auth, {
+  const { signIn, loading, error } = useCustomTokenSignIn({
     formatErrorMessage: errorFormat.value,
     onIdToken: onIdToken.value,
   });

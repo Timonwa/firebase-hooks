@@ -10,7 +10,7 @@ import { PageIntro } from '@/components/page-intro';
 
 export default function EmailLinkCallbackPage() {
   const { auth, config } = useFirebase();
-  const { completeSignIn, loading, error } = useEmailLinkSignIn(auth);
+  const { completeSignIn, loading, error } = useEmailLinkSignIn();
   const [result, setResult] = useState<
     (Awaited<ReturnType<typeof completeSignIn>> & { needsEmail?: boolean }) | undefined
   >();

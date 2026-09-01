@@ -34,6 +34,7 @@ import {
   type OnIdToken,
   requireAuth,
   runOnIdToken,
+  useAuthArgs,
   useAuthTask,
   useResolvedConfig,
 } from "./_shared";
@@ -51,7 +52,21 @@ export interface UseSignupOptionsProps extends HookErrorOptions {
   onIdToken?: OnIdToken | null;
 }
 
-export function useSignup(auth: Auth | null, options: UseSignupOptionsProps = {}) {
+export function useSignup(
+  options?: UseSignupOptionsProps,
+): ReturnType<typeof useSignupBase>;
+export function useSignup(
+  auth: Auth | null,
+  options?: UseSignupOptionsProps,
+): ReturnType<typeof useSignupBase>;
+export function useSignup(
+  authOrOptions?: Auth | null | UseSignupOptionsProps,
+  maybeOptions?: UseSignupOptionsProps,
+) {
+  return useSignupBase(...useAuthArgs(authOrOptions, maybeOptions));
+}
+
+function useSignupBase(auth: Auth | null, options: UseSignupOptionsProps) {
   const { sendVerificationEmail = true } = options;
   const { loading, error, run } = useAuthTask(options);
   const onIdToken = useResolvedConfig("onIdToken", options.onIdToken);
