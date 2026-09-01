@@ -36,6 +36,8 @@ function rawErrorMessage(error: unknown, fallback: string): string {
 
 /** Provider-level configuration shared with every hook below the provider. */
 export interface AuthConfigContextValueProps {
+  /** The provider's own `Auth`, for hooks called without one. */
+  auth?: Auth | null;
   formatErrorMessage?: (error: unknown) => string;
   onIdToken?: OnIdToken;
   onBeforeSignOut?: () => void | Promise<void>;
@@ -59,6 +61,44 @@ export function useResolvedConfig<K extends keyof AuthConfigContextValueProps>(
   const config = useContext(AuthConfigContext);
   if (option === null) return undefined;
   return option ?? config?.[key];
+}
+
+/**
+ * Is this the SDK's `Auth`, or an options object?
+ *
+ * Structural rather than `instanceof`: the SDK exports `Auth` as a type only.
+ * `currentUser` is the discriminator — always present on a real instance, and
+ * not a field any options interface declares, so the two can never be confused.
+ */
+function isAuthInstance(value: unknown): value is Auth {
+  return typeof value === "object" && value !== null && "currentUser" in value;
+}
+
+/**
+ * Splits `(auth?, options?)` from `(options?)`, falling back to the provider's
+ * `auth` when the hook was called without one.
+ *
+ * `undefined` and an options object both mean "use the provider". An explicit
+ * `null` keeps its existing meaning — auth is not ready yet, so don't run —
+ * and must not be treated as "inherit", or a hook would start acting during
+ * the window a consumer is deliberately holding it back.
+ */
+export function useAuthArgs<O extends object>(
+  authOrOptions: Auth | null | O | undefined,
+  maybeOptions: O | undefined,
+): [Auth | null, O] {
+  const config = useContext(AuthConfigContext);
+  const passedAuth = isAuthInstance(authOrOptions) || authOrOptions === null;
+
+  const auth = passedAuth ? (authOrOptions as Auth | null) : (config?.auth ?? null);
+  // Falls through to the second slot when the first holds no options: hooks
+  // with an extra positional argument resolve their own and call with
+  // `(undefined, options)`.
+  const options =
+    (passedAuth ? maybeOptions : ((authOrOptions as O | undefined) ?? maybeOptions)) ??
+    ({} as O);
+
+  return [auth, options];
 }
 
 export function requireAuth(auth: Auth | null): Auth {

@@ -12,7 +12,7 @@ import { useLogin } from '@timonwa/firebase-hooks/auth';
 import { auth } from '@/lib/firebase';
 
 function LoginForm() {
-  const { login, loading, error } = useLogin(auth, {
+  const { login, loading, error } = useLogin({
     onIdToken: (idToken) => createSession(idToken),
   });
 

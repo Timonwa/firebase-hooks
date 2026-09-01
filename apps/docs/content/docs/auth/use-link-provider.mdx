@@ -4,7 +4,7 @@ description: Add a sign-in method to the current user.
 ---
 
 ```tsx
-const { linkWithProvider, linkWithPassword } = useLinkProvider(auth);
+const { linkWithProvider, linkWithPassword } = useLinkProvider();
 
 await linkWithProvider(new GoogleAuthProvider()); // guest -> Google account
 await linkWithPassword(email, password); // guest -> email/password account

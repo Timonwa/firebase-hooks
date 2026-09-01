@@ -17,7 +17,7 @@ Where Firebase initialises in an effect or a provider, there's a window with no 
 Nothing throws, so you don't need to guard every call site.
 
 ```tsx
-const { login } = useLogin(auth); // auth may be null — calling login just fails cleanly
+const { login } = useLogin(); // auth may be null — calling login just fails cleanly
 ```
 
 ## Distinguishing "signed out" from "not yet known"

@@ -7,13 +7,13 @@ Two steps across two page loads: send the link, then complete the sign-in when t
 
 ```tsx
 // Request page
-const { sendLink } = useEmailLinkSignIn(auth, {
+const { sendLink } = useEmailLinkSignIn({
   actionCodeSettings: { url: `${origin}/auth/callback`, handleCodeInApp: true },
 });
 await sendLink(email);
 
 // Callback page
-const { completeSignIn } = useEmailLinkSignIn(auth, { onIdToken: createSession });
+const { completeSignIn } = useEmailLinkSignIn({ onIdToken: createSession });
 const result = await completeSignIn(window.location.href);
 if (!result.success && result.needsEmail) showEmailConfirmField();
 ```

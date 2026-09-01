@@ -262,11 +262,11 @@ export function hookSnippet({
 }) {
   const set = lines.filter((line): line is string => Boolean(line));
 
+  // No `auth` argument: the playground runs below an AuthProvider, so the hooks
+  // take theirs from it. The snippet shows what you would actually write here.
   const call = set.length
-    ? `const { ${returns} } = ${hook}(auth, {\n${set
-        .map((line) => `  ${line}`)
-        .join('\n')}\n});`
-    : `const { ${returns} } = ${hook}(auth);`;
+    ? `const { ${returns} } = ${hook}({\n${set.map((line) => `  ${line}`).join('\n')}\n});`
+    : `const { ${returns} } = ${hook}();`;
 
   return body ? `${call}\n\n${body}` : call;
 }

@@ -27,6 +27,7 @@ import {
   type HookResult,
   reauthenticateUserWithPassword,
   requireCurrentUser,
+  useAuthArgs,
   useAuthTask,
 } from "./_shared";
 
@@ -39,9 +40,20 @@ export interface UseDeleteAccountOptionsProps extends HookErrorOptions {
 }
 
 export function useDeleteAccount(
+  options?: UseDeleteAccountOptionsProps,
+): ReturnType<typeof useDeleteAccountBase>;
+export function useDeleteAccount(
   auth: Auth | null,
-  options: UseDeleteAccountOptionsProps = {},
+  options?: UseDeleteAccountOptionsProps,
+): ReturnType<typeof useDeleteAccountBase>;
+export function useDeleteAccount(
+  authOrOptions?: Auth | null | UseDeleteAccountOptionsProps,
+  maybeOptions?: UseDeleteAccountOptionsProps,
 ) {
+  return useDeleteAccountBase(...useAuthArgs(authOrOptions, maybeOptions));
+}
+
+function useDeleteAccountBase(auth: Auth | null, options: UseDeleteAccountOptionsProps) {
   const { loading, error, run } = useAuthTask(options);
 
   const deleteAccount = ({

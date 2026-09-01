@@ -3,7 +3,6 @@
 import { useSignup } from '@timonwa/firebase-hooks/auth';
 import { useState } from 'react';
 import { Button, Field } from '@/components/controls';
-import { useFirebase } from '@/components/firebase-provider';
 import {
   hookSnippet,
   useBooleanOption,
@@ -13,7 +12,6 @@ import {
 import { HookSection } from '@/components/hook-section';
 
 export function UseSignupSection() {
-  const { auth } = useFirebase();
   const errorFormat = useErrorFormat();
   const sendVerificationEmail = useBooleanOption({
     name: 'sendVerificationEmail',
@@ -26,7 +24,7 @@ export function UseSignupSection() {
     body: 'createSession(idToken)',
     throwsHint: 'Signup aborts after the account exists — try signing in with it.',
   });
-  const { signup, loading, error } = useSignup(auth, {
+  const { signup, loading, error } = useSignup({
     sendVerificationEmail: sendVerificationEmail.value,
     formatErrorMessage: errorFormat.value,
     onIdToken: onIdToken.value,

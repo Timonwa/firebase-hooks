@@ -6,7 +6,7 @@ description: The recent-sign-in check, standalone.
 For custom sensitive flows beyond what [`useUpdatePassword`](/docs/auth/use-update-password), [`useUpdateEmail`](/docs/auth/use-update-email), and [`useDeleteAccount`](/docs/auth/use-delete-account) build in.
 
 ```tsx
-const { reauthenticateWithPassword } = useReauthenticate(auth);
+const { reauthenticateWithPassword } = useReauthenticate();
 
 const check = await reauthenticateWithPassword(currentPassword);
 if (check.success) await performSensitiveOperation();

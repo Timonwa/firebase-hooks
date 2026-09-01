@@ -3,12 +3,10 @@
 import { usePhoneSignIn } from '@timonwa/firebase-hooks/auth';
 import { useState } from 'react';
 import { Button, Field, Select } from '@/components/controls';
-import { useFirebase } from '@/components/firebase-provider';
 import { hookSnippet, useErrorFormat, useFlowCallback } from '@/components/hook-options';
 import { HookSection } from '@/components/hook-section';
 
 export function UsePhoneSignInSection() {
-  const { auth } = useFirebase();
   const errorFormat = useErrorFormat();
   const [recaptchaSize, setRecaptchaSize] = useState<'invisible' | 'normal'>('normal');
   const onIdToken = useFlowCallback({
@@ -17,7 +15,7 @@ export function UsePhoneSignInSection() {
     body: 'createSession(idToken)',
     throwsHint: 'Aborts once the code is confirmed.',
   });
-  const { sendCode, confirmCode, codeSent, loading, error } = usePhoneSignIn(auth, {
+  const { sendCode, confirmCode, codeSent, loading, error } = usePhoneSignIn({
     recaptchaSize,
     formatErrorMessage: errorFormat.value,
     onIdToken: onIdToken.value,

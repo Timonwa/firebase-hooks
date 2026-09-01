@@ -4,14 +4,12 @@ import { useLinkProvider } from '@timonwa/firebase-hooks/auth';
 import { GoogleAuthProvider } from 'firebase/auth';
 import { useState } from 'react';
 import { Button, Field } from '@/components/controls';
-import { useFirebase } from '@/components/firebase-provider';
 import { hookSnippet, useErrorFormat } from '@/components/hook-options';
 import { HookSection } from '@/components/hook-section';
 
 export function UseLinkProviderSection() {
-  const { auth } = useFirebase();
   const errorFormat = useErrorFormat();
-  const { linkWithProvider, linkWithPassword, loading, error } = useLinkProvider(auth, {
+  const { linkWithProvider, linkWithPassword, loading, error } = useLinkProvider({
     formatErrorMessage: errorFormat.value,
   });
   const [email, setEmail] = useState('');

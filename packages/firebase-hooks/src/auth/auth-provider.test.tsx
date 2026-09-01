@@ -269,3 +269,85 @@ describe("global onError observer", () => {
     expect(onError).not.toHaveBeenCalled();
   });
 });
+
+describe("auth argument resolution", () => {
+  beforeEach(() => {
+    vi.mocked(signInWithEmailAndPassword).mockResolvedValue({
+      user: makeUser(),
+    } as never);
+  });
+
+  it("falls back to the provider's auth when the hook is called without one", async () => {
+    const providerAuth = makeAuth();
+    const wrapper = withAuthProvider({ auth: providerAuth });
+
+    const { result } = renderHook(() => useLogin(), { wrapper });
+    await act(async () => {
+      await result.current.login("a@b.c", "pw");
+    });
+
+    expect(signInWithEmailAndPassword).toHaveBeenCalledWith(providerAuth, "a@b.c", "pw");
+  });
+
+  it("takes options as the only argument, still using the provider's auth", async () => {
+    const providerAuth = makeAuth();
+    const onIdToken = vi.fn();
+    const wrapper = withAuthProvider({ auth: providerAuth });
+
+    const { result } = renderHook(() => useLogin({ onIdToken }), { wrapper });
+    await act(async () => {
+      await result.current.login("a@b.c", "pw");
+    });
+
+    expect(signInWithEmailAndPassword).toHaveBeenCalledWith(providerAuth, "a@b.c", "pw");
+    expect(onIdToken).toHaveBeenCalled();
+  });
+
+  it("a hook's own auth wins over the provider's", async () => {
+    const ownAuth = makeAuth();
+    const wrapper = withAuthProvider({ auth: makeAuth() });
+
+    const { result } = renderHook(() => useLogin(ownAuth), { wrapper });
+    await act(async () => {
+      await result.current.login("a@b.c", "pw");
+    });
+
+    expect(signInWithEmailAndPassword).toHaveBeenCalledWith(ownAuth, "a@b.c", "pw");
+  });
+
+  it("an explicit null still means 'not ready', never 'inherit'", async () => {
+    // The distinction that makes this safe: a consumer holding a hook back
+    // during initialisation must not have the provider's auth substituted in.
+    const wrapper = withAuthProvider({ auth: makeAuth() });
+
+    const { result } = renderHook(() => useLogin(null), { wrapper });
+    let outcome: unknown;
+    await act(async () => {
+      outcome = await result.current.login("a@b.c", "pw");
+    });
+
+    expect(signInWithEmailAndPassword).not.toHaveBeenCalled();
+    expect(outcome).toMatchObject({ success: false });
+  });
+
+  it("works with no provider at all, given an auth", async () => {
+    const ownAuth = makeAuth();
+    const { result } = renderHook(() => useLogin(ownAuth));
+    await act(async () => {
+      await result.current.login("a@b.c", "pw");
+    });
+
+    expect(signInWithEmailAndPassword).toHaveBeenCalledWith(ownAuth, "a@b.c", "pw");
+  });
+
+  it("fails cleanly with neither a provider nor an auth", async () => {
+    const { result } = renderHook(() => useLogin());
+    let outcome: unknown;
+    await act(async () => {
+      outcome = await result.current.login("a@b.c", "pw");
+    });
+
+    expect(signInWithEmailAndPassword).not.toHaveBeenCalled();
+    expect(outcome).toMatchObject({ success: false });
+  });
+});

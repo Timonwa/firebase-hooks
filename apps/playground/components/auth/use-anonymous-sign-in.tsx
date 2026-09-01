@@ -3,12 +3,10 @@
 import { useAnonymousSignIn } from '@timonwa/firebase-hooks/auth';
 import { useState } from 'react';
 import { Button } from '@/components/controls';
-import { useFirebase } from '@/components/firebase-provider';
 import { hookSnippet, useErrorFormat, useFlowCallback } from '@/components/hook-options';
 import { HookSection } from '@/components/hook-section';
 
 export function UseAnonymousSignInSection() {
-  const { auth } = useFirebase();
   const errorFormat = useErrorFormat();
   const onIdToken = useFlowCallback({
     name: 'onIdToken',
@@ -16,7 +14,7 @@ export function UseAnonymousSignInSection() {
     body: 'createSession(idToken)',
     throwsHint: 'The guest session is not created.',
   });
-  const { signIn, loading, error } = useAnonymousSignIn(auth, {
+  const { signIn, loading, error } = useAnonymousSignIn({
     formatErrorMessage: errorFormat.value,
     onIdToken: onIdToken.value,
   });

@@ -4,7 +4,7 @@ description: Delete the account, with reauth and server cleanup.
 ---
 
 ```tsx
-const { deleteAccount, loading, error } = useDeleteAccount(auth, {
+const { deleteAccount, loading, error } = useDeleteAccount({
   onBeforeDelete: (user) => deleteUserRecord(user.uid),
 });
 

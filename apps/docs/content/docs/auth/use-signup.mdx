@@ -6,7 +6,7 @@ description: Email/password signup with optional profile and a verification emai
 The standard client-side signup: create the account, set the optional profile, send the verification email (on by default), then run `onIdToken`.
 
 ```tsx
-const { signup, loading, error } = useSignup(auth, { onIdToken: createSession });
+const { signup, loading, error } = useSignup({ onIdToken: createSession });
 
 const result = await signup(email, password, { displayName: fullName });
 if (result.success) router.push('/verify-email');

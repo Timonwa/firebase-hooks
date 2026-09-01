@@ -6,7 +6,7 @@ description: Sign-out, with your server session cleared first.
 `onBeforeSignOut` runs **before** Firebase clears anything. If it throws, the Firebase session is left intact and the user can retry.
 
 ```tsx
-const { logout, loading } = useLogout(auth, { onBeforeSignOut: clearSession });
+const { logout, loading } = useLogout({ onBeforeSignOut: clearSession });
 
 <button onClick={logout} disabled={loading}>
   Sign out

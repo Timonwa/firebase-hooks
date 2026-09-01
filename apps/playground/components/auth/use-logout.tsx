@@ -3,19 +3,17 @@
 import { useLogout } from '@timonwa/firebase-hooks/auth';
 import { useState } from 'react';
 import { Button } from '@/components/controls';
-import { useFirebase } from '@/components/firebase-provider';
 import { hookSnippet, useErrorFormat, useFlowCallback } from '@/components/hook-options';
 import { HookSection } from '@/components/hook-section';
 
 export function UseLogoutSection() {
-  const { auth } = useFirebase();
   const errorFormat = useErrorFormat();
   const onBeforeSignOut = useFlowCallback({
     name: 'onBeforeSignOut',
     body: 'clearSession()',
     throwsHint: 'You stay signed in — check the header, the session is still there.',
   });
-  const { logout, loading, error } = useLogout(auth, {
+  const { logout, loading, error } = useLogout({
     formatErrorMessage: errorFormat.value,
     onBeforeSignOut: onBeforeSignOut.value,
   });

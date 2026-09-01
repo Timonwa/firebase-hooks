@@ -12,9 +12,9 @@
  * @returns `{ update, loading, error, success }`
  *
  * @example
- * const { update, success } = useUpdateEmail(auth);
- * await update({ newEmail, currentPassword }); // password account
- * await update({ newEmail });                  // OAuth account — reauth handled by you
+ * const { update, success } = useUpdateEmail();
+ * await update(newEmail, { currentPassword }); // password account
+ * await update(newEmail);                      // OAuth account — reauth handled by you
  * {success && <p>Check {newEmail} to confirm the change.</p>}
  */
 
@@ -31,6 +31,7 @@ import {
   type HookResult,
   reauthenticateUserWithPassword,
   requireCurrentUser,
+  useAuthArgs,
   useAuthTask,
   useResolvedConfig,
 } from "./_shared";
@@ -41,9 +42,20 @@ export interface UseUpdateEmailOptionsProps extends HookErrorOptions {
 }
 
 export function useUpdateEmail(
+  options?: UseUpdateEmailOptionsProps,
+): ReturnType<typeof useUpdateEmailBase>;
+export function useUpdateEmail(
   auth: Auth | null,
-  options: UseUpdateEmailOptionsProps = {},
+  options?: UseUpdateEmailOptionsProps,
+): ReturnType<typeof useUpdateEmailBase>;
+export function useUpdateEmail(
+  authOrOptions?: Auth | null | UseUpdateEmailOptionsProps,
+  maybeOptions?: UseUpdateEmailOptionsProps,
 ) {
+  return useUpdateEmailBase(...useAuthArgs(authOrOptions, maybeOptions));
+}
+
+function useUpdateEmailBase(auth: Auth | null, options: UseUpdateEmailOptionsProps) {
   const { loading, error, run } = useAuthTask(options);
   const actionCodeSettings = useResolvedConfig(
     "actionCodeSettings",
@@ -51,13 +63,12 @@ export function useUpdateEmail(
   );
   const [success, setSuccess] = useState(false);
 
-  const update = async ({
-    newEmail,
-    currentPassword,
-  }: {
-    newEmail: string;
-    currentPassword?: string;
-  }): Promise<HookResult> => {
+  // Shaped like the SDK's `verifyBeforeUpdateEmail(user, newEmail, …)` — the
+  // required value leads, and the reauthentication this hook adds goes after.
+  const update = async (
+    newEmail: string,
+    { currentPassword }: { currentPassword?: string } = {},
+  ): Promise<HookResult> => {
     setSuccess(false);
     const result = await run("update-email", "Failed to update email", async () => {
       const user = requireCurrentUser(auth);

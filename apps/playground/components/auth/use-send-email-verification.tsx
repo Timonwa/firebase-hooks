@@ -3,7 +3,6 @@
 import { useSendEmailVerification } from '@timonwa/firebase-hooks/auth';
 import { useState } from 'react';
 import { Button } from '@/components/controls';
-import { useFirebase } from '@/components/firebase-provider';
 import {
   hookSnippet,
   useActionCodeSettings,
@@ -12,10 +11,9 @@ import {
 import { HookSection } from '@/components/hook-section';
 
 export function UseSendEmailVerificationSection() {
-  const { auth } = useFirebase();
   const errorFormat = useErrorFormat();
   const actionCodeSettings = useActionCodeSettings();
-  const { send, loading, error, success } = useSendEmailVerification(auth, {
+  const { send, loading, error, success } = useSendEmailVerification({
     actionCodeSettings: actionCodeSettings.value,
     formatErrorMessage: errorFormat.value,
   });

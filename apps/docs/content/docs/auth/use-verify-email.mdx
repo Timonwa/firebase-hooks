@@ -6,7 +6,7 @@ description: Apply the emailed verification code on mount.
 Unlike the other hooks, this one runs on mount and reports a status the page renders from. Pass the `oobCode` from the URL, or `null` while you're still reading it.
 
 ```tsx
-const { status, error } = useVerifyEmail(auth, searchParams.get('oobCode'), {
+const { status, error } = useVerifyEmail(searchParams.get('oobCode'), {
   onVerified: refreshSession,
 });
 

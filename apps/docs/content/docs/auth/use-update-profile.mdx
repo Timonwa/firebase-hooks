@@ -4,7 +4,7 @@ description: Display name and photo URL.
 ---
 
 ```tsx
-const { update, loading } = useUpdateProfile(auth);
+const { update, loading } = useUpdateProfile();
 
 await update({ displayName: fullName, photoURL: avatarUrl });
 ```

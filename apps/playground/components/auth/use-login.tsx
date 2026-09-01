@@ -3,12 +3,10 @@
 import { useLogin } from '@timonwa/firebase-hooks/auth';
 import { useState } from 'react';
 import { Button, Field } from '@/components/controls';
-import { useFirebase } from '@/components/firebase-provider';
 import { hookSnippet, useErrorFormat, useFlowCallback } from '@/components/hook-options';
 import { HookSection } from '@/components/hook-section';
 
 export function UseLoginSection() {
-  const { auth } = useFirebase();
   const errorFormat = useErrorFormat();
   const onIdToken = useFlowCallback({
     name: 'onIdToken',
@@ -16,7 +14,7 @@ export function UseLoginSection() {
     body: 'createSession(idToken)',
     throwsHint: 'Sign-in aborts — the result comes back as a failure.',
   });
-  const { login, loading, error } = useLogin(auth, {
+  const { login, loading, error } = useLogin({
     formatErrorMessage: errorFormat.value,
     onIdToken: onIdToken.value,
   });

@@ -22,7 +22,7 @@ export default function AuthActionPage() {
 }
 
 function AuthAction() {
-  const { auth, config } = useFirebase();
+  const { config } = useFirebase();
   const params = useSearchParams();
   const mode = params.get('mode');
   const oobCode = params.get('oobCode');
@@ -40,8 +40,8 @@ function AuthAction() {
         }
       />
 
-      {mode === 'verifyEmail' ? <VerifyEmail auth={auth} oobCode={oobCode} /> : null}
-      {mode === 'resetPassword' ? <ConfirmReset auth={auth} oobCode={oobCode} /> : null}
+      {mode === 'verifyEmail' ? <VerifyEmail oobCode={oobCode} /> : null}
+      {mode === 'resetPassword' ? <ConfirmReset oobCode={oobCode} /> : null}
 
       {!mode ? (
         <p className="text-muted text-sm">
@@ -53,10 +53,10 @@ function AuthAction() {
   );
 }
 
-type Props = { auth: Parameters<typeof useVerifyEmail>[0]; oobCode: string | null };
+type Props = { oobCode: string | null };
 
-function VerifyEmail({ auth, oobCode }: Props) {
-  const { status, error } = useVerifyEmail(auth, oobCode);
+function VerifyEmail({ oobCode }: Props) {
+  const { status, error } = useVerifyEmail(oobCode);
 
   return (
     <HookSection
@@ -69,7 +69,7 @@ function VerifyEmail({ auth, oobCode }: Props) {
           that actually succeeded.
         </>
       }
-      snippet={`const { status, error } = useVerifyEmail(auth, oobCode, {
+      snippet={`const { status, error } = useVerifyEmail(oobCode, {
   onVerified: refreshSession,
 });
 
@@ -86,8 +86,8 @@ if (status === "processing") return <Spinner />;`}
   );
 }
 
-function ConfirmReset({ auth, oobCode }: Props) {
-  const { confirm, verifyCode, loading, error, success } = useConfirmPasswordReset(auth);
+function ConfirmReset({ oobCode }: Props) {
+  const { confirm, verifyCode, loading, error, success } = useConfirmPasswordReset();
   const [password, setPassword] = useState('');
   const [result, setResult] = useState<unknown>();
 

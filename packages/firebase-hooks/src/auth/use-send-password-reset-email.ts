@@ -25,6 +25,7 @@ import {
   type HookErrorOptions,
   type HookResult,
   requireAuth,
+  useAuthArgs,
   useAuthTask,
   useResolvedConfig,
 } from "./_shared";
@@ -35,8 +36,22 @@ export interface UseSendPasswordResetEmailOptionsProps extends HookErrorOptions 
 }
 
 export function useSendPasswordResetEmail(
+  options?: UseSendPasswordResetEmailOptionsProps,
+): ReturnType<typeof useSendPasswordResetEmailBase>;
+export function useSendPasswordResetEmail(
   auth: Auth | null,
-  options: UseSendPasswordResetEmailOptionsProps = {},
+  options?: UseSendPasswordResetEmailOptionsProps,
+): ReturnType<typeof useSendPasswordResetEmailBase>;
+export function useSendPasswordResetEmail(
+  authOrOptions?: Auth | null | UseSendPasswordResetEmailOptionsProps,
+  maybeOptions?: UseSendPasswordResetEmailOptionsProps,
+) {
+  return useSendPasswordResetEmailBase(...useAuthArgs(authOrOptions, maybeOptions));
+}
+
+function useSendPasswordResetEmailBase(
+  auth: Auth | null,
+  options: UseSendPasswordResetEmailOptionsProps,
 ) {
   const { loading, error, setError, run } = useAuthTask(options);
   const actionCodeSettings = useResolvedConfig(

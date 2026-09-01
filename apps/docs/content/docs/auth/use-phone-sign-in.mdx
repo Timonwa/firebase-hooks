@@ -6,7 +6,7 @@ description: SMS code sign-in with a managed reCAPTCHA verifier.
 Two steps: `sendCode` verifies the caller through reCAPTCHA and texts the code, `confirmCode` completes the sign-in.
 
 ```tsx
-const { sendCode, confirmCode, codeSent } = usePhoneSignIn(auth, {
+const { sendCode, confirmCode, codeSent } = usePhoneSignIn({
   onIdToken: createSession,
 });
 

@@ -3,7 +3,6 @@
 import { useUpdateEmail } from '@timonwa/firebase-hooks/auth';
 import { useState } from 'react';
 import { Button, Field } from '@/components/controls';
-import { useFirebase } from '@/components/firebase-provider';
 import {
   hookSnippet,
   useActionCodeSettings,
@@ -12,10 +11,9 @@ import {
 import { HookSection } from '@/components/hook-section';
 
 export function UseUpdateEmailSection() {
-  const { auth } = useFirebase();
   const errorFormat = useErrorFormat();
   const actionCodeSettings = useActionCodeSettings();
-  const { update, loading, error, success } = useUpdateEmail(auth, {
+  const { update, loading, error, success } = useUpdateEmail({
     actionCodeSettings: actionCodeSettings.value,
     formatErrorMessage: errorFormat.value,
   });
@@ -38,7 +36,7 @@ export function UseUpdateEmailSection() {
         hook: 'useUpdateEmail',
         returns: 'update, loading, error, success',
         lines: [actionCodeSettings.line, errorFormat.line],
-        body: `await update({ newEmail, currentPassword });
+        body: `await update(newEmail, { currentPassword });
 // success === true → "check <newEmail> to confirm"`,
       })}
       options={
@@ -64,7 +62,7 @@ export function UseUpdateEmailSection() {
             disabled={loading}
             onClick={async () =>
               setResult(
-                await update({ newEmail, ...(currentPassword && { currentPassword }) }),
+                await update(newEmail, currentPassword ? { currentPassword } : undefined),
               )
             }
           >

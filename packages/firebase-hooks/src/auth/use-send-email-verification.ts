@@ -20,6 +20,7 @@ import {
   type HookErrorOptions,
   type HookResult,
   requireCurrentUser,
+  useAuthArgs,
   useAuthTask,
   useResolvedConfig,
 } from "./_shared";
@@ -30,8 +31,22 @@ export interface UseSendEmailVerificationOptionsProps extends HookErrorOptions {
 }
 
 export function useSendEmailVerification(
+  options?: UseSendEmailVerificationOptionsProps,
+): ReturnType<typeof useSendEmailVerificationBase>;
+export function useSendEmailVerification(
   auth: Auth | null,
-  options: UseSendEmailVerificationOptionsProps = {},
+  options?: UseSendEmailVerificationOptionsProps,
+): ReturnType<typeof useSendEmailVerificationBase>;
+export function useSendEmailVerification(
+  authOrOptions?: Auth | null | UseSendEmailVerificationOptionsProps,
+  maybeOptions?: UseSendEmailVerificationOptionsProps,
+) {
+  return useSendEmailVerificationBase(...useAuthArgs(authOrOptions, maybeOptions));
+}
+
+function useSendEmailVerificationBase(
+  auth: Auth | null,
+  options: UseSendEmailVerificationOptionsProps,
 ) {
   const { loading, error, run } = useAuthTask(options);
   const actionCodeSettings = useResolvedConfig(

@@ -44,6 +44,7 @@ import {
   type OnIdToken,
   requireAuth,
   runOnIdToken,
+  useAuthArgs,
   useAuthTask,
   useResolvedConfig,
 } from "./_shared";
@@ -76,8 +77,22 @@ type CompleteSignInResult =
     };
 
 export function useEmailLinkSignIn(
+  options?: UseEmailLinkSignInOptionsProps,
+): ReturnType<typeof useEmailLinkSignInBase>;
+export function useEmailLinkSignIn(
   auth: Auth | null,
-  options: UseEmailLinkSignInOptionsProps = {},
+  options?: UseEmailLinkSignInOptionsProps,
+): ReturnType<typeof useEmailLinkSignInBase>;
+export function useEmailLinkSignIn(
+  authOrOptions?: Auth | null | UseEmailLinkSignInOptionsProps,
+  maybeOptions?: UseEmailLinkSignInOptionsProps,
+) {
+  return useEmailLinkSignInBase(...useAuthArgs(authOrOptions, maybeOptions));
+}
+
+function useEmailLinkSignInBase(
+  auth: Auth | null,
+  options: UseEmailLinkSignInOptionsProps,
 ) {
   const { storageKey = "emailForSignIn" } = options;
   const { loading, error, setError, run } = useAuthTask(options);

@@ -3,14 +3,12 @@
 import { useUnlinkProvider } from '@timonwa/firebase-hooks/auth';
 import { useState } from 'react';
 import { Button, Field } from '@/components/controls';
-import { useFirebase } from '@/components/firebase-provider';
 import { hookSnippet, useErrorFormat } from '@/components/hook-options';
 import { HookSection } from '@/components/hook-section';
 
 export function UseUnlinkProviderSection() {
-  const { auth } = useFirebase();
   const errorFormat = useErrorFormat();
-  const { unlinkProvider, loading, error } = useUnlinkProvider(auth, {
+  const { unlinkProvider, loading, error } = useUnlinkProvider({
     formatErrorMessage: errorFormat.value,
   });
   const [providerId, setProviderId] = useState('google.com');

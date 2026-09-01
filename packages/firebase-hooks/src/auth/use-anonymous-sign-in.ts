@@ -25,6 +25,7 @@ import {
   type OnIdToken,
   requireAuth,
   runOnIdToken,
+  useAuthArgs,
   useAuthTask,
   useResolvedConfig,
 } from "./_shared";
@@ -38,8 +39,22 @@ export interface UseAnonymousSignInOptionsProps extends HookErrorOptions {
 }
 
 export function useAnonymousSignIn(
+  options?: UseAnonymousSignInOptionsProps,
+): ReturnType<typeof useAnonymousSignInBase>;
+export function useAnonymousSignIn(
   auth: Auth | null,
-  options: UseAnonymousSignInOptionsProps = {},
+  options?: UseAnonymousSignInOptionsProps,
+): ReturnType<typeof useAnonymousSignInBase>;
+export function useAnonymousSignIn(
+  authOrOptions?: Auth | null | UseAnonymousSignInOptionsProps,
+  maybeOptions?: UseAnonymousSignInOptionsProps,
+) {
+  return useAnonymousSignInBase(...useAuthArgs(authOrOptions, maybeOptions));
+}
+
+function useAnonymousSignInBase(
+  auth: Auth | null,
+  options: UseAnonymousSignInOptionsProps,
 ) {
   const { loading, error, run } = useAuthTask(options);
   const onIdToken = useResolvedConfig("onIdToken", options.onIdToken);
