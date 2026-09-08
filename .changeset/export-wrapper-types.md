@@ -4,13 +4,13 @@
 
 Every type needed to write a wrapper around a hook is now reachable from `@timonwa/firebase-hooks/auth`:
 
-- all 13 `Use*OptionsProps` interfaces, so a wrapper can accept and forward a hook's options without restating them
-- `AuthProviderProps` and `AuthContextValueProps` (what `useAuth` returns), for an app provider layered over this one
+- all 13 `Use*Options` interfaces, so a wrapper can accept and forward a hook's options without restating them
+- `AuthProviderProps` and `UseAuthResult` (what `useAuth` returns), for an app provider layered over this one
 
 ```tsx
-import { useLogin, type UseLoginOptionsProps } from "@timonwa/firebase-hooks/auth";
+import { useLogin, type UseLoginOptions } from "@timonwa/firebase-hooks/auth";
 
-export function useAppLogin(options?: UseLoginOptionsProps) {
+export function useAppLogin(options?: UseLoginOptions) {
   return useLogin(options);
 }
 ```

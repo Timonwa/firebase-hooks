@@ -29,39 +29,39 @@ import {
 } from "firebase/auth";
 import { useState } from "react";
 import {
+  type EmailSender,
   type HookErrorOptions,
   type HookResult,
   requireAuth,
-  type SendEmail,
   useAuthArgs,
   useAuthTask,
   useResolvedConfig,
 } from "./_shared";
 
-export interface UseSendPasswordResetEmailOptionsProps extends HookErrorOptions {
+export interface UseSendPasswordResetEmailOptions extends HookErrorOptions {
   /** Where the emailed link points back to. Overrides the provider; `null` opts out. */
   actionCodeSettings?: ActionCodeSettings | null;
   /** Replace the sender — e.g. your own API emails the reset link instead of Firebase. */
-  sendEmail?: SendEmail | null;
+  sendEmail?: EmailSender | null;
 }
 
 export function useSendPasswordResetEmail(
-  options?: UseSendPasswordResetEmailOptionsProps,
+  options?: UseSendPasswordResetEmailOptions,
 ): ReturnType<typeof useSendPasswordResetEmailBase>;
 export function useSendPasswordResetEmail(
   auth: Auth | null,
-  options?: UseSendPasswordResetEmailOptionsProps,
+  options?: UseSendPasswordResetEmailOptions,
 ): ReturnType<typeof useSendPasswordResetEmailBase>;
 export function useSendPasswordResetEmail(
-  authOrOptions?: Auth | null | UseSendPasswordResetEmailOptionsProps,
-  maybeOptions?: UseSendPasswordResetEmailOptionsProps,
+  authOrOptions?: Auth | null | UseSendPasswordResetEmailOptions,
+  maybeOptions?: UseSendPasswordResetEmailOptions,
 ) {
   return useSendPasswordResetEmailBase(...useAuthArgs(authOrOptions, maybeOptions));
 }
 
 function useSendPasswordResetEmailBase(
   auth: Auth | null,
-  options: UseSendPasswordResetEmailOptionsProps,
+  options: UseSendPasswordResetEmailOptions,
 ) {
   const { loading, error, setError, run } = useAuthTask(options);
   const actionCodeSettings = useResolvedConfig(

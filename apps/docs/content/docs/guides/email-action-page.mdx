@@ -15,7 +15,7 @@ So you write one page that dispatches on `mode`, and a hook handles each branch.
 | `verifyAndChangeEmail` | [`useUpdateEmail`](/docs/auth/use-update-email) | `useVerifyEmail` |
 | `recoverEmail` | Firebase, unprompted, after an address change | `useVerifyEmail` |
 
-The last two are easy to miss. `useUpdateEmail` uses `verifyBeforeUpdateEmail`, so its link arrives as `verifyAndChangeEmail`, not `verifyEmail` — a handler that only knows the first three sends your own users to a dead end. And `recoverEmail` goes to the *old* address whenever an email changes, so the owner can undo it; you never send it, but it arrives. Both apply an action code, which is what `useVerifyEmail` does.
+The last two are easy to miss. `useUpdateEmail` uses `verifyBeforeUpdateEmail`, so its link arrives as `verifyAndChangeEmail`, not `verifyEmail` — a handler that only knows the first three sends your own users to a dead end. And `recoverEmail` goes to the _old_ address whenever an email changes, so the owner can undo it; you never send it, but it arrives. Both apply an action code, which is what `useVerifyEmail` does.
 
 ## The page
 

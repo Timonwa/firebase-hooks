@@ -30,7 +30,7 @@ import {
   useResolvedConfig,
 } from "./_shared";
 
-export interface UseAnonymousSignInOptionsProps extends HookErrorOptions {
+export interface UseAnonymousSignInOptions extends HookErrorOptions {
   /**
    * Called with a freshly minted ID token after sign-in — mint your server
    * session here. Throwing aborts the flow. Overrides the provider; `null` opts out.
@@ -39,23 +39,20 @@ export interface UseAnonymousSignInOptionsProps extends HookErrorOptions {
 }
 
 export function useAnonymousSignIn(
-  options?: UseAnonymousSignInOptionsProps,
+  options?: UseAnonymousSignInOptions,
 ): ReturnType<typeof useAnonymousSignInBase>;
 export function useAnonymousSignIn(
   auth: Auth | null,
-  options?: UseAnonymousSignInOptionsProps,
+  options?: UseAnonymousSignInOptions,
 ): ReturnType<typeof useAnonymousSignInBase>;
 export function useAnonymousSignIn(
-  authOrOptions?: Auth | null | UseAnonymousSignInOptionsProps,
-  maybeOptions?: UseAnonymousSignInOptionsProps,
+  authOrOptions?: Auth | null | UseAnonymousSignInOptions,
+  maybeOptions?: UseAnonymousSignInOptions,
 ) {
   return useAnonymousSignInBase(...useAuthArgs(authOrOptions, maybeOptions));
 }
 
-function useAnonymousSignInBase(
-  auth: Auth | null,
-  options: UseAnonymousSignInOptionsProps,
-) {
+function useAnonymousSignInBase(auth: Auth | null, options: UseAnonymousSignInOptions) {
   const { loading, error, run } = useAuthTask(options);
   const onIdToken = useResolvedConfig("onIdToken", options.onIdToken);
 

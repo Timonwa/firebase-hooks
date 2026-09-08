@@ -43,7 +43,7 @@ import {
   useResolvedConfig,
 } from "./_shared";
 
-export interface UseOAuthSignInOptionsProps extends HookErrorOptions {
+export interface UseOAuthSignInOptions extends HookErrorOptions {
   /**
    * Called with a freshly minted ID token after sign-in — mint your server
    * session here. Throwing aborts the flow. Overrides the provider; `null` opts out.
@@ -52,20 +52,20 @@ export interface UseOAuthSignInOptionsProps extends HookErrorOptions {
 }
 
 export function useOAuthSignIn(
-  options?: UseOAuthSignInOptionsProps,
+  options?: UseOAuthSignInOptions,
 ): ReturnType<typeof useOAuthSignInBase>;
 export function useOAuthSignIn(
   auth: Auth | null,
-  options?: UseOAuthSignInOptionsProps,
+  options?: UseOAuthSignInOptions,
 ): ReturnType<typeof useOAuthSignInBase>;
 export function useOAuthSignIn(
-  authOrOptions?: Auth | null | UseOAuthSignInOptionsProps,
-  maybeOptions?: UseOAuthSignInOptionsProps,
+  authOrOptions?: Auth | null | UseOAuthSignInOptions,
+  maybeOptions?: UseOAuthSignInOptions,
 ) {
   return useOAuthSignInBase(...useAuthArgs(authOrOptions, maybeOptions));
 }
 
-function useOAuthSignInBase(auth: Auth | null, options: UseOAuthSignInOptionsProps) {
+function useOAuthSignInBase(auth: Auth | null, options: UseOAuthSignInOptions) {
   const { loading, error, run } = useAuthTask(options);
   // getRedirectResult consumes the pending result — guard Strict Mode's double effect.
   const redirectHandledRef = useRef(false);

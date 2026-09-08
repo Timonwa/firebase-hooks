@@ -60,7 +60,7 @@ result.user; // User — narrowed, no optional chaining needed
 type AsyncStatus = 'pending' | 'error' | 'success';
 ```
 
-There is no idle state — the work starts before you can render, so `pending` is where it begins. [`useVerifyEmail`](/docs/auth/use-verify-email) reports it as `VerifyEmailStatusType`, an alias of this.
+There is no idle state — the work starts before you can render, so `pending` is where it begins. [`useVerifyEmail`](/docs/auth/use-verify-email) reports it as `VerifyEmailStatus`, an alias of this.
 
 Render the three branches and you've handled every case:
 

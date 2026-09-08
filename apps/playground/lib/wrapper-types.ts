@@ -5,27 +5,27 @@
 
 import type { AsyncStatus, HookResult } from '@timonwa/firebase-hooks';
 import type {
-  AuthContextValueProps,
+  UseAuthResult,
   AuthProviderProps,
   CompleteSignInResult,
-  VerifyEmailStatusType,
-  UseAnonymousSignInOptionsProps,
-  UseCustomTokenSignInOptionsProps,
-  UseDeleteAccountOptionsProps,
-  UseEmailLinkSignInOptionsProps,
-  UseLoginOptionsProps,
-  UseLogoutOptionsProps,
-  UseOAuthSignInOptionsProps,
-  UsePhoneSignInOptionsProps,
-  UseSendEmailVerificationOptionsProps,
-  UseSendPasswordResetEmailOptionsProps,
-  UseSignupOptionsProps,
-  UseUpdateEmailOptionsProps,
-  UseVerifyEmailOptionsProps,
+  VerifyEmailStatus,
+  UseAnonymousSignInOptions,
+  UseCustomTokenSignInOptions,
+  UseDeleteAccountOptions,
+  UseEmailLinkSignInOptions,
+  UseLoginOptions,
+  UseLogoutOptions,
+  UseOAuthSignInOptions,
+  UsePhoneSignInOptions,
+  UseSendEmailVerificationOptions,
+  UseSendPasswordResetEmailOptions,
+  UseSignupOptions,
+  UseUpdateEmailOptions,
+  UseVerifyEmailOptions,
 } from '@timonwa/firebase-hooks/auth';
 
 /** The wrapper shape the docs recommend for server-fetched user records. */
-export type AppAuth = AuthContextValueProps & { record: { plan: string } | null };
+export type AppAuth = UseAuthResult & { record: { plan: string } | null };
 
 /** An app provider layered on top, reusing the package's own props. */
 export type AppAuthProviderProps = Omit<AuthProviderProps, 'auth'> & {
@@ -44,21 +44,21 @@ export type CallbackState =
   | { phase: 'error'; result: Extract<CompleteSignInResult, { success: false }> };
 
 /** The status vocabulary, shared rather than respelled per hook. */
-export const VERIFY_STATES: VerifyEmailStatusType[] = ['pending', 'error', 'success'];
+export const VERIFY_STATES: VerifyEmailStatus[] = ['pending', 'error', 'success'];
 
 /** Every option interface, reachable by name from the auth entry. */
 export type AuthOptions = {
-  anonymousSignIn: UseAnonymousSignInOptionsProps;
-  customTokenSignIn: UseCustomTokenSignInOptionsProps;
-  deleteAccount: UseDeleteAccountOptionsProps;
-  emailLinkSignIn: UseEmailLinkSignInOptionsProps;
-  login: UseLoginOptionsProps;
-  logout: UseLogoutOptionsProps;
-  oauthSignIn: UseOAuthSignInOptionsProps;
-  phoneSignIn: UsePhoneSignInOptionsProps;
-  sendEmailVerification: UseSendEmailVerificationOptionsProps;
-  sendPasswordResetEmail: UseSendPasswordResetEmailOptionsProps;
-  signup: UseSignupOptionsProps;
-  updateEmail: UseUpdateEmailOptionsProps;
-  verifyEmail: UseVerifyEmailOptionsProps;
+  anonymousSignIn: UseAnonymousSignInOptions;
+  customTokenSignIn: UseCustomTokenSignInOptions;
+  deleteAccount: UseDeleteAccountOptions;
+  emailLinkSignIn: UseEmailLinkSignInOptions;
+  login: UseLoginOptions;
+  logout: UseLogoutOptions;
+  oauthSignIn: UseOAuthSignInOptions;
+  phoneSignIn: UsePhoneSignInOptions;
+  sendEmailVerification: UseSendEmailVerificationOptions;
+  sendPasswordResetEmail: UseSendPasswordResetEmailOptions;
+  signup: UseSignupOptions;
+  updateEmail: UseUpdateEmailOptions;
+  verifyEmail: UseVerifyEmailOptions;
 };

@@ -41,7 +41,7 @@ import {
   useResolvedConfig,
 } from "./_shared";
 
-export interface UseLoginOptionsProps extends HookErrorOptions {
+export interface UseLoginOptions extends HookErrorOptions {
   /**
    * Called with a freshly minted ID token after sign-in — mint your server
    * session here. Throwing aborts the flow. Overrides the provider; `null` opts out.
@@ -51,19 +51,19 @@ export interface UseLoginOptionsProps extends HookErrorOptions {
 
 // Overloads give the two call styles; the return type is inferred from the
 // implementation below rather than restated, so it cannot drift from it.
-export function useLogin(options?: UseLoginOptionsProps): ReturnType<typeof useLoginBase>;
+export function useLogin(options?: UseLoginOptions): ReturnType<typeof useLoginBase>;
 export function useLogin(
   auth: Auth | null,
-  options?: UseLoginOptionsProps,
+  options?: UseLoginOptions,
 ): ReturnType<typeof useLoginBase>;
 export function useLogin(
-  authOrOptions?: Auth | null | UseLoginOptionsProps,
-  maybeOptions?: UseLoginOptionsProps,
+  authOrOptions?: Auth | null | UseLoginOptions,
+  maybeOptions?: UseLoginOptions,
 ) {
   return useLoginBase(...useAuthArgs(authOrOptions, maybeOptions));
 }
 
-function useLoginBase(auth: Auth | null, options: UseLoginOptionsProps) {
+function useLoginBase(auth: Auth | null, options: UseLoginOptions) {
   const { loading, error, run } = useAuthTask(options);
   const onIdToken = useResolvedConfig("onIdToken", options.onIdToken);
 

@@ -31,7 +31,7 @@ import {
   useAuthTask,
 } from "./_shared";
 
-export interface UseDeleteAccountOptionsProps extends HookErrorOptions {
+export interface UseDeleteAccountOptions extends HookErrorOptions {
   /**
    * Runs while the user is still authenticated — clean up server-side data
    * here. Throwing aborts the deletion.
@@ -40,20 +40,20 @@ export interface UseDeleteAccountOptionsProps extends HookErrorOptions {
 }
 
 export function useDeleteAccount(
-  options?: UseDeleteAccountOptionsProps,
+  options?: UseDeleteAccountOptions,
 ): ReturnType<typeof useDeleteAccountBase>;
 export function useDeleteAccount(
   auth: Auth | null,
-  options?: UseDeleteAccountOptionsProps,
+  options?: UseDeleteAccountOptions,
 ): ReturnType<typeof useDeleteAccountBase>;
 export function useDeleteAccount(
-  authOrOptions?: Auth | null | UseDeleteAccountOptionsProps,
-  maybeOptions?: UseDeleteAccountOptionsProps,
+  authOrOptions?: Auth | null | UseDeleteAccountOptions,
+  maybeOptions?: UseDeleteAccountOptions,
 ) {
   return useDeleteAccountBase(...useAuthArgs(authOrOptions, maybeOptions));
 }
 
-function useDeleteAccountBase(auth: Auth | null, options: UseDeleteAccountOptionsProps) {
+function useDeleteAccountBase(auth: Auth | null, options: UseDeleteAccountOptions) {
   const { loading, error, run } = useAuthTask(options);
 
   const deleteAccount = ({

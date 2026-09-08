@@ -24,7 +24,7 @@ import {
   useResolvedConfig,
 } from "./_shared";
 
-export interface UseLogoutOptionsProps extends HookErrorOptions {
+export interface UseLogoutOptions extends HookErrorOptions {
   /**
    * Runs before Firebase clears the session — clear your server session here.
    * Throwing leaves the user signed in. Overrides the provider; `null` opts out.
@@ -32,21 +32,19 @@ export interface UseLogoutOptionsProps extends HookErrorOptions {
   onBeforeSignOut?: (() => void | Promise<void>) | null;
 }
 
-export function useLogout(
-  options?: UseLogoutOptionsProps,
-): ReturnType<typeof useLogoutBase>;
+export function useLogout(options?: UseLogoutOptions): ReturnType<typeof useLogoutBase>;
 export function useLogout(
   auth: Auth | null,
-  options?: UseLogoutOptionsProps,
+  options?: UseLogoutOptions,
 ): ReturnType<typeof useLogoutBase>;
 export function useLogout(
-  authOrOptions?: Auth | null | UseLogoutOptionsProps,
-  maybeOptions?: UseLogoutOptionsProps,
+  authOrOptions?: Auth | null | UseLogoutOptions,
+  maybeOptions?: UseLogoutOptions,
 ) {
   return useLogoutBase(...useAuthArgs(authOrOptions, maybeOptions));
 }
 
-function useLogoutBase(auth: Auth | null, options: UseLogoutOptionsProps) {
+function useLogoutBase(auth: Auth | null, options: UseLogoutOptions) {
   const { loading, error, run } = useAuthTask(options);
   const onBeforeSignOut = useResolvedConfig("onBeforeSignOut", options.onBeforeSignOut);
 

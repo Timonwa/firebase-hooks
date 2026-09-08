@@ -36,26 +36,26 @@ import {
   useResolvedConfig,
 } from "./_shared";
 
-export interface UseUpdateEmailOptionsProps extends HookErrorOptions {
+export interface UseUpdateEmailOptions extends HookErrorOptions {
   /** Where the emailed link points back to. Overrides the provider; `null` opts out. */
   actionCodeSettings?: ActionCodeSettings | null;
 }
 
 export function useUpdateEmail(
-  options?: UseUpdateEmailOptionsProps,
+  options?: UseUpdateEmailOptions,
 ): ReturnType<typeof useUpdateEmailBase>;
 export function useUpdateEmail(
   auth: Auth | null,
-  options?: UseUpdateEmailOptionsProps,
+  options?: UseUpdateEmailOptions,
 ): ReturnType<typeof useUpdateEmailBase>;
 export function useUpdateEmail(
-  authOrOptions?: Auth | null | UseUpdateEmailOptionsProps,
-  maybeOptions?: UseUpdateEmailOptionsProps,
+  authOrOptions?: Auth | null | UseUpdateEmailOptions,
+  maybeOptions?: UseUpdateEmailOptions,
 ) {
   return useUpdateEmailBase(...useAuthArgs(authOrOptions, maybeOptions));
 }
 
-function useUpdateEmailBase(auth: Auth | null, options: UseUpdateEmailOptionsProps) {
+function useUpdateEmailBase(auth: Auth | null, options: UseUpdateEmailOptions) {
   const { loading, error, run } = useAuthTask(options);
   const actionCodeSettings = useResolvedConfig(
     "actionCodeSettings",

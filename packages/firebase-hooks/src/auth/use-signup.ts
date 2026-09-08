@@ -39,7 +39,7 @@ import {
   useResolvedConfig,
 } from "./_shared";
 
-export interface UseSignupOptionsProps extends HookErrorOptions {
+export interface UseSignupOptions extends HookErrorOptions {
   /**
    * Send the verification email once the account is created.
    * @defaultValue true
@@ -52,21 +52,19 @@ export interface UseSignupOptionsProps extends HookErrorOptions {
   onIdToken?: OnIdToken | null;
 }
 
-export function useSignup(
-  options?: UseSignupOptionsProps,
-): ReturnType<typeof useSignupBase>;
+export function useSignup(options?: UseSignupOptions): ReturnType<typeof useSignupBase>;
 export function useSignup(
   auth: Auth | null,
-  options?: UseSignupOptionsProps,
+  options?: UseSignupOptions,
 ): ReturnType<typeof useSignupBase>;
 export function useSignup(
-  authOrOptions?: Auth | null | UseSignupOptionsProps,
-  maybeOptions?: UseSignupOptionsProps,
+  authOrOptions?: Auth | null | UseSignupOptions,
+  maybeOptions?: UseSignupOptions,
 ) {
   return useSignupBase(...useAuthArgs(authOrOptions, maybeOptions));
 }
 
-function useSignupBase(auth: Auth | null, options: UseSignupOptionsProps) {
+function useSignupBase(auth: Auth | null, options: UseSignupOptions) {
   const { sendVerificationEmail = true } = options;
   const { loading, error, run } = useAuthTask(options);
   const onIdToken = useResolvedConfig("onIdToken", options.onIdToken);

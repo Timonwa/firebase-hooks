@@ -32,9 +32,9 @@ import {
   useErrorMessageResolver,
 } from "./_shared";
 
-export type VerifyEmailStatusType = AsyncStatus;
+export type VerifyEmailStatus = AsyncStatus;
 
-export interface UseVerifyEmailOptionsProps extends HookErrorOptions {
+export interface UseVerifyEmailOptions extends HookErrorOptions {
   /**
    * Runs after the code is applied and the token refreshed — refresh your
    * server session here.
@@ -44,17 +44,17 @@ export interface UseVerifyEmailOptionsProps extends HookErrorOptions {
 
 export function useVerifyEmail(
   oobCode: string | null,
-  options?: UseVerifyEmailOptionsProps,
+  options?: UseVerifyEmailOptions,
 ): ReturnType<typeof useVerifyEmailBase>;
 export function useVerifyEmail(
   auth: Auth | null,
   oobCode: string | null,
-  options?: UseVerifyEmailOptionsProps,
+  options?: UseVerifyEmailOptions,
 ): ReturnType<typeof useVerifyEmailBase>;
 export function useVerifyEmail(
   ...args:
-    | [oobCode: string | null, options?: UseVerifyEmailOptionsProps]
-    | [auth: Auth | null, oobCode: string | null, options?: UseVerifyEmailOptionsProps]
+    | [oobCode: string | null, options?: UseVerifyEmailOptions]
+    | [auth: Auth | null, oobCode: string | null, options?: UseVerifyEmailOptions]
 ) {
   // Arity, not just type: `useVerifyEmail(null)` has to mean "no code in the
   // URL" — the common case, since `searchParams.get()` returns null — while
@@ -66,9 +66,9 @@ export function useVerifyEmail(
     args.length > 2 ||
     (args.length === 2 && (typeof second === "string" || second === null));
 
-  const [auth, options] = useAuthArgs<UseVerifyEmailOptionsProps>(
+  const [auth, options] = useAuthArgs<UseVerifyEmailOptions>(
     withAuth ? (args[0] as Auth | null) : undefined,
-    (withAuth ? args[2] : args[1]) as UseVerifyEmailOptionsProps | undefined,
+    (withAuth ? args[2] : args[1]) as UseVerifyEmailOptions | undefined,
   );
   const oobCode = ((withAuth ? args[1] : args[0]) as string | null) ?? null;
 
@@ -78,9 +78,9 @@ export function useVerifyEmail(
 function useVerifyEmailBase(
   auth: Auth | null,
   oobCode: string | null,
-  options: UseVerifyEmailOptionsProps,
+  options: UseVerifyEmailOptions,
 ) {
-  const [status, setStatus] = useState<VerifyEmailStatusType>("pending");
+  const [status, setStatus] = useState<VerifyEmailStatus>("pending");
   const [error, setError] = useState<string | null>(null);
   const [code, setCode] = useState<string | null>(null);
   const [cause, setCause] = useState<unknown>(null);

@@ -17,7 +17,7 @@ return <SuccessState />;
 
 ## Returns
 
-`status` is `"pending"`, `"success"`, or `"error"` — exported as `VerifyEmailStatusType`, and the same [`AsyncStatus`](/docs/core/hook-result#asyncstatus) vocabulary every status in the package uses. `error` carries the message on failure.
+`status` is `"pending"`, `"success"`, or `"error"` — exported as `VerifyEmailStatus`, and the same [`AsyncStatus`](/docs/core/hook-result#asyncstatus) vocabulary every status in the package uses. `error` carries the message on failure.
 
 ## Notes
 
@@ -29,7 +29,7 @@ After verifying, the current user is reloaded and the token refreshed so `emailV
 
 <AutoTypeTable
   path="../../packages/firebase-hooks/src/auth/use-verify-email.ts"
-  name="UseVerifyEmailOptionsProps"
+  name="UseVerifyEmailOptions"
 />
 
 All three emailed links land on one URL — see [One page for every emailed link](/docs/guides/email-action-page) for the page that dispatches on `mode`.

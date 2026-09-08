@@ -39,18 +39,18 @@ import {
   type UserCredential,
 } from "firebase/auth";
 import {
+  type EmailSender,
   type HookErrorOptions,
   type HookResult,
   type OnIdToken,
   requireAuth,
   runOnIdToken,
-  type SendEmail,
   useAuthArgs,
   useAuthTask,
   useResolvedConfig,
 } from "./_shared";
 
-export interface UseEmailLinkSignInOptionsProps extends HookErrorOptions {
+export interface UseEmailLinkSignInOptions extends HookErrorOptions {
   /** Where the emailed link points back to. Overrides the provider; `null` opts out. */
   actionCodeSettings?: ActionCodeSettings | null;
   /**
@@ -59,7 +59,7 @@ export interface UseEmailLinkSignInOptionsProps extends HookErrorOptions {
    */
   storageKey?: string;
   /** Replace the sender — e.g. your own API emails the link instead of Firebase. */
-  sendEmail?: SendEmail | null;
+  sendEmail?: EmailSender | null;
   /**
    * Called with a freshly minted ID token after sign-in — mint your server
    * session here. Throwing aborts the flow. Overrides the provider; `null` opts out.
@@ -79,23 +79,20 @@ export type CompleteSignInResult =
     };
 
 export function useEmailLinkSignIn(
-  options?: UseEmailLinkSignInOptionsProps,
+  options?: UseEmailLinkSignInOptions,
 ): ReturnType<typeof useEmailLinkSignInBase>;
 export function useEmailLinkSignIn(
   auth: Auth | null,
-  options?: UseEmailLinkSignInOptionsProps,
+  options?: UseEmailLinkSignInOptions,
 ): ReturnType<typeof useEmailLinkSignInBase>;
 export function useEmailLinkSignIn(
-  authOrOptions?: Auth | null | UseEmailLinkSignInOptionsProps,
-  maybeOptions?: UseEmailLinkSignInOptionsProps,
+  authOrOptions?: Auth | null | UseEmailLinkSignInOptions,
+  maybeOptions?: UseEmailLinkSignInOptions,
 ) {
   return useEmailLinkSignInBase(...useAuthArgs(authOrOptions, maybeOptions));
 }
 
-function useEmailLinkSignInBase(
-  auth: Auth | null,
-  options: UseEmailLinkSignInOptionsProps,
-) {
+function useEmailLinkSignInBase(auth: Auth | null, options: UseEmailLinkSignInOptions) {
   const { storageKey = "emailForSignIn" } = options;
   const { loading, error, setError, run } = useAuthTask(options);
   const onIdToken = useResolvedConfig("onIdToken", options.onIdToken);

@@ -24,42 +24,42 @@
 import { type ActionCodeSettings, type Auth, sendEmailVerification } from "firebase/auth";
 import { useState } from "react";
 import {
+  type EmailSender,
   type HookErrorOptions,
   type HookResult,
   requireCurrentUser,
-  type SendEmail,
   useAuthArgs,
   useAuthTask,
   useResolvedConfig,
 } from "./_shared";
 
-export interface UseSendEmailVerificationOptionsProps extends HookErrorOptions {
+export interface UseSendEmailVerificationOptions extends HookErrorOptions {
   /** Where the emailed link points back to. Overrides the provider; `null` opts out. */
   actionCodeSettings?: ActionCodeSettings | null;
   /**
    * Replace the sender — e.g. your own API emails the link instead of Firebase.
    * Called with the signed-in user's address.
    */
-  sendEmail?: SendEmail | null;
+  sendEmail?: EmailSender | null;
 }
 
 export function useSendEmailVerification(
-  options?: UseSendEmailVerificationOptionsProps,
+  options?: UseSendEmailVerificationOptions,
 ): ReturnType<typeof useSendEmailVerificationBase>;
 export function useSendEmailVerification(
   auth: Auth | null,
-  options?: UseSendEmailVerificationOptionsProps,
+  options?: UseSendEmailVerificationOptions,
 ): ReturnType<typeof useSendEmailVerificationBase>;
 export function useSendEmailVerification(
-  authOrOptions?: Auth | null | UseSendEmailVerificationOptionsProps,
-  maybeOptions?: UseSendEmailVerificationOptionsProps,
+  authOrOptions?: Auth | null | UseSendEmailVerificationOptions,
+  maybeOptions?: UseSendEmailVerificationOptions,
 ) {
   return useSendEmailVerificationBase(...useAuthArgs(authOrOptions, maybeOptions));
 }
 
 function useSendEmailVerificationBase(
   auth: Auth | null,
-  options: UseSendEmailVerificationOptionsProps,
+  options: UseSendEmailVerificationOptions,
 ) {
   const { loading, error, run } = useAuthTask(options);
   const actionCodeSettings = useResolvedConfig(

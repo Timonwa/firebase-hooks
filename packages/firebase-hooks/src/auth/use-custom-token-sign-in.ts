@@ -31,7 +31,7 @@ import {
   useResolvedConfig,
 } from "./_shared";
 
-export interface UseCustomTokenSignInOptionsProps extends HookErrorOptions {
+export interface UseCustomTokenSignInOptions extends HookErrorOptions {
   /**
    * Called with a freshly minted ID token after sign-in — mint your server
    * session here. Throwing aborts the flow. Overrides the provider; `null` opts out.
@@ -40,22 +40,22 @@ export interface UseCustomTokenSignInOptionsProps extends HookErrorOptions {
 }
 
 export function useCustomTokenSignIn(
-  options?: UseCustomTokenSignInOptionsProps,
+  options?: UseCustomTokenSignInOptions,
 ): ReturnType<typeof useCustomTokenSignInBase>;
 export function useCustomTokenSignIn(
   auth: Auth | null,
-  options?: UseCustomTokenSignInOptionsProps,
+  options?: UseCustomTokenSignInOptions,
 ): ReturnType<typeof useCustomTokenSignInBase>;
 export function useCustomTokenSignIn(
-  authOrOptions?: Auth | null | UseCustomTokenSignInOptionsProps,
-  maybeOptions?: UseCustomTokenSignInOptionsProps,
+  authOrOptions?: Auth | null | UseCustomTokenSignInOptions,
+  maybeOptions?: UseCustomTokenSignInOptions,
 ) {
   return useCustomTokenSignInBase(...useAuthArgs(authOrOptions, maybeOptions));
 }
 
 function useCustomTokenSignInBase(
   auth: Auth | null,
-  options: UseCustomTokenSignInOptionsProps,
+  options: UseCustomTokenSignInOptions,
 ) {
   const { loading, error, run } = useAuthTask(options);
   const onIdToken = useResolvedConfig("onIdToken", options.onIdToken);

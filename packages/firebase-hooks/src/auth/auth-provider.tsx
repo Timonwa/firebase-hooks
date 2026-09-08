@@ -44,12 +44,12 @@ import {
 } from "react";
 import {
   AuthConfigContext,
-  type AuthSendersProps,
+  type AuthSenders,
   type HookErrorContext,
   type OnIdToken,
 } from "./_shared";
 
-export interface AuthContextValueProps {
+export interface UseAuthResult {
   firebaseUser: User | null;
   /** Custom claims from the current ID token; null while signed out or loading. */
   claims: Record<string, unknown> | null;
@@ -57,7 +57,7 @@ export interface AuthContextValueProps {
   isLoading: boolean;
 }
 
-const AuthContext = createContext<AuthContextValueProps | undefined>(undefined);
+const AuthContext = createContext<UseAuthResult | undefined>(undefined);
 
 export interface AuthProviderProps {
   /** The Firebase `Auth` instance, or null while it initialises. */
@@ -76,7 +76,7 @@ export interface AuthProviderProps {
    * Your own sender per emailed flow, so the sends go through your API rather
    * than the browser. A hook's own option overrides its entry here.
    */
-  senders?: AuthSendersProps;
+  senders?: AuthSenders;
   children: ReactNode;
 }
 
@@ -162,7 +162,7 @@ export function AuthProvider({
   );
 }
 
-export function useAuth(): AuthContextValueProps {
+export function useAuth(): UseAuthResult {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error("useAuth must be used inside <AuthProvider>");
   return ctx;

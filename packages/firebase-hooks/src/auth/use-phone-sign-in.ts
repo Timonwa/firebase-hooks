@@ -41,7 +41,7 @@ import {
   useResolvedConfig,
 } from "./_shared";
 
-export interface UsePhoneSignInOptionsProps extends HookErrorOptions {
+export interface UsePhoneSignInOptions extends HookErrorOptions {
   /**
    * Size of the managed reCAPTCHA widget.
    * @defaultValue "invisible"
@@ -55,20 +55,20 @@ export interface UsePhoneSignInOptionsProps extends HookErrorOptions {
 }
 
 export function usePhoneSignIn(
-  options?: UsePhoneSignInOptionsProps,
+  options?: UsePhoneSignInOptions,
 ): ReturnType<typeof usePhoneSignInBase>;
 export function usePhoneSignIn(
   auth: Auth | null,
-  options?: UsePhoneSignInOptionsProps,
+  options?: UsePhoneSignInOptions,
 ): ReturnType<typeof usePhoneSignInBase>;
 export function usePhoneSignIn(
-  authOrOptions?: Auth | null | UsePhoneSignInOptionsProps,
-  maybeOptions?: UsePhoneSignInOptionsProps,
+  authOrOptions?: Auth | null | UsePhoneSignInOptions,
+  maybeOptions?: UsePhoneSignInOptions,
 ) {
   return usePhoneSignInBase(...useAuthArgs(authOrOptions, maybeOptions));
 }
 
-function usePhoneSignInBase(auth: Auth | null, options: UsePhoneSignInOptionsProps) {
+function usePhoneSignInBase(auth: Auth | null, options: UsePhoneSignInOptions) {
   const { loading, error, run } = useAuthTask(options);
   const onIdToken = useResolvedConfig("onIdToken", options.onIdToken);
   const [codeSent, setCodeSent] = useState(false);
