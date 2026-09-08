@@ -36,9 +36,8 @@ export interface UseSendEmailVerificationOptionsProps extends HookErrorOptions {
   /** Where the emailed link points back to. Overrides the provider; `null` opts out. */
   actionCodeSettings?: ActionCodeSettings | null;
   /**
-   * Replace the sender — e.g. your own API emails the verification link
-   * instead of Firebase, so the send goes through your rate limiter. Receives
-   * the signed-in user's address; `success` and `error` behave the same way.
+   * Replace the sender — e.g. your own API emails the link instead of Firebase.
+   * Called with the signed-in user's address.
    */
   sendEmail?: (email: string) => Promise<void>;
 }
@@ -76,8 +75,7 @@ function useSendEmailVerificationBase(
       async () => {
         const user = requireCurrentUser(auth);
         if (options.sendEmail) {
-          // Your sender needs an address, which `send()` doesn't take — it
-          // comes off the signed-in user, so a phone-only account can't use it.
+          // `send()` takes no arguments, so the address comes off the user.
           if (!user.email) throw new Error("This account has no email address");
           await options.sendEmail(user.email);
         } else {

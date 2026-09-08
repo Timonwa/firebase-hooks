@@ -40,11 +40,7 @@ import {
 export interface UseSendPasswordResetEmailOptionsProps extends HookErrorOptions {
   /** Where the emailed link points back to. Overrides the provider; `null` opts out. */
   actionCodeSettings?: ActionCodeSettings | null;
-  /**
-   * Replace the sender — e.g. your own API emails the reset link instead of
-   * Firebase, so the send goes through your rate limiter. `success`, `error`
-   * and `resetState` still behave the same way.
-   */
+  /** Replace the sender — e.g. your own API emails the reset link instead of Firebase. */
   sendEmail?: (email: string) => Promise<void>;
 }
 
