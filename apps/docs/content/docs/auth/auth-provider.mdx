@@ -58,6 +58,37 @@ A hook's own option overrides the provider, and an explicit `null` opts that flo
 | `actionCodeSettings` | Inherited by every emailed link |
 | `formatErrorMessage` | Inherited by every hook — see [Error handling](/docs/guides/error-handling) |
 | `onError` | Fire-and-forget observer for every failure |
+| `senders` | Your own email sender per flow — see below |
+
+## Sending the emails yourself
+
+Three hooks email a link, and by default each sends from the browser. `senders` moves them behind your own API, once, instead of per call site:
+
+```tsx
+<AuthProvider
+  auth={auth}
+  senders={{
+    signInLink: (email) => api.sendSignInLink(email),
+    passwordReset: (email) => api.sendPasswordReset(email),
+    emailVerification: (email) => api.sendVerification(email),
+  }}
+>
+```
+
+| Key | Replaces |
+| --- | --- |
+| `signInLink` | [`useEmailLinkSignIn`](/docs/auth/use-email-link-sign-in)'s `sendLink` |
+| `passwordReset` | [`useSendPasswordResetEmail`](/docs/auth/use-send-password-reset-email)'s `sendEmail` |
+| `emailVerification` | [`useSendEmailVerification`](/docs/auth/use-send-email-verification)'s `sendEmail` |
+
+One key per flow rather than a single sender, because the three send different emails — one sender for all of them could mail a password reset to someone who asked to verify an address.
+
+Each follows the usual rule: the hook's own option wins, and `null` opts that one flow back to Firebase's client-side send.
+
+```tsx
+// Everything through your API, except this one call
+const { send } = useSendPasswordResetEmail({ sendEmail: null });
+```
 
 ## Your own user record
 
