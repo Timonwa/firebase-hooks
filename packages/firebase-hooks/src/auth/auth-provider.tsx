@@ -42,7 +42,12 @@ import {
   useMemo,
   useState,
 } from "react";
-import { AuthConfigContext, type HookErrorContext, type OnIdToken } from "./_shared";
+import {
+  AuthConfigContext,
+  type AuthSendersProps,
+  type HookErrorContext,
+  type OnIdToken,
+} from "./_shared";
 
 export interface AuthContextValueProps {
   firebaseUser: User | null;
@@ -67,6 +72,11 @@ export interface AuthProviderProps {
   actionCodeSettings?: ActionCodeSettings;
   /** Fire-and-forget observer every hook failure flows through (logging/analytics). */
   onError?: (error: unknown, context: HookErrorContext) => void;
+  /**
+   * Your own sender per emailed flow, so the sends go through your API rather
+   * than the browser. A hook's own option overrides its entry here.
+   */
+  senders?: AuthSendersProps;
   children: ReactNode;
 }
 
@@ -77,6 +87,7 @@ export function AuthProvider({
   onBeforeSignOut,
   actionCodeSettings,
   onError,
+  senders,
   children,
 }: AuthProviderProps) {
   const [firebaseUser, setFirebaseUser] = useState<User | null>(null);
@@ -106,6 +117,10 @@ export function AuthProvider({
     return () => unsubscribe();
   }, [auth]);
 
+  // Destructured so an inline `senders={{ … }}` doesn't rebuild the config on
+  // every render.
+  const { signInLink, passwordReset, emailVerification } = senders ?? {};
+
   const config = useMemo(
     () => ({
       auth,
@@ -114,8 +129,21 @@ export function AuthProvider({
       onBeforeSignOut,
       actionCodeSettings,
       onError,
+      sendSignInLink: signInLink,
+      sendPasswordReset: passwordReset,
+      sendEmailVerification: emailVerification,
     }),
-    [auth, formatErrorMessage, onIdToken, onBeforeSignOut, actionCodeSettings, onError],
+    [
+      auth,
+      formatErrorMessage,
+      onIdToken,
+      onBeforeSignOut,
+      actionCodeSettings,
+      onError,
+      signInLink,
+      passwordReset,
+      emailVerification,
+    ],
   );
 
   return (

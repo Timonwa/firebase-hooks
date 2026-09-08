@@ -27,6 +27,7 @@ import {
   type HookErrorOptions,
   type HookResult,
   requireCurrentUser,
+  type SendEmail,
   useAuthArgs,
   useAuthTask,
   useResolvedConfig,
@@ -39,7 +40,7 @@ export interface UseSendEmailVerificationOptionsProps extends HookErrorOptions {
    * Replace the sender — e.g. your own API emails the link instead of Firebase.
    * Called with the signed-in user's address.
    */
-  sendEmail?: (email: string) => Promise<void>;
+  sendEmail?: SendEmail | null;
 }
 
 export function useSendEmailVerification(
@@ -65,6 +66,7 @@ function useSendEmailVerificationBase(
     "actionCodeSettings",
     options.actionCodeSettings,
   );
+  const sendEmail = useResolvedConfig("sendEmailVerification", options.sendEmail);
   const [success, setSuccess] = useState(false);
 
   const send = async (): Promise<HookResult> => {
@@ -74,10 +76,10 @@ function useSendEmailVerificationBase(
       "Failed to send verification email",
       async () => {
         const user = requireCurrentUser(auth);
-        if (options.sendEmail) {
+        if (sendEmail) {
           // `send()` takes no arguments, so the address comes off the user.
           if (!user.email) throw new Error("This account has no email address");
-          await options.sendEmail(user.email);
+          await sendEmail(user.email);
         } else {
           await sendEmailVerification(user, actionCodeSettings);
         }

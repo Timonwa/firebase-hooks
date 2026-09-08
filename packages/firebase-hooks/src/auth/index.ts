@@ -4,7 +4,7 @@
 // Shared shapes (HookResult, HookErrorOptions, HookErrorContext, AsyncStatus)
 // ship from the core entry instead: every service returns them.
 
-export type { OnIdToken } from "./_shared.js";
+export type { AuthSendersProps, OnIdToken, SendEmail } from "./_shared.js";
 export { AUTH_ERROR_MESSAGES } from "./auth-error-messages.js";
 export {
   type AuthContextValueProps,

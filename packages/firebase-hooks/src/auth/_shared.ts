@@ -34,6 +34,23 @@ function rawErrorMessage(error: unknown, fallback: string): string {
   return fallback;
 }
 
+/** Emails a link on the app's behalf, in place of Firebase's client SDK. */
+export type SendEmail = (email: string) => Promise<void>;
+
+/**
+ * Your own sender per emailed flow. Each one replaces the client-side send for
+ * that flow only — the three send different emails, so one sender for all of
+ * them could mail a password reset to someone asking to verify an address.
+ */
+export interface AuthSendersProps {
+  /** `useEmailLinkSignIn`'s `sendLink`. */
+  signInLink?: SendEmail;
+  /** `useSendPasswordResetEmail`'s `sendEmail`. */
+  passwordReset?: SendEmail;
+  /** `useSendEmailVerification`'s `sendEmail`. */
+  emailVerification?: SendEmail;
+}
+
 /** Provider-level configuration shared with every hook below the provider. */
 export interface AuthConfigContextValueProps {
   /** The provider's own `Auth`, for hooks called without one. */
@@ -43,6 +60,11 @@ export interface AuthConfigContextValueProps {
   onBeforeSignOut?: () => void | Promise<void>;
   actionCodeSettings?: ActionCodeSettings;
   onError?: (error: unknown, context: HookErrorContext) => void;
+  // Flattened from the provider's `senders` prop, so each resolves through
+  // useResolvedConfig like every other inherited option.
+  sendSignInLink?: SendEmail;
+  sendPasswordReset?: SendEmail;
+  sendEmailVerification?: SendEmail;
 }
 
 export const AuthConfigContext = createContext<AuthConfigContextValueProps | undefined>(

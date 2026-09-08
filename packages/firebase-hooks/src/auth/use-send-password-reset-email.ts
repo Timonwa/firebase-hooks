@@ -32,6 +32,7 @@ import {
   type HookErrorOptions,
   type HookResult,
   requireAuth,
+  type SendEmail,
   useAuthArgs,
   useAuthTask,
   useResolvedConfig,
@@ -41,7 +42,7 @@ export interface UseSendPasswordResetEmailOptionsProps extends HookErrorOptions 
   /** Where the emailed link points back to. Overrides the provider; `null` opts out. */
   actionCodeSettings?: ActionCodeSettings | null;
   /** Replace the sender — e.g. your own API emails the reset link instead of Firebase. */
-  sendEmail?: (email: string) => Promise<void>;
+  sendEmail?: SendEmail | null;
 }
 
 export function useSendPasswordResetEmail(
@@ -67,6 +68,7 @@ function useSendPasswordResetEmailBase(
     "actionCodeSettings",
     options.actionCodeSettings,
   );
+  const sendEmail = useResolvedConfig("sendPasswordReset", options.sendEmail);
   const [success, setSuccess] = useState(false);
 
   const send = async (email: string): Promise<HookResult> => {
@@ -75,8 +77,8 @@ function useSendPasswordResetEmailBase(
       "send-password-reset-email",
       "Failed to send reset email",
       async () => {
-        if (options.sendEmail) {
-          await options.sendEmail(email);
+        if (sendEmail) {
+          await sendEmail(email);
         } else {
           await sendPasswordResetEmail(requireAuth(auth), email, actionCodeSettings);
         }

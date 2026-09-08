@@ -44,6 +44,7 @@ import {
   type OnIdToken,
   requireAuth,
   runOnIdToken,
+  type SendEmail,
   useAuthArgs,
   useAuthTask,
   useResolvedConfig,
@@ -58,7 +59,7 @@ export interface UseEmailLinkSignInOptionsProps extends HookErrorOptions {
    */
   storageKey?: string;
   /** Replace the sender — e.g. your own API emails the link instead of Firebase. */
-  sendLink?: (email: string) => Promise<void>;
+  sendLink?: SendEmail | null;
   /**
    * Called with a freshly minted ID token after sign-in — mint your server
    * session here. Throwing aborts the flow. Overrides the provider; `null` opts out.
@@ -103,10 +104,12 @@ function useEmailLinkSignInBase(
     options.actionCodeSettings,
   );
 
+  const send = useResolvedConfig("sendSignInLink", options.sendLink);
+
   const sendLink = (email: string): Promise<HookResult> =>
     run("send-sign-in-link", "Failed to send sign-in link", async () => {
-      if (options.sendLink) {
-        await options.sendLink(email);
+      if (send) {
+        await send(email);
       } else {
         if (!actionCodeSettings) {
           throw new Error(

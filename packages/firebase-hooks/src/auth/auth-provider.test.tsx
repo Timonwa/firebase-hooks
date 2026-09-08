@@ -351,3 +351,57 @@ describe("auth argument resolution", () => {
     expect(outcome).toMatchObject({ success: false });
   });
 });
+
+describe("provider-level senders", () => {
+  it("each hook inherits its own sender, and only its own", async () => {
+    const signInLink = vi.fn(async () => {});
+    const passwordReset = vi.fn(async () => {});
+    const wrapper = withAuthProvider({
+      auth: makeAuth(),
+      senders: { signInLink, passwordReset },
+    });
+
+    const { result } = renderHook(() => useSendPasswordResetEmail(), { wrapper });
+    await act(async () => {
+      await result.current.send("a@b.c");
+    });
+
+    // The three senders email different things, so a reset must never reach
+    // the sign-in-link sender.
+    expect(passwordReset).toHaveBeenCalledWith("a@b.c");
+    expect(signInLink).not.toHaveBeenCalled();
+    expect(sendPasswordResetEmail).not.toHaveBeenCalled();
+  });
+
+  it("a hook's own sender overrides the provider's", async () => {
+    const passwordReset = vi.fn(async () => {});
+    const own = vi.fn(async () => {});
+    const wrapper = withAuthProvider({ auth: makeAuth(), senders: { passwordReset } });
+
+    const { result } = renderHook(() => useSendPasswordResetEmail({ sendEmail: own }), {
+      wrapper,
+    });
+    await act(async () => {
+      await result.current.send("a@b.c");
+    });
+
+    expect(own).toHaveBeenCalledWith("a@b.c");
+    expect(passwordReset).not.toHaveBeenCalled();
+  });
+
+  it("null opts one flow back to Firebase's own send", async () => {
+    const passwordReset = vi.fn(async () => {});
+    const wrapper = withAuthProvider({ auth: makeAuth(), senders: { passwordReset } });
+
+    const { result } = renderHook(
+      () => useSendPasswordResetEmail({ sendEmail: null, actionCodeSettings: null }),
+      { wrapper },
+    );
+    await act(async () => {
+      await result.current.send("a@b.c");
+    });
+
+    expect(passwordReset).not.toHaveBeenCalled();
+    expect(sendPasswordResetEmail).toHaveBeenCalled();
+  });
+});
