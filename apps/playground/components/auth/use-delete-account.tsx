@@ -14,7 +14,7 @@ export function UseDeleteAccountSection() {
     body: 'deleteUserRecord(user.uid)',
     throwsHint: 'The account survives — cleanup failing cannot orphan its records.',
   });
-  const { deleteAccount, loading, error } = useDeleteAccount({
+  const { deleteAccount, status, isPending, error } = useDeleteAccount({
     formatErrorMessage: errorFormat.value,
     onBeforeDelete: onBeforeDelete.value,
   });
@@ -33,7 +33,7 @@ export function UseDeleteAccountSection() {
       }
       snippet={hookSnippet({
         hook: 'useDeleteAccount',
-        returns: 'deleteAccount, loading, error',
+        returns: 'deleteAccount, isPending, error',
         lines: [onBeforeDelete.line, errorFormat.line],
         body: 'await deleteAccount({ currentPassword });',
       })}
@@ -53,20 +53,20 @@ export function UseDeleteAccountSection() {
           />
           <Button
             variant="danger"
-            disabled={loading}
+            disabled={isPending}
             onClick={async () =>
               setResult(
                 await deleteAccount(currentPassword ? { currentPassword } : undefined),
               )
             }
           >
-            {loading ? 'Deleting…' : 'Delete account'}
+            {isPending ? 'Deleting…' : 'Delete account'}
           </Button>
         </>
       }
       result={result}
       error={error}
-      loading={loading}
+      status={status}
     />
   );
 }

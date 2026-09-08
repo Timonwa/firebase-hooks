@@ -81,13 +81,14 @@ if (status === "pending") return <Spinner />;`}
       }
       result={{ status }}
       error={error}
-      loading={status === 'pending'}
+      status={status}
     />
   );
 }
 
 function ConfirmReset({ oobCode }: Props) {
-  const { confirm, verifyCode, loading, error, success } = useConfirmPasswordReset();
+  const { confirm, verifyCode, status, isPending, isSuccess, error } =
+    useConfirmPasswordReset();
   const [password, setPassword] = useState('');
   const [result, setResult] = useState<unknown>();
 
@@ -109,7 +110,7 @@ await confirm(oobCode, newPassword);`}
         <>
           <Button
             variant="secondary"
-            disabled={loading || !oobCode}
+            disabled={isPending || !oobCode}
             onClick={async () => setResult(await verifyCode(oobCode ?? ''))}
           >
             verifyCode()
@@ -121,17 +122,17 @@ await confirm(oobCode, newPassword);`}
             onChange={(event) => setPassword(event.target.value)}
           />
           <Button
-            disabled={loading || !oobCode}
+            disabled={isPending || !oobCode}
             onClick={async () => setResult(await confirm(oobCode ?? '', password))}
           >
-            {loading ? 'Saving…' : 'Set new password'}
+            {isPending ? 'Saving…' : 'Set new password'}
           </Button>
-          {success ? <p className="text-sm text-green-600">Password updated.</p> : null}
+          {isSuccess ? <p className="text-sm text-green-600">Password updated.</p> : null}
         </>
       }
       result={result}
       error={error}
-      loading={loading}
+      status={status}
     />
   );
 }

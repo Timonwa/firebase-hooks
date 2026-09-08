@@ -9,8 +9,13 @@ import { HookSection } from '@/components/hook-section';
 
 export function UseReauthenticateSection() {
   const errorFormat = useErrorFormat();
-  const { reauthenticateWithPassword, reauthenticateWithProvider, loading, error } =
-    useReauthenticate({ formatErrorMessage: errorFormat.value });
+  const {
+    reauthenticateWithPassword,
+    reauthenticateWithProvider,
+    status,
+    isPending,
+    error,
+  } = useReauthenticate({ formatErrorMessage: errorFormat.value });
   const [password, setPassword] = useState('');
   const [result, setResult] = useState<unknown>();
 
@@ -42,14 +47,14 @@ if (check.success) await performSensitiveOperation();`,
           />
           <div className="flex flex-wrap gap-2">
             <Button
-              disabled={loading}
+              disabled={isPending}
               onClick={async () => setResult(await reauthenticateWithPassword(password))}
             >
               With password
             </Button>
             <Button
               variant="secondary"
-              disabled={loading}
+              disabled={isPending}
               onClick={async () =>
                 setResult(await reauthenticateWithProvider(new GoogleAuthProvider()))
               }
@@ -61,7 +66,7 @@ if (check.success) await performSensitiveOperation();`,
       }
       result={result}
       error={error}
-      loading={loading}
+      status={status}
     />
   );
 }

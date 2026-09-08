@@ -13,7 +13,7 @@ export function UseLogoutSection() {
     body: 'clearSession()',
     throwsHint: 'You stay signed in — check the header, the session is still there.',
   });
-  const { logout, loading, error } = useLogout({
+  const { logout, status, isPending, error } = useLogout({
     formatErrorMessage: errorFormat.value,
     onBeforeSignOut: onBeforeSignOut.value,
   });
@@ -31,7 +31,7 @@ export function UseLogoutSection() {
       }
       snippet={hookSnippet({
         hook: 'useLogout',
-        returns: 'logout, loading, error',
+        returns: 'logout, isPending, error',
         lines: [onBeforeSignOut.line, errorFormat.line],
         body: 'await logout();',
       })}
@@ -44,15 +44,15 @@ export function UseLogoutSection() {
       form={
         <Button
           variant="secondary"
-          disabled={loading}
+          disabled={isPending}
           onClick={async () => setResult(await logout())}
         >
-          {loading ? 'Signing out…' : 'Sign out'}
+          {isPending ? 'Signing out…' : 'Sign out'}
         </Button>
       }
       result={result}
       error={error}
-      loading={loading}
+      status={status}
     />
   );
 }

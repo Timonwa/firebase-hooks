@@ -15,7 +15,7 @@ export function UsePhoneSignInSection() {
     body: 'createSession(idToken)',
     throwsHint: 'Aborts once the code is confirmed.',
   });
-  const { sendCode, confirmCode, codeSent, loading, error } = usePhoneSignIn({
+  const { sendCode, confirmCode, codeSent, status, isPending, error } = usePhoneSignIn({
     recaptchaSize,
     formatErrorMessage: errorFormat.value,
     onIdToken: onIdToken.value,
@@ -74,10 +74,10 @@ await confirmCode(smsCode);`,
           />
           <div id="recaptcha-container" />
           <Button
-            disabled={loading}
+            disabled={isPending}
             onClick={async () => setResult(await sendCode(phone, 'recaptcha-container'))}
           >
-            {loading ? 'Sending…' : 'Send code'}
+            {isPending ? 'Sending…' : 'Send code'}
           </Button>
           {codeSent ? (
             <>
@@ -87,7 +87,7 @@ await confirmCode(smsCode);`,
                 onChange={(e) => setCode(e.target.value)}
               />
               <Button
-                disabled={loading}
+                disabled={isPending}
                 onClick={async () => setResult(await confirmCode(code))}
               >
                 Confirm code
@@ -98,7 +98,7 @@ await confirmCode(smsCode);`,
       }
       result={result}
       error={error}
-      loading={loading}
+      status={status}
     />
   );
 }

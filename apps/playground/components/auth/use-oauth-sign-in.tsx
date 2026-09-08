@@ -20,14 +20,26 @@ import { HookSection } from '@/components/hook-section';
  * the id passed in.
  */
 const PROVIDERS = {
-  google: { label: 'Google', source: 'new GoogleAuthProvider()', make: () => new GoogleAuthProvider() },
-  github: { label: 'GitHub', source: 'new GithubAuthProvider()', make: () => new GithubAuthProvider() },
+  google: {
+    label: 'Google',
+    source: 'new GoogleAuthProvider()',
+    make: () => new GoogleAuthProvider(),
+  },
+  github: {
+    label: 'GitHub',
+    source: 'new GithubAuthProvider()',
+    make: () => new GithubAuthProvider(),
+  },
   facebook: {
     label: 'Facebook',
     source: 'new FacebookAuthProvider()',
     make: () => new FacebookAuthProvider(),
   },
-  twitter: { label: 'X (Twitter)', source: 'new TwitterAuthProvider()', make: () => new TwitterAuthProvider() },
+  twitter: {
+    label: 'X (Twitter)',
+    source: 'new TwitterAuthProvider()',
+    make: () => new TwitterAuthProvider(),
+  },
   apple: {
     label: 'Apple',
     source: 'new OAuthProvider("apple.com")',
@@ -50,7 +62,7 @@ export function UseOAuthSignInSection() {
     body: 'createSession(idToken)',
     throwsHint: 'Aborts on the popup path and on the redirect path alike.',
   });
-  const { signIn, loading, error } = useOAuthSignIn({
+  const { signIn, status, isPending, error } = useOAuthSignIn({
     formatErrorMessage: errorFormat.value,
     onIdToken: onIdToken.value,
   });
@@ -72,7 +84,7 @@ export function UseOAuthSignInSection() {
       }
       snippet={hookSnippet({
         hook: 'useOAuthSignIn',
-        returns: 'signIn, loading, error',
+        returns: 'signIn, isPending, error',
         lines: [onIdToken.line, errorFormat.line],
         body:
           method === 'popup'
@@ -111,15 +123,15 @@ export function UseOAuthSignInSection() {
       }
       form={
         <Button
-          disabled={loading}
+          disabled={isPending}
           onClick={async () => setResult(await signIn(chosen.make(), { method }))}
         >
-          {loading ? 'Signing in…' : `Continue with ${chosen.label}`}
+          {isPending ? 'Signing in…' : `Continue with ${chosen.label}`}
         </Button>
       }
       result={result}
       error={error}
-      loading={loading}
+      status={status}
     />
   );
 }

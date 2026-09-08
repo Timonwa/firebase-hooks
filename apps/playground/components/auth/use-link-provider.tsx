@@ -9,9 +9,10 @@ import { HookSection } from '@/components/hook-section';
 
 export function UseLinkProviderSection() {
   const errorFormat = useErrorFormat();
-  const { linkWithProvider, linkWithPassword, loading, error } = useLinkProvider({
-    formatErrorMessage: errorFormat.value,
-  });
+  const { linkWithProvider, linkWithPassword, status, isPending, error } =
+    useLinkProvider({
+      formatErrorMessage: errorFormat.value,
+    });
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [result, setResult] = useState<unknown>();
@@ -37,7 +38,7 @@ await linkWithPassword(email, password);          // guest → password`,
       form={
         <>
           <Button
-            disabled={loading}
+            disabled={isPending}
             onClick={async () =>
               setResult(await linkWithProvider(new GoogleAuthProvider()))
             }
@@ -53,7 +54,7 @@ await linkWithPassword(email, password);          // guest → password`,
           />
           <Button
             variant="secondary"
-            disabled={loading}
+            disabled={isPending}
             onClick={async () => setResult(await linkWithPassword(email, password))}
           >
             Link email and password
@@ -62,7 +63,7 @@ await linkWithPassword(email, password);          // guest → password`,
       }
       result={result}
       error={error}
-      loading={loading}
+      status={status}
     />
   );
 }

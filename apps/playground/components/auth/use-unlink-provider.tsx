@@ -8,7 +8,7 @@ import { HookSection } from '@/components/hook-section';
 
 export function UseUnlinkProviderSection() {
   const errorFormat = useErrorFormat();
-  const { unlinkProvider, loading, error } = useUnlinkProvider({
+  const { unlinkProvider, status, isPending, error } = useUnlinkProvider({
     formatErrorMessage: errorFormat.value,
   });
   const [providerId, setProviderId] = useState('google.com');
@@ -20,7 +20,7 @@ export function UseUnlinkProviderSection() {
       why="Firebase refuses to unlink the last remaining method, so an account can't be locked out this way — the refusal arrives as an ordinary failure result you can show."
       snippet={hookSnippet({
         hook: 'useUnlinkProvider',
-        returns: 'unlinkProvider, loading, error',
+        returns: 'unlinkProvider, isPending, error',
         lines: [errorFormat.line],
         body: 'await unlinkProvider("google.com");',
       })}
@@ -34,7 +34,7 @@ export function UseUnlinkProviderSection() {
           />
           <Button
             variant="secondary"
-            disabled={loading}
+            disabled={isPending}
             onClick={async () => setResult(await unlinkProvider(providerId))}
           >
             Unlink
@@ -43,7 +43,7 @@ export function UseUnlinkProviderSection() {
       }
       result={result}
       error={error}
-      loading={loading}
+      status={status}
     />
   );
 }

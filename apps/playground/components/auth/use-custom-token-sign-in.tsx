@@ -14,7 +14,7 @@ export function UseCustomTokenSignInSection() {
     body: 'createSession(idToken)',
     throwsHint: 'The exchange is rolled back into a failed result.',
   });
-  const { signIn, loading, error } = useCustomTokenSignIn({
+  const { signIn, status, isPending, error } = useCustomTokenSignIn({
     formatErrorMessage: errorFormat.value,
     onIdToken: onIdToken.value,
   });
@@ -27,7 +27,7 @@ export function UseCustomTokenSignInSection() {
       why="Bridges an existing auth system into Firebase — your server mints a token with the Admin SDK, this exchanges it for a Firebase session."
       snippet={hookSnippet({
         hook: 'useCustomTokenSignIn',
-        returns: 'signIn, loading, error',
+        returns: 'signIn, isPending, error',
         lines: [onIdToken.line, errorFormat.line],
         body: `const { token } = await fetch("/api/firebase-token").then((r) => r.json());
 await signIn(token);`,
@@ -45,14 +45,17 @@ await signIn(token);`,
             value={token}
             onChange={(e) => setToken(e.target.value)}
           />
-          <Button disabled={loading} onClick={async () => setResult(await signIn(token))}>
-            {loading ? 'Signing in…' : 'Sign in with token'}
+          <Button
+            disabled={isPending}
+            onClick={async () => setResult(await signIn(token))}
+          >
+            {isPending ? 'Signing in…' : 'Sign in with token'}
           </Button>
         </>
       }
       result={result}
       error={error}
-      loading={loading}
+      status={status}
     />
   );
 }

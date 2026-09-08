@@ -28,7 +28,7 @@ export function UseEmailLinkSignInSection() {
     typeof window !== 'undefined'
       ? `${window.location.origin}/auth/callback`
       : 'http://localhost:3000/auth/callback';
-  const { sendLink, loading, error } = useEmailLinkSignIn({
+  const { sendLink, status, isPending, error } = useEmailLinkSignIn({
     actionCodeSettings: { url: returnUrl, handleCodeInApp: true },
     storageKey: storageKey.value,
     formatErrorMessage: errorFormat.value,
@@ -53,7 +53,7 @@ export function UseEmailLinkSignInSection() {
       }
       snippet={hookSnippet({
         hook: 'useEmailLinkSignIn',
-        returns: 'sendLink, loading, error',
+        returns: 'sendLink, isPending, error',
         lines: [
           `actionCodeSettings: { url: "${returnUrl}", handleCodeInApp: true },`,
           storageKey.line,
@@ -77,16 +77,16 @@ if (!result.success && result.needsEmail) showEmailField();`,
         <>
           <Field label="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
           <Button
-            disabled={loading}
+            disabled={isPending}
             onClick={async () => setResult(await sendLink(email))}
           >
-            {loading ? 'Sending…' : 'Send sign-in link'}
+            {isPending ? 'Sending…' : 'Send sign-in link'}
           </Button>
         </>
       }
       result={result}
       error={error}
-      loading={loading}
+      status={status}
     />
   );
 }

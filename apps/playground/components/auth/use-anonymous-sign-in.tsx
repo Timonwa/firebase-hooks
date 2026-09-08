@@ -14,7 +14,7 @@ export function UseAnonymousSignInSection() {
     body: 'createSession(idToken)',
     throwsHint: 'The guest session is not created.',
   });
-  const { signIn, loading, error } = useAnonymousSignIn({
+  const { signIn, status, isPending, error } = useAnonymousSignIn({
     formatErrorMessage: errorFormat.value,
     onIdToken: onIdToken.value,
   });
@@ -31,7 +31,7 @@ export function UseAnonymousSignInSection() {
       }
       snippet={hookSnippet({
         hook: 'useAnonymousSignIn',
-        returns: 'signIn, loading, error',
+        returns: 'signIn, isPending, error',
         lines: [onIdToken.line, errorFormat.line],
         body: 'await signIn();',
       })}
@@ -42,13 +42,13 @@ export function UseAnonymousSignInSection() {
         </>
       }
       form={
-        <Button disabled={loading} onClick={async () => setResult(await signIn())}>
-          {loading ? 'Signing in…' : 'Continue as guest'}
+        <Button disabled={isPending} onClick={async () => setResult(await signIn())}>
+          {isPending ? 'Signing in…' : 'Continue as guest'}
         </Button>
       }
       result={result}
       error={error}
-      loading={loading}
+      status={status}
     />
   );
 }

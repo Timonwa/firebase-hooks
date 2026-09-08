@@ -13,7 +13,7 @@ import { HookSection } from '@/components/hook-section';
 export function UseSendPasswordResetEmailSection() {
   const errorFormat = useErrorFormat();
   const actionCodeSettings = useActionCodeSettings();
-  const { send, loading, error, success, resetState } = useSendPasswordResetEmail({
+  const { send, status, isPending, isSuccess, error, reset } = useSendPasswordResetEmail({
     actionCodeSettings: actionCodeSettings.value,
     formatErrorMessage: errorFormat.value,
   });
@@ -25,14 +25,14 @@ export function UseSendPasswordResetEmailSection() {
       hook="useSendPasswordResetEmail"
       why={
         <>
-          <code>success</code> and <code>resetState</code> exist for the form that has to
+          <code>isSuccess</code> and <code>reset()</code> exist for the form that has to
           say “check your inbox”, then let someone try a different address without a stale
           success message sitting underneath.
         </>
       }
       snippet={hookSnippet({
         hook: 'useSendPasswordResetEmail',
-        returns: 'send, success, resetState',
+        returns: 'send, isSuccess, reset',
         lines: [actionCodeSettings.line, errorFormat.line],
         body: `await send(email);
 // success === true → "if an account exists, a link is on its way"`,
@@ -47,20 +47,23 @@ export function UseSendPasswordResetEmailSection() {
         <>
           <Field label="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
           <div className="flex gap-2">
-            <Button disabled={loading} onClick={async () => setResult(await send(email))}>
-              {loading ? 'Sending…' : 'Send reset email'}
+            <Button
+              disabled={isPending}
+              onClick={async () => setResult(await send(email))}
+            >
+              {isPending ? 'Sending…' : 'Send reset email'}
             </Button>
             <Button
               variant="secondary"
               onClick={() => {
-                resetState();
+                reset();
                 setResult(undefined);
               }}
             >
-              resetState()
+              reset()
             </Button>
           </div>
-          {success ? (
+          {isSuccess ? (
             <p className="text-sm text-green-600">
               If an account exists for {email}, a reset link is on its way.
             </p>
@@ -69,7 +72,7 @@ export function UseSendPasswordResetEmailSection() {
       }
       result={result}
       error={error}
-      loading={loading}
+      status={status}
     />
   );
 }

@@ -13,7 +13,7 @@ import { HookSection } from '@/components/hook-section';
 export function UseUpdateEmailSection() {
   const errorFormat = useErrorFormat();
   const actionCodeSettings = useActionCodeSettings();
-  const { update, loading, error, success } = useUpdateEmail({
+  const { update, status, isPending, isSuccess, error } = useUpdateEmail({
     actionCodeSettings: actionCodeSettings.value,
     formatErrorMessage: errorFormat.value,
   });
@@ -34,7 +34,7 @@ export function UseUpdateEmailSection() {
       }
       snippet={hookSnippet({
         hook: 'useUpdateEmail',
-        returns: 'update, loading, error, success',
+        returns: 'update, isPending, isSuccess, error',
         lines: [actionCodeSettings.line, errorFormat.line],
         body: `await update(newEmail, { currentPassword });
 // success === true → "check <newEmail> to confirm"`,
@@ -59,16 +59,16 @@ export function UseUpdateEmailSection() {
             onChange={(e) => setCurrentPassword(e.target.value)}
           />
           <Button
-            disabled={loading}
+            disabled={isPending}
             onClick={async () =>
               setResult(
                 await update(newEmail, currentPassword ? { currentPassword } : undefined),
               )
             }
           >
-            {loading ? 'Sending…' : 'Update email'}
+            {isPending ? 'Sending…' : 'Update email'}
           </Button>
-          {success ? (
+          {isSuccess ? (
             <p className="text-sm text-green-600">
               Check {newEmail} to confirm the change.
             </p>
@@ -77,7 +77,7 @@ export function UseUpdateEmailSection() {
       }
       result={result}
       error={error}
-      loading={loading}
+      status={status}
     />
   );
 }

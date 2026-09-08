@@ -10,7 +10,7 @@ import { PageIntro } from '@/components/page-intro';
 
 export default function EmailLinkCallbackPage() {
   const { auth, config } = useFirebase();
-  const { completeSignIn, loading, error } = useEmailLinkSignIn();
+  const { completeSignIn, status, isPending, error } = useEmailLinkSignIn();
   const [result, setResult] = useState<
     (Awaited<ReturnType<typeof completeSignIn>> & { needsEmail?: boolean }) | undefined
   >();
@@ -53,7 +53,7 @@ if (!result.success && result.needsEmail) {
   await completeSignIn(window.location.href, email);
 }`}
         form={
-          loading ? (
+          isPending ? (
             <p className="text-muted text-sm">Completing sign-in…</p>
           ) : needsEmail ? (
             <>
@@ -81,7 +81,7 @@ if (!result.success && result.needsEmail) {
         }
         result={result}
         error={error}
-        loading={loading}
+        status={status}
       />
     </>
   );

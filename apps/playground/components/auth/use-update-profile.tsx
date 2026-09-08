@@ -8,7 +8,7 @@ import { HookSection } from '@/components/hook-section';
 
 export function UseUpdateProfileSection() {
   const errorFormat = useErrorFormat();
-  const { update, loading, error, success } = useUpdateProfile({
+  const { update, status, isPending, isSuccess, error } = useUpdateProfile({
     formatErrorMessage: errorFormat.value,
   });
   const [displayName, setDisplayName] = useState('');
@@ -21,7 +21,7 @@ export function UseUpdateProfileSection() {
       why="Firebase treats profile fields as non-sensitive, so this is the one account operation that needs no reauthentication."
       snippet={hookSnippet({
         hook: 'useUpdateProfile',
-        returns: 'update, loading, error, success',
+        returns: 'update, isPending, isSuccess, error',
         lines: [errorFormat.line],
         body: 'await update({ displayName, photoURL });',
       })}
@@ -39,7 +39,7 @@ export function UseUpdateProfileSection() {
             onChange={(e) => setPhotoURL(e.target.value)}
           />
           <Button
-            disabled={loading}
+            disabled={isPending}
             onClick={async () =>
               setResult(
                 await update({
@@ -49,14 +49,14 @@ export function UseUpdateProfileSection() {
               )
             }
           >
-            {loading ? 'Saving…' : 'Update profile'}
+            {isPending ? 'Saving…' : 'Update profile'}
           </Button>
-          {success ? <p className="text-sm text-green-600">Profile updated.</p> : null}
+          {isSuccess ? <p className="text-sm text-green-600">Profile updated.</p> : null}
         </>
       }
       result={result}
       error={error}
-      loading={loading}
+      status={status}
     />
   );
 }

@@ -20,7 +20,7 @@ export function HookSection({
   form,
   result,
   error,
-  loading,
+  status,
 }: {
   hook: string;
   why: ReactNode;
@@ -31,8 +31,8 @@ export function HookSection({
   form: ReactNode;
   result?: unknown;
   error?: string | null;
-  /** The hook's own flag, shown live — it's a third of what every hook returns. */
-  loading?: boolean;
+  /** The hook's own status, shown live in the console. */
+  status?: string;
 }) {
   const failure =
     result && typeof result === 'object' && 'success' in result && !result.success
@@ -93,17 +93,19 @@ export function HookSection({
           </p>
           <div className="flex flex-col gap-3 p-4">{form}</div>
 
-          {/* The hook's own state, live. Watching `loading` flip is the clearest
+          {/* The hook's own state, live. Watching `status` move is the clearest
               demonstration that the hook owns this rather than you. */}
           <dl className="border-line text-muted flex flex-col gap-1 border-t border-b px-4 py-2 font-mono text-xs">
             <div className="flex gap-1.5">
-              <dt>loading</dt>
-              <dd className={loading ? 'text-accent font-semibold' : 'text-fg'}>
-                {String(Boolean(loading))}
+              <dt>status</dt>
+              <dd
+                className={status === 'pending' ? 'text-accent font-semibold' : 'text-fg'}
+              >
+                {status ?? 'idle'}
               </dd>
             </div>
             {/* Its own row, wrapping: a Firebase message is long enough that
-                sharing a line with `loading` truncated it to nothing useful. */}
+                sharing a line with `status` truncated it to nothing useful. */}
             <div className="flex min-w-0 gap-1.5">
               <dt className="shrink-0">error</dt>
               <dd className={`wrap-break-word ${error ? 'text-danger' : 'text-fg'}`}>
@@ -116,7 +118,7 @@ export function HookSection({
             Response
           </p>
           <div className="p-4">
-            {loading ? (
+            {status === 'pending' ? (
               <p className="text-accent text-sm">Running…</p>
             ) : result === undefined && !error ? (
               <p className="text-muted text-sm">Run it to see the result.</p>

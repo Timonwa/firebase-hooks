@@ -14,7 +14,7 @@ export function UseLoginSection() {
     body: 'createSession(idToken)',
     throwsHint: 'Sign-in aborts — the result comes back as a failure.',
   });
-  const { login, loading, error } = useLogin({
+  const { login, status, isPending, error } = useLogin({
     formatErrorMessage: errorFormat.value,
     onIdToken: onIdToken.value,
   });
@@ -36,7 +36,7 @@ export function UseLoginSection() {
       }
       snippet={hookSnippet({
         hook: 'useLogin',
-        returns: 'login, loading, error',
+        returns: 'login, isPending, error',
         lines: [onIdToken.line, errorFormat.line],
         body: `const result = await login(email, password);
 if (result.success) router.push("/dashboard");`,
@@ -57,16 +57,16 @@ if (result.success) router.push("/dashboard");`,
             onChange={(e) => setPassword(e.target.value)}
           />
           <Button
-            disabled={loading}
+            disabled={isPending}
             onClick={async () => setResult(await login(email, password))}
           >
-            {loading ? 'Signing in…' : 'Sign in'}
+            {isPending ? 'Signing in…' : 'Sign in'}
           </Button>
         </>
       }
       result={result}
       error={error}
-      loading={loading}
+      status={status}
     />
   );
 }
