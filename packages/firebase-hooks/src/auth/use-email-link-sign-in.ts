@@ -97,7 +97,8 @@ export function useEmailLinkSignIn(
 
 function useEmailLinkSignInBase(auth: Auth | null, options: UseEmailLinkSignInOptions) {
   const { storageKey = "emailForSignIn" } = options;
-  const { loading, error, setError, run } = useAuthTask(options);
+  const { status, isIdle, isPending, isSuccess, isError, error, reset, setError, run } =
+    useAuthTask(options);
   const onIdToken = useResolvedConfig("onIdToken", options.onIdToken);
   const actionCodeSettings = useResolvedConfig(
     "actionCodeSettings",
@@ -168,5 +169,15 @@ function useEmailLinkSignInBase(auth: Auth | null, options: UseEmailLinkSignInOp
     return result;
   };
 
-  return { sendLink, completeSignIn, loading, error, setError };
+  return {
+    sendLink,
+    completeSignIn,
+    status,
+    isIdle,
+    isPending,
+    isSuccess,
+    isError,
+    error,
+    reset,
+  };
 }

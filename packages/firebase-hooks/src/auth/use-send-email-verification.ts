@@ -22,7 +22,6 @@
 "use client";
 
 import { type ActionCodeSettings, type Auth, sendEmailVerification } from "firebase/auth";
-import { useState } from "react";
 import {
   type EmailSender,
   type HookErrorOptions,
@@ -66,16 +65,15 @@ function useSendEmailVerificationBase(
   auth: Auth | null,
   options: UseSendEmailVerificationOptions,
 ) {
-  const { loading, error, run } = useAuthTask(options);
+  const { status, isIdle, isPending, isSuccess, isError, error, reset, run } =
+    useAuthTask(options);
   const actionCodeSettings = useResolvedConfig(
     "actionCodeSettings",
     options.actionCodeSettings,
   );
   const sendEmail = useResolvedConfig("sendEmailVerification", options.sendEmail);
-  const [success, setSuccess] = useState(false);
 
   const send = async (): Promise<HookResult> => {
-    setSuccess(false);
     const result = await run(
       "send-email-verification",
       "Failed to send verification email",
@@ -91,9 +89,8 @@ function useSendEmailVerificationBase(
         return {};
       },
     );
-    if (result.success) setSuccess(true);
     return result;
   };
 
-  return { send, loading, error, success };
+  return { send, status, isIdle, isPending, isSuccess, isError, error, reset };
 }

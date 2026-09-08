@@ -70,7 +70,8 @@ export function usePhoneSignIn(
 }
 
 function usePhoneSignInBase(auth: Auth | null, options: UsePhoneSignInOptions) {
-  const { loading, error, run } = useAuthTask(options);
+  const { status, isIdle, isPending, isSuccess, isError, error, reset, run } =
+    useAuthTask(options);
   const onIdToken = useResolvedConfig("onIdToken", options.onIdToken);
   const [codeSent, setCodeSent] = useState(false);
   const confirmationRef = useRef<ConfirmationResult | null>(null);
@@ -111,5 +112,16 @@ function usePhoneSignInBase(auth: Auth | null, options: UsePhoneSignInOptions) {
       return { user: credential.user, credential };
     });
 
-  return { sendCode, confirmCode, codeSent, loading, error };
+  return {
+    sendCode,
+    confirmCode,
+    codeSent,
+    status,
+    isIdle,
+    isPending,
+    isSuccess,
+    isError,
+    error,
+    reset,
+  };
 }

@@ -28,6 +28,12 @@ export interface HookErrorOptions {
  */
 export type AsyncStatus = "pending" | "error" | "success";
 
+/**
+ * Where an action you call has got to. Unlike `AsyncStatus` it has an idle
+ * state, because nothing runs until you call the action.
+ */
+export type ActionStatus = "idle" | AsyncStatus;
+
 /** What failed, for the global `onError` observer. */
 export interface HookErrorContext {
   /** Stable id of the operation: "login", "oauth-sign-in", "update-password", … */

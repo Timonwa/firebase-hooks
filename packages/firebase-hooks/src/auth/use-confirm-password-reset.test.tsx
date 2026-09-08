@@ -27,7 +27,7 @@ describe("useConfirmPasswordReset", () => {
       "oob-1",
       "new-pw",
     );
-    expect(result.current.success).toBe(true);
+    expect(result.current.isSuccess).toBe(true);
   });
 
   it("an expired link fails verifyCode with error, code, and cause", async () => {
@@ -62,7 +62,7 @@ describe("useConfirmPasswordReset", () => {
       outcome = await result.current.confirm("oob-1", "123");
     });
     expect(outcome?.success).toBe(false);
-    expect(result.current.success).toBe(false);
+    expect(result.current.isSuccess).toBe(false);
     expect(result.current.error).toBe("Firebase: Error (auth/weak-password).");
   });
 
@@ -78,9 +78,9 @@ describe("useConfirmPasswordReset", () => {
       await result.current.confirm("oob-1", "123");
     });
     expect(result.current.error).not.toBe(null);
-    act(() => result.current.resetState());
+    act(() => result.current.reset());
     expect(result.current.error).toBe(null);
-    expect(result.current.success).toBe(false);
+    expect(result.current.isSuccess).toBe(false);
   });
 
   it("notifies onError with the flow-specific action ids — verify vs confirm", async () => {

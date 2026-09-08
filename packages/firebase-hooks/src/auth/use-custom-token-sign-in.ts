@@ -60,7 +60,8 @@ function useCustomTokenSignInBase(
   auth: Auth | null,
   options: UseCustomTokenSignInOptions,
 ) {
-  const { loading, error, run } = useAuthTask(options);
+  const { status, isIdle, isPending, isSuccess, isError, error, reset, run } =
+    useAuthTask(options);
   const onIdToken = useResolvedConfig("onIdToken", options.onIdToken);
 
   const signIn = (
@@ -72,5 +73,5 @@ function useCustomTokenSignInBase(
       return { user: credential.user, credential };
     });
 
-  return { signIn, loading, error };
+  return { signIn, status, isIdle, isPending, isSuccess, isError, error, reset };
 }

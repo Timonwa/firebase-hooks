@@ -56,7 +56,8 @@ export function useAnonymousSignIn(
 }
 
 function useAnonymousSignInBase(auth: Auth | null, options: UseAnonymousSignInOptions) {
-  const { loading, error, run } = useAuthTask(options);
+  const { status, isIdle, isPending, isSuccess, isError, error, reset, run } =
+    useAuthTask(options);
   const onIdToken = useResolvedConfig("onIdToken", options.onIdToken);
 
   const signIn = (): Promise<HookResult<{ user: User; credential: UserCredential }>> =>
@@ -66,5 +67,5 @@ function useAnonymousSignInBase(auth: Auth | null, options: UseAnonymousSignInOp
       return { user: credential.user, credential };
     });
 
-  return { signIn, loading, error };
+  return { signIn, status, isIdle, isPending, isSuccess, isError, error, reset };
 }

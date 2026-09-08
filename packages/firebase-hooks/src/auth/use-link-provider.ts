@@ -47,7 +47,8 @@ export function useLinkProvider(
 }
 
 function useLinkProviderBase(auth: Auth | null, options: HookErrorOptions) {
-  const { loading, error, run } = useAuthTask(options);
+  const { status, isIdle, isPending, isSuccess, isError, error, reset, run } =
+    useAuthTask(options);
 
   const linkWithProvider = (
     provider: FirebaseAuthProvider,
@@ -69,5 +70,15 @@ function useLinkProviderBase(auth: Auth | null, options: HookErrorOptions) {
       return { user: credential.user, credential };
     });
 
-  return { linkWithProvider, linkWithPassword, loading, error };
+  return {
+    linkWithProvider,
+    linkWithPassword,
+    status,
+    isIdle,
+    isPending,
+    isSuccess,
+    isError,
+    error,
+    reset,
+  };
 }

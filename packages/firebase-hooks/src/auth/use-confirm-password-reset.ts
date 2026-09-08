@@ -17,7 +17,6 @@
 "use client";
 
 import { type Auth, confirmPasswordReset, verifyPasswordResetCode } from "firebase/auth";
-import { useState } from "react";
 import {
   type HookErrorOptions,
   type HookResult,
@@ -46,8 +45,8 @@ export function useConfirmPasswordReset(
 }
 
 function useConfirmPasswordResetBase(auth: Auth | null, options: HookErrorOptions) {
-  const { loading, error, setError, run } = useAuthTask(options);
-  const [success, setSuccess] = useState(false);
+  const { status, isIdle, isPending, isSuccess, isError, error, reset, setError, run } =
+    useAuthTask(options);
 
   const verifyCode = (oobCode: string): Promise<HookResult<{ email: string }>> =>
     run(
@@ -60,7 +59,6 @@ function useConfirmPasswordResetBase(auth: Auth | null, options: HookErrorOption
     );
 
   const confirm = async (oobCode: string, newPassword: string): Promise<HookResult> => {
-    setSuccess(false);
     const result = await run(
       "confirm-password-reset",
       "Failed to reset password",
@@ -69,14 +67,18 @@ function useConfirmPasswordResetBase(auth: Auth | null, options: HookErrorOption
         return {};
       },
     );
-    if (result.success) setSuccess(true);
     return result;
   };
 
-  const resetState = () => {
-    setError(null);
-    setSuccess(false);
+  return {
+    confirm,
+    verifyCode,
+    status,
+    isIdle,
+    isPending,
+    isSuccess,
+    isError,
+    error,
+    reset,
   };
-
-  return { confirm, verifyCode, loading, error, success, resetState };
 }

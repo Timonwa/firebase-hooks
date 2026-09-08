@@ -17,7 +17,6 @@
 "use client";
 
 import { type Auth, updatePassword } from "firebase/auth";
-import { useState } from "react";
 import {
   type HookErrorOptions,
   type HookResult,
@@ -43,8 +42,8 @@ export function useUpdatePassword(
 }
 
 function useUpdatePasswordBase(auth: Auth | null, options: HookErrorOptions) {
-  const { loading, error, run } = useAuthTask(options);
-  const [success, setSuccess] = useState(false);
+  const { status, isIdle, isPending, isSuccess, isError, error, reset, run } =
+    useAuthTask(options);
 
   // Shaped like the SDK's `updatePassword(user, newPassword)` — the required
   // value leads, and the reauthentication this hook adds on top goes in the
@@ -53,16 +52,14 @@ function useUpdatePasswordBase(auth: Auth | null, options: HookErrorOptions) {
     newPassword: string,
     { currentPassword }: { currentPassword?: string } = {},
   ): Promise<HookResult> => {
-    setSuccess(false);
     const result = await run("update-password", "Failed to update password", async () => {
       const user = requireCurrentUser(auth);
       if (currentPassword) await reauthenticateUserWithPassword(user, currentPassword);
       await updatePassword(user, newPassword);
       return {};
     });
-    if (result.success) setSuccess(true);
     return result;
   };
 
-  return { update, loading, error, success };
+  return { update, status, isIdle, isPending, isSuccess, isError, error, reset };
 }

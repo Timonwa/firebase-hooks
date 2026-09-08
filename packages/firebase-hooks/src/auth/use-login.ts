@@ -64,7 +64,8 @@ export function useLogin(
 }
 
 function useLoginBase(auth: Auth | null, options: UseLoginOptions) {
-  const { loading, error, run } = useAuthTask(options);
+  const { status, isIdle, isPending, isSuccess, isError, error, reset, run } =
+    useAuthTask(options);
   const onIdToken = useResolvedConfig("onIdToken", options.onIdToken);
 
   const login = (
@@ -81,5 +82,5 @@ function useLoginBase(auth: Auth | null, options: UseLoginOptions) {
       return { user: credential.user, credential };
     });
 
-  return { login, loading, error };
+  return { login, status, isIdle, isPending, isSuccess, isError, error, reset };
 }

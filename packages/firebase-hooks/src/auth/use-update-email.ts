@@ -25,7 +25,6 @@ import {
   type Auth,
   verifyBeforeUpdateEmail,
 } from "firebase/auth";
-import { useState } from "react";
 import {
   type HookErrorOptions,
   type HookResult,
@@ -57,12 +56,12 @@ export function useUpdateEmail(
 }
 
 function useUpdateEmailBase(auth: Auth | null, options: UseUpdateEmailOptions) {
-  const { loading, error, run } = useAuthTask(options);
+  const { status, isIdle, isPending, isSuccess, isError, error, reset, run } =
+    useAuthTask(options);
   const actionCodeSettings = useResolvedConfig(
     "actionCodeSettings",
     options.actionCodeSettings,
   );
-  const [success, setSuccess] = useState(false);
 
   // Shaped like the SDK's `verifyBeforeUpdateEmail(user, newEmail, …)` — the
   // required value leads, and the reauthentication this hook adds goes after.
@@ -70,16 +69,14 @@ function useUpdateEmailBase(auth: Auth | null, options: UseUpdateEmailOptions) {
     newEmail: string,
     { currentPassword }: { currentPassword?: string } = {},
   ): Promise<HookResult> => {
-    setSuccess(false);
     const result = await run("update-email", "Failed to update email", async () => {
       const user = requireCurrentUser(auth);
       if (currentPassword) await reauthenticateUserWithPassword(user, currentPassword);
       await verifyBeforeUpdateEmail(user, newEmail, actionCodeSettings);
       return {};
     });
-    if (result.success) setSuccess(true);
     return result;
   };
 
-  return { update, loading, error, success };
+  return { update, status, isIdle, isPending, isSuccess, isError, error, reset };
 }

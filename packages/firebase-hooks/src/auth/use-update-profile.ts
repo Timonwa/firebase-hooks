@@ -13,7 +13,6 @@
 "use client";
 
 import { type Auth, updateProfile } from "firebase/auth";
-import { useState } from "react";
 import {
   type HookErrorOptions,
   type HookResult,
@@ -38,21 +37,19 @@ export function useUpdateProfile(
 }
 
 function useUpdateProfileBase(auth: Auth | null, options: HookErrorOptions) {
-  const { loading, error, run } = useAuthTask(options);
-  const [success, setSuccess] = useState(false);
+  const { status, isIdle, isPending, isSuccess, isError, error, reset, run } =
+    useAuthTask(options);
 
   const update = async (profile: {
     displayName?: string | null;
     photoURL?: string | null;
   }): Promise<HookResult> => {
-    setSuccess(false);
     const result = await run("update-profile", "Failed to update profile", async () => {
       await updateProfile(requireCurrentUser(auth), profile);
       return {};
     });
-    if (result.success) setSuccess(true);
     return result;
   };
 
-  return { update, loading, error, success };
+  return { update, status, isIdle, isPending, isSuccess, isError, error, reset };
 }

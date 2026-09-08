@@ -66,7 +66,8 @@ export function useSignup(
 
 function useSignupBase(auth: Auth | null, options: UseSignupOptions) {
   const { sendVerificationEmail = true } = options;
-  const { loading, error, run } = useAuthTask(options);
+  const { status, isIdle, isPending, isSuccess, isError, error, reset, run } =
+    useAuthTask(options);
   const onIdToken = useResolvedConfig("onIdToken", options.onIdToken);
 
   const signup = (
@@ -90,5 +91,5 @@ function useSignupBase(auth: Auth | null, options: UseSignupOptions) {
       return { user: credential.user, credential };
     });
 
-  return { signup, loading, error };
+  return { signup, status, isIdle, isPending, isSuccess, isError, error, reset };
 }

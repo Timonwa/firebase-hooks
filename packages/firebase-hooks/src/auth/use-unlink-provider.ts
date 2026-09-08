@@ -38,7 +38,8 @@ export function useUnlinkProvider(
 }
 
 function useUnlinkProviderBase(auth: Auth | null, options: HookErrorOptions) {
-  const { loading, error, run } = useAuthTask(options);
+  const { status, isIdle, isPending, isSuccess, isError, error, reset, run } =
+    useAuthTask(options);
 
   const unlinkProvider = (providerId: string): Promise<HookResult<{ user: User }>> =>
     run("unlink-provider", "Failed to unlink provider", async () => {
@@ -46,5 +47,5 @@ function useUnlinkProviderBase(auth: Auth | null, options: HookErrorOptions) {
       return { user };
     });
 
-  return { unlinkProvider, loading, error };
+  return { unlinkProvider, status, isIdle, isPending, isSuccess, isError, error, reset };
 }

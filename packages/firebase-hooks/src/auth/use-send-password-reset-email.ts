@@ -27,7 +27,6 @@ import {
   type Auth,
   sendPasswordResetEmail,
 } from "firebase/auth";
-import { useState } from "react";
 import {
   type EmailSender,
   type HookErrorOptions,
@@ -68,16 +67,15 @@ function useSendPasswordResetEmailBase(
   auth: Auth | null,
   options: UseSendPasswordResetEmailOptions,
 ) {
-  const { loading, error, setError, run } = useAuthTask(options);
+  const { status, isIdle, isPending, isSuccess, isError, error, reset, setError, run } =
+    useAuthTask(options);
   const actionCodeSettings = useResolvedConfig(
     "actionCodeSettings",
     options.actionCodeSettings,
   );
   const sendEmail = useResolvedConfig("sendPasswordReset", options.sendEmail);
-  const [success, setSuccess] = useState(false);
 
   const send = async (email: string): Promise<HookResult> => {
-    setSuccess(false);
     const result = await run(
       "send-password-reset-email",
       "Failed to send reset email",
@@ -90,14 +88,8 @@ function useSendPasswordResetEmailBase(
         return {};
       },
     );
-    if (result.success) setSuccess(true);
     return result;
   };
 
-  const resetState = () => {
-    setError(null);
-    setSuccess(false);
-  };
-
-  return { send, loading, error, success, resetState };
+  return { send, status, isIdle, isPending, isSuccess, isError, error, reset };
 }

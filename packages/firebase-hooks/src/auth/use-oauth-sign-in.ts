@@ -67,7 +67,8 @@ export function useOAuthSignIn(
 }
 
 function useOAuthSignInBase(auth: Auth | null, options: UseOAuthSignInOptions) {
-  const { loading, error, run } = useAuthTask(options);
+  const { status, isIdle, isPending, isSuccess, isError, error, reset, run } =
+    useAuthTask(options);
   // getRedirectResult consumes the pending result — guard Strict Mode's double effect.
   const redirectHandledRef = useRef(false);
   // Read the callback through a ref so an inline option object can't re-trigger the effect.
@@ -101,5 +102,5 @@ function useOAuthSignInBase(auth: Auth | null, options: UseOAuthSignInOptions) {
       return { user: credential.user, credential };
     });
 
-  return { signIn, loading, error };
+  return { signIn, status, isIdle, isPending, isSuccess, isError, error, reset };
 }

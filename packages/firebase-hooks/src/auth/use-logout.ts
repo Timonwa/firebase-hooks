@@ -45,7 +45,8 @@ export function useLogout(
 }
 
 function useLogoutBase(auth: Auth | null, options: UseLogoutOptions) {
-  const { loading, error, run } = useAuthTask(options);
+  const { status, isIdle, isPending, isSuccess, isError, error, reset, run } =
+    useAuthTask(options);
   const onBeforeSignOut = useResolvedConfig("onBeforeSignOut", options.onBeforeSignOut);
 
   const logout = (): Promise<HookResult> =>
@@ -55,5 +56,5 @@ function useLogoutBase(auth: Auth | null, options: UseLogoutOptions) {
       return {};
     });
 
-  return { logout, loading, error };
+  return { logout, status, isIdle, isPending, isSuccess, isError, error, reset };
 }

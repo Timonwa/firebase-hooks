@@ -17,9 +17,9 @@ describe("useSendPasswordResetEmail", () => {
       await result.current.send("a@b.c");
     });
     expect(sendPasswordResetEmail).toHaveBeenCalled();
-    expect(result.current.success).toBe(true);
-    act(() => result.current.resetState());
-    expect(result.current.success).toBe(false);
+    expect(result.current.isSuccess).toBe(true);
+    act(() => result.current.reset());
+    expect(result.current.isSuccess).toBe(false);
   });
 
   it("hook-level actionCodeSettings wins over the provider default; null opts out", async () => {
@@ -73,7 +73,7 @@ describe("useSendPasswordResetEmail", () => {
       code: "auth/invalid-email",
       cause: firebaseError,
     });
-    expect(result.current.success).toBe(false);
+    expect(result.current.isSuccess).toBe(false);
     expect(result.current.error).toBe("Firebase: Error (auth/invalid-email).");
   });
 });
@@ -91,7 +91,7 @@ describe("sendEmail", () => {
 
     expect(sendEmail).toHaveBeenCalledWith(expect.objectContaining({ email: "a@b.c" }));
     expect(sendPasswordResetEmail).not.toHaveBeenCalled();
-    expect(result.current.success).toBe(true);
+    expect(result.current.isSuccess).toBe(true);
   });
 
   it("a throwing sender fails like any other error, leaving success false", async () => {
@@ -108,7 +108,7 @@ describe("sendEmail", () => {
     });
 
     expect(outcome).toMatchObject({ success: false, error: "rate limited" });
-    expect(result.current.success).toBe(false);
+    expect(result.current.isSuccess).toBe(false);
   });
 
   it("needs no actionCodeSettings, since Firebase is not the sender", async () => {
@@ -121,6 +121,6 @@ describe("sendEmail", () => {
       await result.current.send("a@b.c");
     });
 
-    expect(result.current.success).toBe(true);
+    expect(result.current.isSuccess).toBe(true);
   });
 });

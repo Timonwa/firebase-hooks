@@ -57,7 +57,8 @@ export function useDeleteAccount(
 }
 
 function useDeleteAccountBase(auth: Auth | null, options: UseDeleteAccountOptions) {
-  const { loading, error, run } = useAuthTask(options);
+  const { status, isIdle, isPending, isSuccess, isError, error, reset, run } =
+    useAuthTask(options);
 
   const deleteAccount = ({
     currentPassword,
@@ -72,5 +73,5 @@ function useDeleteAccountBase(auth: Auth | null, options: UseDeleteAccountOption
       return {};
     });
 
-  return { deleteAccount, loading, error };
+  return { deleteAccount, status, isIdle, isPending, isSuccess, isError, error, reset };
 }

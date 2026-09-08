@@ -131,5 +131,13 @@ function useVerifyEmailBase(
       });
   }, [auth, oobCode, resolveMessage, notifyError]);
 
-  return { status, error, code, cause };
+  return {
+    status,
+    isPending: status === "pending",
+    isSuccess: status === "success",
+    isError: status === "error",
+    error,
+    code,
+    cause,
+  };
 }

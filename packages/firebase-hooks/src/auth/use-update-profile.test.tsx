@@ -18,7 +18,7 @@ describe("useUpdateProfile", () => {
       await result.current.update({ displayName: "Ada" });
     });
     expect(updateProfile).toHaveBeenCalledWith(user, { displayName: "Ada" });
-    expect(result.current.success).toBe(true);
+    expect(result.current.isSuccess).toBe(true);
   });
 
   it("a failed update keeps success false and carries code and cause", async () => {
@@ -37,7 +37,7 @@ describe("useUpdateProfile", () => {
       code: "auth/network-request-failed",
       cause: firebaseError,
     });
-    expect(result.current.success).toBe(false);
+    expect(result.current.isSuccess).toBe(false);
     expect(result.current.error).toBe("Firebase: Error (auth/network-request-failed).");
   });
 
