@@ -1,0 +1,94 @@
+---
+title: One page for every emailed link
+description: Firebase sends sign-in, password-reset and verification links to a single URL. Dispatch on mode and hand each one to its hook.
+---
+
+Firebase emails three kinds of link, and by default they all land on Firebase's own hosted pages. To handle them in your app instead, you point Firebase at **one** URL — every link goes there, with a `mode` parameter saying which flow it is.
+
+So you write one page that dispatches on `mode`, and a hook handles each branch.
+
+| `mode` | Hook | Also in the URL |
+| --- | --- | --- |
+| `signIn` | [`useEmailLinkSignIn`](/docs/auth/use-email-link-sign-in) | the whole URL is the credential |
+| `resetPassword` | [`useConfirmPasswordReset`](/docs/auth/use-confirm-password-reset) | `oobCode` |
+| `verifyEmail` | [`useVerifyEmail`](/docs/auth/use-verify-email) | `oobCode` |
+
+## The page
+
+```tsx title="app/auth/action/page.tsx"
+'use client';
+
+import {
+  useConfirmPasswordReset,
+  useEmailLinkSignIn,
+  useVerifyEmail,
+} from '@timonwa/firebase-hooks/auth';
+import { useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
+
+export default function AuthActionPage() {
+  return (
+    <Suspense fallback={<Spinner />}>
+      <AuthAction />
+    </Suspense>
+  );
+}
+
+function AuthAction() {
+  const params = useSearchParams();
+  const mode = params.get('mode');
+  const oobCode = params.get('oobCode');
+
+  if (mode === 'signIn') return <CompleteSignIn />;
+  if (mode === 'resetPassword') return <ResetPassword oobCode={oobCode} />;
+  if (mode === 'verifyEmail') return <VerifyEmail oobCode={oobCode} />;
+  return <p>This link isn't one we recognise.</p>;
+}
+```
+
+Each branch is then the ordinary hook usage:
+
+```tsx
+function VerifyEmail({ oobCode }: { oobCode: string | null }) {
+  const { status, error } = useVerifyEmail(oobCode);
+
+  if (status === 'processing') return <Spinner />;
+  if (status === 'failed') return <ErrorState message={error} />;
+  return <p>Email verified.</p>;
+}
+
+function ResetPassword({ oobCode }: { oobCode: string | null }) {
+  const { verifyCode, confirm, loading, error } = useConfirmPasswordReset();
+  // verifyCode(oobCode) first — it returns the account email, so the form can
+  // say whose password is being reset before asking for a new one.
+}
+
+function CompleteSignIn() {
+  const { completeSignIn } = useEmailLinkSignIn();
+  // Pass the full URL, not the oobCode: the link itself is the credential.
+  // A failure with needsEmail means the link opened on another device.
+}
+```
+
+## Set the action URL per template
+
+This is the step that silently half-works. The action URL is configured **per email template**, not once for the project — **Authentication → Templates**, then edit each one.
+
+Set it for the sign-in template only and password resets keep going to Firebase's hosted page, with no error anywhere to tell you. If two of your three flows work and one doesn't, this is why.
+
+Both `resetPassword` and `verifyEmail` need it. `signIn` is the exception: [`useEmailLinkSignIn`](/docs/auth/use-email-link-sign-in) passes its return URL in `actionCodeSettings` at send time, so it doesn't depend on the console setting.
+
+Add your domain under **Authentication → Settings → Authorized domains**. `localhost` is there by default.
+
+## In Next.js, wrap it in Suspense
+
+`useSearchParams` opts the route out of prerendering unless it sits under a `<Suspense>` boundary — without one the build fails. That's the only reason the page above splits into two components: the outer one exists to hold the boundary.
+
+## Testing it
+
+The codes are single-use and expire, so you need a real email each time. Two things make that less painful:
+
+- Verification links can be re-sent from the app with [`useSendEmailVerification`](/docs/auth/use-send-email-verification).
+- A reset code can be checked without spending it — `verifyCode(oobCode)` validates and returns the email; only `confirm` consumes it.
+
+`useVerifyEmail` applies its code on mount and is guarded against React Strict Mode's double effect, which would otherwise spend the code on the first run and report failure on the second.
