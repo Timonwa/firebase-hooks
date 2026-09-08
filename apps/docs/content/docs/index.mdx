@@ -3,7 +3,7 @@ title: Introduction
 description: Typed React hooks for Firebase — one hook per flow, with its state, errors, and callbacks handled.
 ---
 
-Each hook runs one flow end to end. It holds its own loading, error, and success state, and sets up the browser pieces and callbacks the flow needs.
+Each hook runs one flow end to end. It holds its own status and error, and sets up the browser pieces and callbacks the flow needs.
 
 Every action returns a result you can branch on — `{ success: true, … }` when it works, `{ success: false, error, code, cause }` when it doesn't. Firebase's own response is on both paths, unmodified.
 

@@ -8,7 +8,7 @@
 
 ---
 
-Each hook runs one flow end to end. It holds its own loading, error, and success state, and sets up the browser pieces and callbacks the flow needs. Every action returns a result you can branch on: `{ success: true, … }` when it works, `{ success: false, error, code, cause }` when it doesn't. Firebase's own response is on both paths.
+Each hook runs one flow end to end. It holds its own status and error, and sets up the browser pieces and callbacks the flow needs. Every action returns a result you can branch on: `{ success: true, … }` when it works, `{ success: false, error, code, cause }` when it doesn't. Firebase's own response is on both paths.
 
 Zero dependencies — `firebase` and `react` are peers.
 
@@ -48,7 +48,7 @@ Hooks below it need nothing passed:
 import { useLogin } from "@timonwa/firebase-hooks/auth";
 
 function LoginForm() {
-  const { login, loading, error } = useLogin();
+  const { login, isPending, error } = useLogin();
 
   async function onSubmit(email: string, password: string) {
     const result = await login(email, password);
@@ -89,7 +89,7 @@ Every hook has its own page — signature, options, and a worked example — in 
 One contract, so learning one hook is learning them all:
 
 - **Every hook needs an `Auth` instance** — taken from `AuthProvider`, or passed in as the first argument to override it. No global, no hidden singleton. Passing `null` means "not ready yet", never "use the provider's", so an action called before `auth` exists fails cleanly with `{ success: false, error }`.
-- **Every action resolves to `HookResult`** — `{ success: true, ...data }` or `{ success: false, error, code, cause }`. The hook's `error` state carries the same message for rendering, and `loading` and `success` track the action. See [Error handling](#error-handling).
+- **Every action resolves to `HookResult`** — `{ success: true, ...data }` or `{ success: false, error, code, cause }`. The hook's `status` — `idle`, `pending`, `success`, `error` — tracks the action, with `isPending`/`isSuccess`/`isError` derived from it and `reset()` to go back to idle; `error` carries the message for rendering. See [Error handling](#error-handling).
 - **`onIdToken(idToken, user)` runs after a successful sign-in**, with a freshly minted token. Throw inside it to abort the flow; the error surfaces like any other.
 - **`currentPassword` triggers reauthentication** in `useUpdatePassword`, `useUpdateEmail`, and `useDeleteAccount`. `useReauthenticate` exposes the same step for custom flows.
 - **Provider options are defaults, hook options win.** `onIdToken`, `onBeforeSignOut`, `actionCodeSettings`, `formatErrorMessage`, and the `onError` observer can all be set once on `AuthProvider`; a hook's own option overrides the provider, and an explicit `null` opts that flow out entirely:

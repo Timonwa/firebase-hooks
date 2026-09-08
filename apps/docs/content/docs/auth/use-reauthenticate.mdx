@@ -14,7 +14,7 @@ if (check.success) await performSensitiveOperation();
 
 ## Returns
 
-`reauthenticateWithPassword(currentPassword)` and `reauthenticateWithProvider(provider)` each resolve to `{ success: true }` or a failure result. Also exposes `loading` and `error`.
+`reauthenticateWithPassword(currentPassword)` and `reauthenticateWithProvider(provider)` each resolve to `{ success: true }` or a failure result. Also exposes `status`, `isPending`, `error`, and `reset`.
 
 ## When you need it
 

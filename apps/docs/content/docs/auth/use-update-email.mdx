@@ -4,25 +4,25 @@ description: Change the email via verify-before-update.
 ---
 
 ```tsx
-const { update, success } = useUpdateEmail();
+const { update, isSuccess } = useUpdateEmail();
 
 await update(newEmail, { currentPassword }); // password account
 await update(newEmail); // OAuth account
 
 {
-  success && <p>Check {newEmail} to confirm the change.</p>;
+  isSuccess && <p>Check {newEmail} to confirm the change.</p>;
 }
 ```
 
 ## Returns
 
-`update(newEmail, { currentPassword? })` resolves to `{ success: true }` or a failure result. Also exposes `loading`, `error`, and `success`.
+`update(newEmail, { currentPassword? })` resolves to `{ success: true }` or a failure result. Also exposes `status`, `isPending`, `isSuccess`, `error`, and `reset`.
 
-## `success` means "email sent"
+## `isSuccess` means "email sent"
 
 This uses Firebase's `verifyBeforeUpdateEmail`. Firebase mails a verification link to the **new** address, and the change lands only when it's clicked.
 
-So `success` means the verification email went out — not that the email changed. Word your UI accordingly.
+So `isSuccess` means the verification email went out — not that the email changed. Word your UI accordingly.
 
 ## Reauthentication
 

@@ -62,6 +62,14 @@ type AsyncStatus = 'pending' | 'error' | 'success';
 
 There is no idle state — the work starts before you can render, so `pending` is where it begins. [`useVerifyEmail`](/docs/auth/use-verify-email) reports it as `VerifyEmailStatus`, an alias of this.
 
+Actions you call get one more state, because nothing runs until you call them:
+
+```ts
+type ActionStatus = 'idle' | AsyncStatus;
+```
+
+Every action hook returns `status: ActionStatus` with `isIdle`, `isPending`, `isSuccess` and `isError` derived from it, plus `reset()`. Two vocabularies rather than one is deliberate — the same split TanStack Query makes between a query's status and a mutation's.
+
 Render the three branches and you've handled every case:
 
 ```tsx

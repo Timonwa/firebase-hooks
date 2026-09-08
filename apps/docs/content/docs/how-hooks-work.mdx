@@ -39,7 +39,7 @@ Actions never throw. Each resolves to a `HookResult`:
 { success: false, error, code, cause }
 ```
 
-The hook's own `error` state carries the same message for rendering, and `loading` tracks the action. Some hooks also expose `success` and `resetState`.
+Alongside the result, every action hook reports where it is: `status` is `"idle" | "pending" | "success" | "error"`, with `isIdle`, `isPending`, `isSuccess` and `isError` derived from it, `error` carrying the message for rendering, and `reset()` returning to idle — for a form the user retries, so a stale message doesn't sit under the new attempt. It's the same shape as TanStack Query's mutation result. Hooks that act on mount, like `useVerifyEmail`, report [`AsyncStatus`](/docs/core/hook-result#asyncstatus) instead: the same words without `idle`.
 
 ```tsx
 const result = await login(email, password);
@@ -61,9 +61,9 @@ import {
 } from '@timonwa/firebase-hooks/auth';
 
 export function useAppLogin(options?: UseLoginOptions): UseLoginResult {
-  const { login, loading, error } = useLogin(options);
+  const { login, isPending, error } = useLogin(options);
   // …your own state on top
-  return { login, loading, error };
+  return { login, isPending, error };
 }
 ```
 

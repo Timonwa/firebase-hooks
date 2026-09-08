@@ -23,7 +23,7 @@ const result = await confirmCode(smsCode);
 
 `confirmCode(code)` resolves to `{ success: true, user, credential }` or a failure result.
 
-`codeSent` flips true after a successful send. Also exposes `loading` and `error`.
+`codeSent` flips true after a successful send. Also exposes `status`, `isPending`, `error`, and `reset`.
 
 ## The reCAPTCHA verifier
 

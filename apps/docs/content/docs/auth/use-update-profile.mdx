@@ -4,14 +4,14 @@ description: Display name and photo URL.
 ---
 
 ```tsx
-const { update, loading } = useUpdateProfile();
+const { update, isPending } = useUpdateProfile();
 
 await update({ displayName: fullName, photoURL: avatarUrl });
 ```
 
 ## Returns
 
-`update({ displayName?, photoURL? })` resolves to `{ success: true }` or a failure result. Both fields accept `null` to clear them. Also exposes `loading`, `error`, and `success`.
+`update({ displayName?, photoURL? })` resolves to `{ success: true }` or a failure result. Both fields accept `null` to clear them. Also exposes `status`, `isPending`, `isSuccess`, `error`, and `reset`.
 
 ## Notes
 

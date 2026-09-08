@@ -14,7 +14,7 @@ await linkWithPassword(email, password); // guest -> email/password account
 
 `linkWithProvider(provider)` links an OAuth provider via popup. `linkWithPassword(email, password)` links an email/password credential.
 
-Both resolve to `{ success: true, user, credential }` or a failure result. Also exposes `loading` and `error`.
+Both resolve to `{ success: true, user, credential }` or a failure result. Also exposes `status`, `isPending`, `error`, and `reset`.
 
 ## Upgrading a guest
 

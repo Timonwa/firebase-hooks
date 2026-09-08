@@ -6,16 +6,16 @@ description: The resend-verification-email button.
 Sends, or re-sends, the verification email to the signed-in user.
 
 ```tsx
-const { send, loading, success } = useSendEmailVerification();
+const { send, isPending, isSuccess } = useSendEmailVerification();
 
-<button onClick={send} disabled={loading}>
+<button onClick={send} disabled={isPending}>
   Resend verification email
 </button>;
 ```
 
 ## Returns
 
-`send()` resolves to `{ success: true }` or a failure result. Also exposes `loading`, `error`, and `success`.
+`send()` resolves to `{ success: true }` or a failure result. Also exposes `status`, `isPending`, `isSuccess`, `error`, and `reset`.
 
 ## Notes
 

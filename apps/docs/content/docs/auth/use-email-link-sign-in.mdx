@@ -26,7 +26,7 @@ Set the `sendEmail` option to send it from your own API instead — the same opt
 
 `completeSignIn(url, email?)` resolves to `{ success: true, user, credential }` or a failure result, exported as `CompleteSignInResult` — a failure there also carries `needsEmail`.
 
-Also exposes `loading` and `error`.
+Also exposes `status`, `isPending`, `error`, and `reset`.
 
 ## When the link opens on another device
 

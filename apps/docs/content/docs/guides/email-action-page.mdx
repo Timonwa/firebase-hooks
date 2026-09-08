@@ -70,7 +70,7 @@ function VerifyEmail({ oobCode }: { oobCode: string | null }) {
 }
 
 function ResetPassword({ oobCode }: { oobCode: string | null }) {
-  const { verifyCode, confirm, loading, error } = useConfirmPasswordReset();
+  const { verifyCode, confirm, isPending, error } = useConfirmPasswordReset();
   // verifyCode(oobCode) first — it returns the account email, so the form can
   // say whose password is being reset before asking for a new one.
 }
