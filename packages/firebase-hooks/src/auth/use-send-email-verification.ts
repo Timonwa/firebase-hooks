@@ -5,11 +5,18 @@
  *
  * @param auth - Firebase `Auth` instance, or null while it initialises
  * @param options.actionCodeSettings - Where the emailed verification link lands
+ * @param options.sendEmail - Replace the client-side sender, called with the user's address
  * @returns `{ send, loading, error, success }`
  *
  * @example
- * const { send, loading, success } = useSendEmailVerification(auth);
+ * const { send, loading, success } = useSendEmailVerification();
  * <button onClick={send} disabled={loading}>Resend verification email</button>
+ *
+ * @example
+ * // Sent by your own API, so the flow goes through your rate limiter
+ * const { send } = useSendEmailVerification({
+ *   sendEmail: (email) => requestVerification(email),
+ * });
  */
 
 "use client";
@@ -28,6 +35,12 @@ import {
 export interface UseSendEmailVerificationOptionsProps extends HookErrorOptions {
   /** Where the emailed link points back to. Overrides the provider; `null` opts out. */
   actionCodeSettings?: ActionCodeSettings | null;
+  /**
+   * Replace the sender — e.g. your own API emails the verification link
+   * instead of Firebase, so the send goes through your rate limiter. Receives
+   * the signed-in user's address; `success` and `error` behave the same way.
+   */
+  sendEmail?: (email: string) => Promise<void>;
 }
 
 export function useSendEmailVerification(
@@ -61,7 +74,15 @@ function useSendEmailVerificationBase(
       "send-email-verification",
       "Failed to send verification email",
       async () => {
-        await sendEmailVerification(requireCurrentUser(auth), actionCodeSettings);
+        const user = requireCurrentUser(auth);
+        if (options.sendEmail) {
+          // Your sender needs an address, which `send()` doesn't take — it
+          // comes off the signed-in user, so a phone-only account can't use it.
+          if (!user.email) throw new Error("This account has no email address");
+          await options.sendEmail(user.email);
+        } else {
+          await sendEmailVerification(user, actionCodeSettings);
+        }
         return {};
       },
     );

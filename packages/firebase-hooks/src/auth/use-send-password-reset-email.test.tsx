@@ -77,3 +77,50 @@ describe("useSendPasswordResetEmail", () => {
     expect(result.current.error).toBe("Firebase: Error (auth/invalid-email).");
   });
 });
+
+describe("sendEmail", () => {
+  it("delegates the send and never touches Firebase", async () => {
+    const sendEmail = vi.fn(async () => {});
+    const { result } = renderHook(() =>
+      useSendPasswordResetEmail(makeAuth(), { sendEmail }),
+    );
+
+    await act(async () => {
+      await result.current.send("a@b.c");
+    });
+
+    expect(sendEmail).toHaveBeenCalledWith("a@b.c");
+    expect(sendPasswordResetEmail).not.toHaveBeenCalled();
+    expect(result.current.success).toBe(true);
+  });
+
+  it("a throwing sender fails like any other error, leaving success false", async () => {
+    const sendEmail = vi.fn(async () => {
+      throw new Error("rate limited");
+    });
+    const { result } = renderHook(() =>
+      useSendPasswordResetEmail(makeAuth(), { sendEmail }),
+    );
+
+    let outcome: unknown;
+    await act(async () => {
+      outcome = await result.current.send("a@b.c");
+    });
+
+    expect(outcome).toMatchObject({ success: false, error: "rate limited" });
+    expect(result.current.success).toBe(false);
+  });
+
+  it("needs no actionCodeSettings, since Firebase is not the sender", async () => {
+    const sendEmail = vi.fn(async () => {});
+    const { result } = renderHook(() =>
+      useSendPasswordResetEmail(makeAuth(), { sendEmail, actionCodeSettings: null }),
+    );
+
+    await act(async () => {
+      await result.current.send("a@b.c");
+    });
+
+    expect(result.current.success).toBe(true);
+  });
+});

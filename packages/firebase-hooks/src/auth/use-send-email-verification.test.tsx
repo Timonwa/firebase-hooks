@@ -51,3 +51,35 @@ describe("useSendEmailVerification", () => {
     expect(result.current.success).toBe(false);
   });
 });
+
+describe("sendEmail", () => {
+  it("delegates the send, passing the signed-in user's address", async () => {
+    const sendEmail = vi.fn(async () => {});
+    const { result } = renderHook(() =>
+      useSendEmailVerification(makeAuth(makeUser({ email: "who@b.c" })), { sendEmail }),
+    );
+
+    await act(async () => {
+      await result.current.send();
+    });
+
+    expect(sendEmail).toHaveBeenCalledWith("who@b.c");
+    expect(sendEmailVerification).not.toHaveBeenCalled();
+    expect(result.current.success).toBe(true);
+  });
+
+  it("fails clearly on an account with no email, rather than sending to undefined", async () => {
+    const sendEmail = vi.fn(async () => {});
+    const { result } = renderHook(() =>
+      useSendEmailVerification(makeAuth(makeUser({ email: null })), { sendEmail }),
+    );
+
+    let outcome: unknown;
+    await act(async () => {
+      outcome = await result.current.send();
+    });
+
+    expect(sendEmail).not.toHaveBeenCalled();
+    expect(outcome).toMatchObject({ success: false });
+  });
+});

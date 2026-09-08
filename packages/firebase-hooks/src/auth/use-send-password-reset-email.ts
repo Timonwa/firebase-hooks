@@ -5,12 +5,19 @@
  *
  * @param auth - Firebase `Auth` instance, or null while it initialises
  * @param options.actionCodeSettings - Where the emailed reset link lands
+ * @param options.sendEmail - Replace the client-side sender (e.g. your API emails the link instead)
  * @returns `{ send, loading, error, success, resetState }`
  *
  * @example
- * const { send, loading, success } = useSendPasswordResetEmail(auth);
+ * const { send, loading, success } = useSendPasswordResetEmail();
  * await send(email);
  * {success && <p>If an account exists for {email}, a reset link is on its way.</p>}
+ *
+ * @example
+ * // Sent by your own API, so the flow goes through your rate limiter
+ * const { send } = useSendPasswordResetEmail({
+ *   sendEmail: (email) => requestPasswordReset(email),
+ * });
  */
 
 "use client";
@@ -33,6 +40,12 @@ import {
 export interface UseSendPasswordResetEmailOptionsProps extends HookErrorOptions {
   /** Where the emailed link points back to. Overrides the provider; `null` opts out. */
   actionCodeSettings?: ActionCodeSettings | null;
+  /**
+   * Replace the sender — e.g. your own API emails the reset link instead of
+   * Firebase, so the send goes through your rate limiter. `success`, `error`
+   * and `resetState` still behave the same way.
+   */
+  sendEmail?: (email: string) => Promise<void>;
 }
 
 export function useSendPasswordResetEmail(
@@ -66,7 +79,11 @@ function useSendPasswordResetEmailBase(
       "send-password-reset-email",
       "Failed to send reset email",
       async () => {
-        await sendPasswordResetEmail(requireAuth(auth), email, actionCodeSettings);
+        if (options.sendEmail) {
+          await options.sendEmail(email);
+        } else {
+          await sendPasswordResetEmail(requireAuth(auth), email, actionCodeSettings);
+        }
         return {};
       },
     );
