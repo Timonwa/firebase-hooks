@@ -3,15 +3,19 @@ title: One page for every emailed link
 description: Firebase sends sign-in, password-reset and verification links to a single URL. Dispatch on mode and hand each one to its hook.
 ---
 
-Firebase emails three kinds of link, and by default they all land on Firebase's own hosted pages. To handle them in your app instead, you point Firebase at **one** URL — every link goes there, with a `mode` parameter saying which flow it is.
+Every link Firebase emails lands on Firebase's own hosted pages by default. To handle them in your app instead, you point Firebase at **one** URL — every link goes there, with a `mode` parameter saying which flow it is. This is Firebase's [custom email action handler](https://firebase.google.com/docs/auth/custom-email-handler) pattern; the page below is that handler, built from the hooks.
 
 So you write one page that dispatches on `mode`, and a hook handles each branch.
 
-| `mode` | Hook | Also in the URL |
+| `mode` | Sent by | Hook |
 | --- | --- | --- |
-| `signIn` | [`useEmailLinkSignIn`](/docs/auth/use-email-link-sign-in) | the whole URL is the credential |
-| `resetPassword` | [`useConfirmPasswordReset`](/docs/auth/use-confirm-password-reset) | `oobCode` |
-| `verifyEmail` | [`useVerifyEmail`](/docs/auth/use-verify-email) | `oobCode` |
+| `signIn` | [`useEmailLinkSignIn`](/docs/auth/use-email-link-sign-in) `sendLink` | `useEmailLinkSignIn` `completeSignIn` |
+| `resetPassword` | [`useSendPasswordResetEmail`](/docs/auth/use-send-password-reset-email) | [`useConfirmPasswordReset`](/docs/auth/use-confirm-password-reset) |
+| `verifyEmail` | [`useSendEmailVerification`](/docs/auth/use-send-email-verification), [`useSignup`](/docs/auth/use-signup) | [`useVerifyEmail`](/docs/auth/use-verify-email) |
+| `verifyAndChangeEmail` | [`useUpdateEmail`](/docs/auth/use-update-email) | `useVerifyEmail` |
+| `recoverEmail` | Firebase, unprompted, after an address change | `useVerifyEmail` |
+
+The last two are easy to miss. `useUpdateEmail` uses `verifyBeforeUpdateEmail`, so its link arrives as `verifyAndChangeEmail`, not `verifyEmail` — a handler that only knows the first three sends your own users to a dead end. And `recoverEmail` goes to the *old* address whenever an email changes, so the owner can undo it; you never send it, but it arrives. Both apply an action code, which is what `useVerifyEmail` does.
 
 ## The page
 
@@ -39,10 +43,18 @@ function AuthAction() {
   const mode = params.get('mode');
   const oobCode = params.get('oobCode');
 
-  if (mode === 'signIn') return <CompleteSignIn />;
-  if (mode === 'resetPassword') return <ResetPassword oobCode={oobCode} />;
-  if (mode === 'verifyEmail') return <VerifyEmail oobCode={oobCode} />;
-  return <p>This link isn't one we recognise.</p>;
+  switch (mode) {
+    case 'signIn':
+      return <CompleteSignIn />;
+    case 'resetPassword':
+      return <ResetPassword oobCode={oobCode} />;
+    case 'verifyEmail':
+    case 'verifyAndChangeEmail':
+    case 'recoverEmail':
+      return <VerifyEmail oobCode={oobCode} />;
+    default:
+      return <p>This link isn't one we recognise.</p>;
+  }
 }
 ```
 
@@ -76,7 +88,7 @@ This is the step that silently half-works. The action URL is configured **per em
 
 Set it for the sign-in template only and password resets keep going to Firebase's hosted page, with no error anywhere to tell you. If two of your three flows work and one doesn't, this is why.
 
-Both `resetPassword` and `verifyEmail` need it. `signIn` is the exception: [`useEmailLinkSignIn`](/docs/auth/use-email-link-sign-in) passes its return URL in `actionCodeSettings` at send time, so it doesn't depend on the console setting.
+Every mode except `signIn` needs it — password reset, email verification, and email change each have their own template. `signIn` is the exception: [`useEmailLinkSignIn`](/docs/auth/use-email-link-sign-in) passes its return URL in `actionCodeSettings` at send time, so it doesn't depend on the console setting.
 
 Add your domain under **Authentication → Settings → Authorized domains**. `localhost` is there by default.
 
