@@ -44,7 +44,7 @@ import {
 } from "react";
 import { AuthConfigContext, type HookErrorContext, type OnIdToken } from "./_shared";
 
-interface AuthContextValueProps {
+export interface AuthContextValueProps {
   firebaseUser: User | null;
   /** Custom claims from the current ID token; null while signed out or loading. */
   claims: Record<string, unknown> | null;
@@ -54,7 +54,7 @@ interface AuthContextValueProps {
 
 const AuthContext = createContext<AuthContextValueProps | undefined>(undefined);
 
-interface AuthProviderProps {
+export interface AuthProviderProps {
   /** The Firebase `Auth` instance, or null while it initialises. */
   auth: Auth | null;
   /** Package-wide default error wording; each hook's own option overrides it. */
