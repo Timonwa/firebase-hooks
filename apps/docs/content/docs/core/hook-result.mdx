@@ -52,6 +52,24 @@ if (!result.success) {
 result.user; // User — narrowed, no optional chaining needed
 ```
 
+## AsyncStatus
+
+`HookResult` covers actions you call. A hook that acts on mount reports a status instead, and they all use one vocabulary:
+
+```ts
+type AsyncStatus = 'processing' | 'success' | 'failed';
+```
+
+There is no idle state — the work starts before you can render, so `processing` is where it begins. [`useVerifyEmail`](/docs/auth/use-verify-email) reports it as `VerifyEmailStatusType`, an alias of this.
+
+Render the three branches and you've handled every case:
+
+```tsx
+if (status === 'processing') return <Spinner />;
+if (status === 'failed') return <ErrorState message={error} />;
+return <Success />;
+```
+
 ## Related types
 
 `HookErrorOptions` — the `formatErrorMessage` option every hook accepts.

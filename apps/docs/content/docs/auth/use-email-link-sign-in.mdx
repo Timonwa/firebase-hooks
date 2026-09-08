@@ -22,7 +22,7 @@ if (!result.success && result.needsEmail) showEmailConfirmField();
 
 `sendLink(email)` emails the link and remembers the address in `localStorage`.
 
-`completeSignIn(url, email?)` resolves to `{ success: true, user, credential }` or a failure result.
+`completeSignIn(url, email?)` resolves to `{ success: true, user, credential }` or a failure result, exported as `CompleteSignInResult` — a failure there also carries `needsEmail`.
 
 Also exposes `loading` and `error`.
 
