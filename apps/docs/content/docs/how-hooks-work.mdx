@@ -49,6 +49,30 @@ else if (result.code === 'auth/too-many-requests') startCooldown();
 
 See [Error handling](/docs/guides/error-handling) for the full model.
 
+## Writing a wrapper around a hook
+
+Everything a wrapper needs to name is exported. Each hook's options interface comes from the auth entry, so you can accept and forward them without restating the shape:
+
+```tsx
+import { useLogin, type UseLoginOptionsProps } from '@timonwa/firebase-hooks/auth';
+
+export function useAppLogin(options?: UseLoginOptionsProps) {
+  const { login, loading, error } = useLogin(options);
+  // …your own state on top
+  return { login, loading, error };
+}
+```
+
+`AuthProviderProps` and the type `useAuth` returns are exported too, for an app provider layered over this one — see [Server sessions](/docs/guides/server-sessions).
+
+The result and error shapes — `HookResult`, `HookErrorOptions`, `HookErrorContext` — come from the **root** entry instead, because every service shares them:
+
+```ts
+import type { HookResult } from '@timonwa/firebase-hooks';
+```
+
+Hooks whose only option is `formatErrorMessage` take `HookErrorOptions` directly rather than declaring an interface of their own. See [Core](/docs/core).
+
 ## `onIdToken` runs after a successful sign-in
 
 With a freshly minted token, so you can trade it for a server session. Throwing inside it aborts the flow, and the error surfaces like any other failure.
