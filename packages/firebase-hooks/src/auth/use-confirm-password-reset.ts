@@ -45,7 +45,7 @@ export function useConfirmPasswordReset(
 }
 
 function useConfirmPasswordResetBase(auth: Auth | null, options: HookErrorOptions) {
-  const { status, isIdle, isPending, isSuccess, isError, error, reset, setError, run } =
+  const { status, isIdle, isPending, isSuccess, isError, error, reset, run } =
     useAuthTask(options);
 
   const verifyCode = (oobCode: string): Promise<HookResult<{ email: string }>> =>

@@ -67,7 +67,7 @@ function useSendPasswordResetEmailBase(
   auth: Auth | null,
   options: UseSendPasswordResetEmailOptions,
 ) {
-  const { status, isIdle, isPending, isSuccess, isError, error, reset, setError, run } =
+  const { status, isIdle, isPending, isSuccess, isError, error, reset, run } =
     useAuthTask(options);
   const actionCodeSettings = useResolvedConfig(
     "actionCodeSettings",
