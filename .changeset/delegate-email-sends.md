@@ -6,8 +6,9 @@
 
 ```tsx
 const { send } = useSendPasswordResetEmail({
-  sendEmail: (email) => requestPasswordReset(email), // your rate-limited endpoint
+  sendEmail: ({ email, actionCodeSettings }) =>
+    requestPasswordReset(email, actionCodeSettings),
 });
 ```
 
-The hook keeps its own bookkeeping either way: `loading`, `error`, `success` and `resetState` behave identically, and a throwing sender surfaces as an ordinary failure result. On `useSendEmailVerification` the sender receives the signed-in user's address, since `send()` takes no arguments; an account without one fails clearly rather than calling your sender with nothing.
+The hook keeps its own bookkeeping either way: `loading`, `error`, `success` and `resetState` behave identically, and a throwing sender surfaces as an ordinary failure result. The sender receives `{ email, actionCodeSettings }` — the same inputs Firebase's client send takes and the Admin SDK's `generate*Link` wants, so a provider-level `actionCodeSettings` still reaches your server. On `useSendEmailVerification`, `email` is the signed-in user's address, since `send()` takes no arguments; an account without one fails clearly rather than calling your sender with nothing.

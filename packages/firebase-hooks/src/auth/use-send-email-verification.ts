@@ -5,7 +5,7 @@
  *
  * @param auth - Firebase `Auth` instance, or null while it initialises
  * @param options.actionCodeSettings - Where the emailed verification link lands
- * @param options.sendEmail - Replace the client-side sender, called with the user's address
+ * @param options.sendEmail - Replace the client-side sender; gets the signed-in user's address
  * @returns `{ send, loading, error, success }`
  *
  * @example
@@ -15,7 +15,7 @@
  * @example
  * // Sent by your own API, so the flow goes through your rate limiter
  * const { send } = useSendEmailVerification({
- *   sendEmail: (email) => requestVerification(email),
+ *   sendEmail: ({ email }) => requestVerification(email),
  * });
  */
 
@@ -38,7 +38,7 @@ export interface UseSendEmailVerificationOptions extends HookErrorOptions {
   actionCodeSettings?: ActionCodeSettings | null;
   /**
    * Replace the sender — e.g. your own API emails the link instead of Firebase.
-   * Called with the signed-in user's address.
+   * `email` is the signed-in user's address.
    */
   sendEmail?: EmailSender | null;
 }
@@ -79,7 +79,7 @@ function useSendEmailVerificationBase(
         if (sendEmail) {
           // `send()` takes no arguments, so the address comes off the user.
           if (!user.email) throw new Error("This account has no email address");
-          await sendEmail(user.email);
+          await sendEmail({ email: user.email, actionCodeSettings });
         } else {
           await sendEmailVerification(user, actionCodeSettings);
         }

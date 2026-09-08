@@ -15,5 +15,5 @@
 
 ```tsx
 -useEmailLinkSignIn({ sendLink: (email) => api.send(email) });
-+useEmailLinkSignIn({ sendEmail: (email) => api.send(email) });
++useEmailLinkSignIn({ sendEmail: ({ email }) => api.send(email) });
 ```

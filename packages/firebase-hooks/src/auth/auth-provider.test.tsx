@@ -368,7 +368,9 @@ describe("provider-level senders", () => {
 
     // The three senders email different things, so a reset must never reach
     // the sign-in-link sender.
-    expect(passwordReset).toHaveBeenCalledWith("a@b.c");
+    expect(passwordReset).toHaveBeenCalledWith(
+      expect.objectContaining({ email: "a@b.c" }),
+    );
     expect(signInLink).not.toHaveBeenCalled();
     expect(sendPasswordResetEmail).not.toHaveBeenCalled();
   });
@@ -385,7 +387,7 @@ describe("provider-level senders", () => {
       await result.current.send("a@b.c");
     });
 
-    expect(own).toHaveBeenCalledWith("a@b.c");
+    expect(own).toHaveBeenCalledWith(expect.objectContaining({ email: "a@b.c" }));
     expect(passwordReset).not.toHaveBeenCalled();
   });
 

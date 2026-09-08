@@ -8,9 +8,9 @@
 <AuthProvider
   auth={auth}
   senders={{
-    signInLink: (email) => api.sendSignInLink(email),
-    passwordReset: (email) => api.sendPasswordReset(email),
-    emailVerification: (email) => api.sendVerification(email),
+    signInLink: ({ email, actionCodeSettings }) => api.sendSignInLink(email, actionCodeSettings),
+    passwordReset: ({ email, actionCodeSettings }) => api.sendPasswordReset(email, actionCodeSettings),
+    emailVerification: ({ email, actionCodeSettings }) => api.sendVerification(email, actionCodeSettings),
   }}
 >
 ```

@@ -69,7 +69,7 @@ describe("useEmailLinkSignIn", () => {
     await act(async () => {
       await result.current.sendLink("a@b.c");
     });
-    expect(sendViaApi).toHaveBeenCalledWith("a@b.c");
+    expect(sendViaApi).toHaveBeenCalledWith(expect.objectContaining({ email: "a@b.c" }));
     expect(sendSignInLinkToEmail).not.toHaveBeenCalled();
     expect(window.localStorage.getItem("magic-email")).toBe("a@b.c");
   });

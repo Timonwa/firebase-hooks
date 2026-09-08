@@ -27,11 +27,12 @@ Pair with a cooldown to stop rapid re-sends — Firebase rate-limits these, and 
 
 ```tsx
 const { send } = useSendEmailVerification({
-  sendEmail: (email) => requestVerification(email), // your rate-limited endpoint
+  sendEmail: ({ email, actionCodeSettings }) =>
+    requestVerification(email, actionCodeSettings),
 });
 ```
 
-It receives the signed-in user's address, because `send()` takes no arguments. An account with no email — phone-only, for instance — fails with a clear result rather than calling your sender with nothing.
+It receives `{ email, actionCodeSettings }` — `email` is the signed-in user's address, since `send()` takes no arguments, and `actionCodeSettings` is whatever the hook or provider resolved, ready for the Admin SDK's `generateEmailVerificationLink`. An account with no email — phone-only, for instance — fails with a clear result rather than calling your sender with nothing.
 
 ## Options
 

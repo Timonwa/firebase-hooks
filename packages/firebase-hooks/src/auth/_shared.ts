@@ -34,8 +34,15 @@ function rawErrorMessage(error: unknown, fallback: string): string {
   return fallback;
 }
 
-/** Emails a link on the app's behalf, in place of Firebase's client SDK. */
-export type EmailSender = (email: string) => Promise<void>;
+/**
+ * Emails a link on the app's behalf, in place of Firebase's client SDK. Receives
+ * the same two things Firebase's own send functions take — and the same two the
+ * Admin SDK's `generate*Link(email, actionCodeSettings)` wants on the server.
+ */
+export type EmailSender = (params: {
+  email: string;
+  actionCodeSettings?: ActionCodeSettings;
+}) => Promise<void>;
 
 /**
  * Your own sender per emailed flow. Each one replaces the client-side send for

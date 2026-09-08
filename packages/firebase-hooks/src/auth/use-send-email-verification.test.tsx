@@ -63,7 +63,7 @@ describe("sendEmail", () => {
       await result.current.send();
     });
 
-    expect(sendEmail).toHaveBeenCalledWith("who@b.c");
+    expect(sendEmail).toHaveBeenCalledWith(expect.objectContaining({ email: "who@b.c" }));
     expect(sendEmailVerification).not.toHaveBeenCalled();
     expect(result.current.success).toBe(true);
   });

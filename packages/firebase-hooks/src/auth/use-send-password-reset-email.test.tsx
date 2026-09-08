@@ -89,7 +89,7 @@ describe("sendEmail", () => {
       await result.current.send("a@b.c");
     });
 
-    expect(sendEmail).toHaveBeenCalledWith("a@b.c");
+    expect(sendEmail).toHaveBeenCalledWith(expect.objectContaining({ email: "a@b.c" }));
     expect(sendPasswordResetEmail).not.toHaveBeenCalled();
     expect(result.current.success).toBe(true);
   });

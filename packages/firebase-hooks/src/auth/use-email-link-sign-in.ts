@@ -106,7 +106,7 @@ function useEmailLinkSignInBase(auth: Auth | null, options: UseEmailLinkSignInOp
   const sendLink = (email: string): Promise<HookResult> =>
     run("send-sign-in-link", "Failed to send sign-in link", async () => {
       if (send) {
-        await send(email);
+        await send({ email, actionCodeSettings: actionCodeSettings ?? undefined });
       } else {
         if (!actionCodeSettings) {
           throw new Error(

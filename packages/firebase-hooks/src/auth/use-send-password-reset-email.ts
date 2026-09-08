@@ -16,7 +16,7 @@
  * @example
  * // Sent by your own API, so the flow goes through your rate limiter
  * const { send } = useSendPasswordResetEmail({
- *   sendEmail: (email) => requestPasswordReset(email),
+ *   sendEmail: ({ email }) => requestPasswordReset(email),
  * });
  */
 
@@ -78,7 +78,7 @@ function useSendPasswordResetEmailBase(
       "Failed to send reset email",
       async () => {
         if (sendEmail) {
-          await sendEmail(email);
+          await sendEmail({ email, actionCodeSettings });
         } else {
           await sendPasswordResetEmail(requireAuth(auth), email, actionCodeSettings);
         }
