@@ -21,6 +21,18 @@ const { send, loading, success } = useSendEmailVerification();
 
 Pair with a cooldown to stop rapid re-sends — Firebase rate-limits these, and hitting the limit is a worse experience than a disabled button.
 
+### Sending it yourself
+
+`sendEmail` replaces the browser send, so the request goes through your own API and your own rate limiter:
+
+```tsx
+const { send } = useSendEmailVerification({
+  sendEmail: (email) => requestVerification(email), // your rate-limited endpoint
+});
+```
+
+It receives the signed-in user's address, because `send()` takes no arguments. An account with no email — phone-only, for instance — fails with a clear result rather than calling your sender with nothing.
+
 ## Options
 
 <AutoTypeTable
