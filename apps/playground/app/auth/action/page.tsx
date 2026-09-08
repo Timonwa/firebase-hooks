@@ -73,7 +73,7 @@ function VerifyEmail({ oobCode }: Props) {
   onVerified: refreshSession,
 });
 
-if (status === "processing") return <Spinner />;`}
+if (status === "pending") return <Spinner />;`}
       form={
         <p className="text-sm">
           Status: <code className="text-accent font-mono">{status}</code>
@@ -81,7 +81,7 @@ if (status === "processing") return <Spinner />;`}
       }
       result={{ status }}
       error={error}
-      loading={status === 'processing'}
+      loading={status === 'pending'}
     />
   );
 }

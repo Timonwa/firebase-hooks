@@ -9,7 +9,7 @@
  * @param auth - Firebase `Auth` instance, or null while it initialises
  * @param options.actionCodeSettings - Where the emailed link lands (`url`, `handleCodeInApp: true`)
  * @param options.storageKey - localStorage key the address persists under (default: "emailForSignIn")
- * @param options.sendLink - Replace the client-side sender (e.g. your API emails the link instead)
+ * @param options.sendEmail - Replace the client-side sender (e.g. your API emails the link instead)
  * @param options.onIdToken - Called with the ID token + user after sign-in
  * @returns `{ sendLink, completeSignIn, loading, error }`
  *
@@ -59,7 +59,7 @@ export interface UseEmailLinkSignInOptionsProps extends HookErrorOptions {
    */
   storageKey?: string;
   /** Replace the sender — e.g. your own API emails the link instead of Firebase. */
-  sendLink?: SendEmail | null;
+  sendEmail?: SendEmail | null;
   /**
    * Called with a freshly minted ID token after sign-in — mint your server
    * session here. Throwing aborts the flow. Overrides the provider; `null` opts out.
@@ -104,7 +104,7 @@ function useEmailLinkSignInBase(
     options.actionCodeSettings,
   );
 
-  const send = useResolvedConfig("sendSignInLink", options.sendLink);
+  const send = useResolvedConfig("sendSignInLink", options.sendEmail);
 
   const sendLink = (email: string): Promise<HookResult> =>
     run("send-sign-in-link", "Failed to send sign-in link", async () => {

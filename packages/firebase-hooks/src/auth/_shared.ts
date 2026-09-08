@@ -43,7 +43,7 @@ export type SendEmail = (email: string) => Promise<void>;
  * them could mail a password reset to someone asking to verify an address.
  */
 export interface AuthSendersProps {
-  /** `useEmailLinkSignIn`'s `sendLink`. */
+  /** `useEmailLinkSignIn`'s `sendEmail`. */
   signInLink?: SendEmail;
   /** `useSendPasswordResetEmail`'s `sendEmail`. */
   passwordReset?: SendEmail;

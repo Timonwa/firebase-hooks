@@ -52,8 +52,8 @@ Each branch is then the ordinary hook usage:
 function VerifyEmail({ oobCode }: { oobCode: string | null }) {
   const { status, error } = useVerifyEmail(oobCode);
 
-  if (status === 'processing') return <Spinner />;
-  if (status === 'failed') return <ErrorState message={error} />;
+  if (status === 'pending') return <Spinner />;
+  if (status === 'error') return <ErrorState message={error} />;
   return <p>Email verified.</p>;
 }
 

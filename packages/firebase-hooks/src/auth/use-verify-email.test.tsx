@@ -30,7 +30,7 @@ describe("useVerifyEmail", () => {
 
   it("fails fast on a missing code", () => {
     const { result } = renderHook(() => useVerifyEmail(makeAuth(), null));
-    expect(result.current.status).toBe("failed");
+    expect(result.current.status).toBe("error");
     expect(result.current.error).toMatch(/missing/i);
   });
 
@@ -59,7 +59,7 @@ describe("useVerifyEmail", () => {
     );
     vi.mocked(applyActionCode).mockRejectedValue(firebaseError);
     const { result } = renderHook(() => useVerifyEmail(makeAuth(), "bad-oob"));
-    await waitFor(() => expect(result.current.status).toBe("failed"));
+    await waitFor(() => expect(result.current.status).toBe("error"));
     expect(result.current.error).toBe("Firebase: Error (auth/invalid-action-code).");
     expect(result.current.code).toBe("auth/invalid-action-code");
     expect(result.current.cause).toBe(firebaseError);
@@ -76,7 +76,7 @@ describe("useVerifyEmail", () => {
     const { result } = renderHook(() => useVerifyEmail(makeAuth(), "stale-oob"), {
       wrapper,
     });
-    await waitFor(() => expect(result.current.status).toBe("failed"));
+    await waitFor(() => expect(result.current.status).toBe("error"));
     expect(onError).toHaveBeenCalledWith(firebaseError, {
       action: "verify-email",
       code: "auth/expired-action-code",
@@ -108,11 +108,11 @@ describe("useVerifyEmail argument forms", () => {
   it("reads a single null as a missing code, not as a missing auth", () => {
     // searchParams.get("oobCode") returns null when the parameter is absent,
     // and that is the far more common reason to pass one. Treating it as auth
-    // would leave the page stuck on "processing" instead of reporting failure.
+    // would leave the page stuck on "pending" instead of reporting failure.
     const wrapper = withAuthProvider({ auth: makeAuth() });
     const { result } = renderHook(() => useVerifyEmail(null), { wrapper });
 
-    expect(result.current.status).toBe("failed");
+    expect(result.current.status).toBe("error");
     expect(applyActionCode).not.toHaveBeenCalled();
   });
 
@@ -120,8 +120,8 @@ describe("useVerifyEmail argument forms", () => {
     const wrapper = withAuthProvider({ auth: makeAuth() });
     const { result } = renderHook(() => useVerifyEmail(null, "oob-1"), { wrapper });
 
-    // Still processing: nothing ran, and no failure was reported either.
-    expect(result.current.status).toBe("processing");
+    // Still pending: nothing ran, and no failure was reported either.
+    expect(result.current.status).toBe("pending");
     expect(applyActionCode).not.toHaveBeenCalled();
   });
 });

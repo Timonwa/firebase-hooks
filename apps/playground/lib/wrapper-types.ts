@@ -40,11 +40,11 @@ export type WrappedLogin = (
 
 /** A page rendering the link-completion result without redeclaring its shape. */
 export type CallbackState =
-  | { phase: Exclude<AsyncStatus, 'failed'> }
-  | { phase: 'failed'; result: Extract<CompleteSignInResult, { success: false }> };
+  | { phase: Exclude<AsyncStatus, 'error'> }
+  | { phase: 'error'; result: Extract<CompleteSignInResult, { success: false }> };
 
 /** The status vocabulary, shared rather than respelled per hook. */
-export const VERIFY_STATES: VerifyEmailStatusType[] = ['processing', 'success', 'failed'];
+export const VERIFY_STATES: VerifyEmailStatusType[] = ['pending', 'error', 'success'];
 
 /** Every option interface, reachable by name from the auth entry. */
 export type AuthOptions = {

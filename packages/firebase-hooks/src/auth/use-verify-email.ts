@@ -8,14 +8,14 @@
  * @param auth - Firebase `Auth` instance, or null while it initialises
  * @param oobCode - The code from the verification link, or null while parsing the URL
  * @param options.onVerified - Runs after a successful verification (e.g. refresh the session)
- * @returns `{ status, error, code, cause }` — status is "processing" | "success" | "failed";
+ * @returns `{ status, error, code, cause }` — status is "pending" | "error" | "success";
  * `code`/`cause` carry the raw failure like every other hook
  *
  * @example
  * const oobCode = searchParams.get("oobCode");
  * const { status, error } = useVerifyEmail(auth, oobCode, { onVerified: refreshSession });
- * if (status === "processing") return <Spinner />;
- * if (status === "failed") return <ErrorState message={error} />;
+ * if (status === "pending") return <Spinner />;
+ * if (status === "error") return <ErrorState message={error} />;
  * return <SuccessState />;
  */
 
@@ -80,7 +80,7 @@ function useVerifyEmailBase(
   oobCode: string | null,
   options: UseVerifyEmailOptionsProps,
 ) {
-  const [status, setStatus] = useState<VerifyEmailStatusType>("processing");
+  const [status, setStatus] = useState<VerifyEmailStatusType>("pending");
   const [error, setError] = useState<string | null>(null);
   const [code, setCode] = useState<string | null>(null);
   const [cause, setCause] = useState<unknown>(null);
@@ -93,7 +93,7 @@ function useVerifyEmailBase(
   useEffect(() => {
     if (!auth) return;
     if (!oobCode) {
-      setStatus("failed");
+      setStatus("error");
       setError("Verification code is missing");
       return;
     }
@@ -116,7 +116,7 @@ function useVerifyEmailBase(
       })
       .catch((err: unknown) => {
         const message = resolveMessage(err, "Failed to verify email");
-        setStatus("failed");
+        setStatus("error");
         setError(message);
         setCode(getFirebaseErrorCode(err));
         setCause(err);

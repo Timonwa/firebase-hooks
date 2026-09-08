@@ -19,7 +19,7 @@ export function UseVerifyEmailSection() {
   onVerified: refreshSession,
 });
 
-if (status === "processing") return <Spinner />;`}
+if (status === "pending") return <Spinner />;`}
       form={
         <div className="text-muted flex flex-col gap-2 text-sm">
           <p>

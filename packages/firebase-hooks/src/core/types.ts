@@ -23,10 +23,10 @@ export interface HookErrorOptions {
 }
 
 /**
- * Where a hook that acts on mount has got to. Starts at `processing` — there is
- * no idle state, because the work begins before you can render.
+ * Where a hook that acts on mount has got to. Starts at `pending` — there is no
+ * idle state, because the work begins before you can render.
  */
-export type AsyncStatus = "processing" | "success" | "failed";
+export type AsyncStatus = "pending" | "error" | "success";
 
 /** What failed, for the global `onError` observer. */
 export interface HookErrorContext {

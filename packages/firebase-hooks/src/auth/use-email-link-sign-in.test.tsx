@@ -58,10 +58,13 @@ describe("useEmailLinkSignIn", () => {
     expect(result.current.error).toMatch(/actionCodeSettings/);
   });
 
-  it("a custom sendLink replaces the client-side sender and stores under the custom key", async () => {
+  it("a custom sendEmail replaces the client-side sender and stores under the custom key", async () => {
     const sendViaApi = vi.fn(async () => {});
     const { result } = renderHook(() =>
-      useEmailLinkSignIn(makeAuth(), { sendLink: sendViaApi, storageKey: "magic-email" }),
+      useEmailLinkSignIn(makeAuth(), {
+        sendEmail: sendViaApi,
+        storageKey: "magic-email",
+      }),
     );
     await act(async () => {
       await result.current.sendLink("a@b.c");
