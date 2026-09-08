@@ -39,13 +39,16 @@ export interface UseDeleteAccountOptions extends HookErrorOptions {
   onBeforeDelete?: (user: User) => void | Promise<void>;
 }
 
+/** What `useDeleteAccount` returns. */
+export type UseDeleteAccountResult = ReturnType<typeof useDeleteAccountBase>;
+
 export function useDeleteAccount(
   options?: UseDeleteAccountOptions,
-): ReturnType<typeof useDeleteAccountBase>;
+): UseDeleteAccountResult;
 export function useDeleteAccount(
   auth: Auth | null,
   options?: UseDeleteAccountOptions,
-): ReturnType<typeof useDeleteAccountBase>;
+): UseDeleteAccountResult;
 export function useDeleteAccount(
   authOrOptions?: Auth | null | UseDeleteAccountOptions,
   maybeOptions?: UseDeleteAccountOptions,

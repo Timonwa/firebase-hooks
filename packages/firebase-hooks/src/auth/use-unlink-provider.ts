@@ -22,13 +22,14 @@ import {
   useAuthTask,
 } from "./_shared";
 
-export function useUnlinkProvider(
-  options?: HookErrorOptions,
-): ReturnType<typeof useUnlinkProviderBase>;
+/** What `useUnlinkProvider` returns. */
+export type UseUnlinkProviderResult = ReturnType<typeof useUnlinkProviderBase>;
+
+export function useUnlinkProvider(options?: HookErrorOptions): UseUnlinkProviderResult;
 export function useUnlinkProvider(
   auth: Auth | null,
   options?: HookErrorOptions,
-): ReturnType<typeof useUnlinkProviderBase>;
+): UseUnlinkProviderResult;
 export function useUnlinkProvider(
   authOrOptions?: Auth | null | HookErrorOptions,
   maybeOptions?: HookErrorOptions,

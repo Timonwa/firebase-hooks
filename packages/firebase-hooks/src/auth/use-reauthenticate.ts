@@ -33,13 +33,14 @@ import {
   useAuthTask,
 } from "./_shared";
 
-export function useReauthenticate(
-  options?: HookErrorOptions,
-): ReturnType<typeof useReauthenticateBase>;
+/** What `useReauthenticate` returns. */
+export type UseReauthenticateResult = ReturnType<typeof useReauthenticateBase>;
+
+export function useReauthenticate(options?: HookErrorOptions): UseReauthenticateResult;
 export function useReauthenticate(
   auth: Auth | null,
   options?: HookErrorOptions,
-): ReturnType<typeof useReauthenticateBase>;
+): UseReauthenticateResult;
 export function useReauthenticate(
   authOrOptions?: Auth | null | HookErrorOptions,
   maybeOptions?: HookErrorOptions,

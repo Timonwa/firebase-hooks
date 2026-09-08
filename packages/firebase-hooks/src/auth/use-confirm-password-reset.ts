@@ -26,13 +26,18 @@ import {
   useAuthTask,
 } from "./_shared";
 
+/** What `useConfirmPasswordReset` returns. */
+export type UseConfirmPasswordResetResult = ReturnType<
+  typeof useConfirmPasswordResetBase
+>;
+
 export function useConfirmPasswordReset(
   options?: HookErrorOptions,
-): ReturnType<typeof useConfirmPasswordResetBase>;
+): UseConfirmPasswordResetResult;
 export function useConfirmPasswordReset(
   auth: Auth | null,
   options?: HookErrorOptions,
-): ReturnType<typeof useConfirmPasswordResetBase>;
+): UseConfirmPasswordResetResult;
 export function useConfirmPasswordReset(
   authOrOptions?: Auth | null | HookErrorOptions,
   maybeOptions?: HookErrorOptions,

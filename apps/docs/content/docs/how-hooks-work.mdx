@@ -54,16 +54,20 @@ See [Error handling](/docs/guides/error-handling) for the full model.
 Everything a wrapper needs to name is exported. Each hook's options interface comes from the auth entry, so you can accept and forward them without restating the shape:
 
 ```tsx
-import { useLogin, type UseLoginOptions } from '@timonwa/firebase-hooks/auth';
+import {
+  useLogin,
+  type UseLoginOptions,
+  type UseLoginResult,
+} from '@timonwa/firebase-hooks/auth';
 
-export function useAppLogin(options?: UseLoginOptions) {
+export function useAppLogin(options?: UseLoginOptions): UseLoginResult {
   const { login, loading, error } = useLogin(options);
   // …your own state on top
   return { login, loading, error };
 }
 ```
 
-`AuthProviderProps` and the type `useAuth` returns are exported too, for an app provider layered over this one — see [Server sessions](/docs/guides/server-sessions).
+Every hook exports what it returns as `Use<Name>Result` — `UseLoginResult`, `UseSignupResult`, and so on — so a wrapper can state its return type rather than re-deriving it. `AuthProviderProps` and `UseAuthResult` are exported too, for an app provider layered over this one — see [Server sessions](/docs/guides/server-sessions).
 
 The result and error shapes — `HookResult`, `HookErrorOptions`, `HookErrorContext` — come from the **root** entry instead, because every service shares them:
 

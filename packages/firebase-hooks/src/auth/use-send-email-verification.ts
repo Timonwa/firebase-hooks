@@ -43,13 +43,18 @@ export interface UseSendEmailVerificationOptions extends HookErrorOptions {
   sendEmail?: EmailSender | null;
 }
 
+/** What `useSendEmailVerification` returns. */
+export type UseSendEmailVerificationResult = ReturnType<
+  typeof useSendEmailVerificationBase
+>;
+
 export function useSendEmailVerification(
   options?: UseSendEmailVerificationOptions,
-): ReturnType<typeof useSendEmailVerificationBase>;
+): UseSendEmailVerificationResult;
 export function useSendEmailVerification(
   auth: Auth | null,
   options?: UseSendEmailVerificationOptions,
-): ReturnType<typeof useSendEmailVerificationBase>;
+): UseSendEmailVerificationResult;
 export function useSendEmailVerification(
   authOrOptions?: Auth | null | UseSendEmailVerificationOptions,
   maybeOptions?: UseSendEmailVerificationOptions,

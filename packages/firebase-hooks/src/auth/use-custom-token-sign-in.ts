@@ -39,13 +39,16 @@ export interface UseCustomTokenSignInOptions extends HookErrorOptions {
   onIdToken?: OnIdToken | null;
 }
 
+/** What `useCustomTokenSignIn` returns. */
+export type UseCustomTokenSignInResult = ReturnType<typeof useCustomTokenSignInBase>;
+
 export function useCustomTokenSignIn(
   options?: UseCustomTokenSignInOptions,
-): ReturnType<typeof useCustomTokenSignInBase>;
+): UseCustomTokenSignInResult;
 export function useCustomTokenSignIn(
   auth: Auth | null,
   options?: UseCustomTokenSignInOptions,
-): ReturnType<typeof useCustomTokenSignInBase>;
+): UseCustomTokenSignInResult;
 export function useCustomTokenSignIn(
   authOrOptions?: Auth | null | UseCustomTokenSignInOptions,
   maybeOptions?: UseCustomTokenSignInOptions,

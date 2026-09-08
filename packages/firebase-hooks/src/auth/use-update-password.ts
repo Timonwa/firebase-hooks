@@ -27,13 +27,14 @@ import {
   useAuthTask,
 } from "./_shared";
 
-export function useUpdatePassword(
-  options?: HookErrorOptions,
-): ReturnType<typeof useUpdatePasswordBase>;
+/** What `useUpdatePassword` returns. */
+export type UseUpdatePasswordResult = ReturnType<typeof useUpdatePasswordBase>;
+
+export function useUpdatePassword(options?: HookErrorOptions): UseUpdatePasswordResult;
 export function useUpdatePassword(
   auth: Auth | null,
   options?: HookErrorOptions,
-): ReturnType<typeof useUpdatePasswordBase>;
+): UseUpdatePasswordResult;
 export function useUpdatePassword(
   authOrOptions?: Auth | null | HookErrorOptions,
   maybeOptions?: HookErrorOptions,

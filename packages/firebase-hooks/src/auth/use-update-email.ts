@@ -41,13 +41,14 @@ export interface UseUpdateEmailOptions extends HookErrorOptions {
   actionCodeSettings?: ActionCodeSettings | null;
 }
 
-export function useUpdateEmail(
-  options?: UseUpdateEmailOptions,
-): ReturnType<typeof useUpdateEmailBase>;
+/** What `useUpdateEmail` returns. */
+export type UseUpdateEmailResult = ReturnType<typeof useUpdateEmailBase>;
+
+export function useUpdateEmail(options?: UseUpdateEmailOptions): UseUpdateEmailResult;
 export function useUpdateEmail(
   auth: Auth | null,
   options?: UseUpdateEmailOptions,
-): ReturnType<typeof useUpdateEmailBase>;
+): UseUpdateEmailResult;
 export function useUpdateEmail(
   authOrOptions?: Auth | null | UseUpdateEmailOptions,
   maybeOptions?: UseUpdateEmailOptions,

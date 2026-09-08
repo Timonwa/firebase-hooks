@@ -78,13 +78,16 @@ export type CompleteSignInResult =
       needsEmail?: boolean;
     };
 
+/** What `useEmailLinkSignIn` returns. */
+export type UseEmailLinkSignInResult = ReturnType<typeof useEmailLinkSignInBase>;
+
 export function useEmailLinkSignIn(
   options?: UseEmailLinkSignInOptions,
-): ReturnType<typeof useEmailLinkSignInBase>;
+): UseEmailLinkSignInResult;
 export function useEmailLinkSignIn(
   auth: Auth | null,
   options?: UseEmailLinkSignInOptions,
-): ReturnType<typeof useEmailLinkSignInBase>;
+): UseEmailLinkSignInResult;
 export function useEmailLinkSignIn(
   authOrOptions?: Auth | null | UseEmailLinkSignInOptions,
   maybeOptions?: UseEmailLinkSignInOptions,

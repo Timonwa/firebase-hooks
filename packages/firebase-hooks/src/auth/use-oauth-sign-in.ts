@@ -51,13 +51,14 @@ export interface UseOAuthSignInOptions extends HookErrorOptions {
   onIdToken?: OnIdToken | null;
 }
 
-export function useOAuthSignIn(
-  options?: UseOAuthSignInOptions,
-): ReturnType<typeof useOAuthSignInBase>;
+/** What `useOAuthSignIn` returns. */
+export type UseOAuthSignInResult = ReturnType<typeof useOAuthSignInBase>;
+
+export function useOAuthSignIn(options?: UseOAuthSignInOptions): UseOAuthSignInResult;
 export function useOAuthSignIn(
   auth: Auth | null,
   options?: UseOAuthSignInOptions,
-): ReturnType<typeof useOAuthSignInBase>;
+): UseOAuthSignInResult;
 export function useOAuthSignIn(
   authOrOptions?: Auth | null | UseOAuthSignInOptions,
   maybeOptions?: UseOAuthSignInOptions,

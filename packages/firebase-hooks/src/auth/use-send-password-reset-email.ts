@@ -45,13 +45,18 @@ export interface UseSendPasswordResetEmailOptions extends HookErrorOptions {
   sendEmail?: EmailSender | null;
 }
 
+/** What `useSendPasswordResetEmail` returns. */
+export type UseSendPasswordResetEmailResult = ReturnType<
+  typeof useSendPasswordResetEmailBase
+>;
+
 export function useSendPasswordResetEmail(
   options?: UseSendPasswordResetEmailOptions,
-): ReturnType<typeof useSendPasswordResetEmailBase>;
+): UseSendPasswordResetEmailResult;
 export function useSendPasswordResetEmail(
   auth: Auth | null,
   options?: UseSendPasswordResetEmailOptions,
-): ReturnType<typeof useSendPasswordResetEmailBase>;
+): UseSendPasswordResetEmailResult;
 export function useSendPasswordResetEmail(
   authOrOptions?: Auth | null | UseSendPasswordResetEmailOptions,
   maybeOptions?: UseSendPasswordResetEmailOptions,

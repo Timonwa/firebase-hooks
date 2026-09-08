@@ -51,11 +51,11 @@ export interface UseLoginOptions extends HookErrorOptions {
 
 // Overloads give the two call styles; the return type is inferred from the
 // implementation below rather than restated, so it cannot drift from it.
-export function useLogin(options?: UseLoginOptions): ReturnType<typeof useLoginBase>;
-export function useLogin(
-  auth: Auth | null,
-  options?: UseLoginOptions,
-): ReturnType<typeof useLoginBase>;
+/** What `useLogin` returns. */
+export type UseLoginResult = ReturnType<typeof useLoginBase>;
+
+export function useLogin(options?: UseLoginOptions): UseLoginResult;
+export function useLogin(auth: Auth | null, options?: UseLoginOptions): UseLoginResult;
 export function useLogin(
   authOrOptions?: Auth | null | UseLoginOptions,
   maybeOptions?: UseLoginOptions,

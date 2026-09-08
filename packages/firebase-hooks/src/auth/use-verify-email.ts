@@ -42,15 +42,18 @@ export interface UseVerifyEmailOptions extends HookErrorOptions {
   onVerified?: (user: User | null) => void | Promise<void>;
 }
 
+/** What `useVerifyEmail` returns. */
+export type UseVerifyEmailResult = ReturnType<typeof useVerifyEmailBase>;
+
 export function useVerifyEmail(
   oobCode: string | null,
   options?: UseVerifyEmailOptions,
-): ReturnType<typeof useVerifyEmailBase>;
+): UseVerifyEmailResult;
 export function useVerifyEmail(
   auth: Auth | null,
   oobCode: string | null,
   options?: UseVerifyEmailOptions,
-): ReturnType<typeof useVerifyEmailBase>;
+): UseVerifyEmailResult;
 export function useVerifyEmail(
   ...args:
     | [oobCode: string | null, options?: UseVerifyEmailOptions]

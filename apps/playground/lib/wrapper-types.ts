@@ -10,6 +10,25 @@ import type {
   CompleteSignInResult,
   VerifyEmailStatus,
   UseAnonymousSignInOptions,
+  UseAnonymousSignInResult,
+  UseConfirmPasswordResetResult,
+  UseCustomTokenSignInResult,
+  UseDeleteAccountResult,
+  UseEmailLinkSignInResult,
+  UseLinkProviderResult,
+  UseLoginResult,
+  UseLogoutResult,
+  UseOAuthSignInResult,
+  UsePhoneSignInResult,
+  UseReauthenticateResult,
+  UseSendEmailVerificationResult,
+  UseSendPasswordResetEmailResult,
+  UseSignupResult,
+  UseUnlinkProviderResult,
+  UseUpdateEmailResult,
+  UseUpdatePasswordResult,
+  UseUpdateProfileResult,
+  UseVerifyEmailResult,
   UseCustomTokenSignInOptions,
   UseDeleteAccountOptions,
   UseEmailLinkSignInOptions,
@@ -61,4 +80,27 @@ export type AuthOptions = {
   signup: UseSignupOptions;
   updateEmail: UseUpdateEmailOptions;
   verifyEmail: UseVerifyEmailOptions;
+};
+
+/** Every hook's return type, reachable by name from the auth entry. */
+export type AuthResults = {
+  anonymousSignIn: UseAnonymousSignInResult;
+  confirmPasswordReset: UseConfirmPasswordResetResult;
+  customTokenSignIn: UseCustomTokenSignInResult;
+  deleteAccount: UseDeleteAccountResult;
+  emailLinkSignIn: UseEmailLinkSignInResult;
+  linkProvider: UseLinkProviderResult;
+  login: UseLoginResult;
+  logout: UseLogoutResult;
+  oAuthSignIn: UseOAuthSignInResult;
+  phoneSignIn: UsePhoneSignInResult;
+  reauthenticate: UseReauthenticateResult;
+  sendEmailVerification: UseSendEmailVerificationResult;
+  sendPasswordResetEmail: UseSendPasswordResetEmailResult;
+  signup: UseSignupResult;
+  unlinkProvider: UseUnlinkProviderResult;
+  updateEmail: UseUpdateEmailResult;
+  updatePassword: UseUpdatePasswordResult;
+  updateProfile: UseUpdateProfileResult;
+  verifyEmail: UseVerifyEmailResult;
 };

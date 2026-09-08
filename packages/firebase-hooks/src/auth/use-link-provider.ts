@@ -31,13 +31,14 @@ import {
   useAuthTask,
 } from "./_shared";
 
-export function useLinkProvider(
-  options?: HookErrorOptions,
-): ReturnType<typeof useLinkProviderBase>;
+/** What `useLinkProvider` returns. */
+export type UseLinkProviderResult = ReturnType<typeof useLinkProviderBase>;
+
+export function useLinkProvider(options?: HookErrorOptions): UseLinkProviderResult;
 export function useLinkProvider(
   auth: Auth | null,
   options?: HookErrorOptions,
-): ReturnType<typeof useLinkProviderBase>;
+): UseLinkProviderResult;
 export function useLinkProvider(
   authOrOptions?: Auth | null | HookErrorOptions,
   maybeOptions?: HookErrorOptions,

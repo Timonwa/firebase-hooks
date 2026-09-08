@@ -54,13 +54,14 @@ export interface UsePhoneSignInOptions extends HookErrorOptions {
   onIdToken?: OnIdToken | null;
 }
 
-export function usePhoneSignIn(
-  options?: UsePhoneSignInOptions,
-): ReturnType<typeof usePhoneSignInBase>;
+/** What `usePhoneSignIn` returns. */
+export type UsePhoneSignInResult = ReturnType<typeof usePhoneSignInBase>;
+
+export function usePhoneSignIn(options?: UsePhoneSignInOptions): UsePhoneSignInResult;
 export function usePhoneSignIn(
   auth: Auth | null,
   options?: UsePhoneSignInOptions,
-): ReturnType<typeof usePhoneSignInBase>;
+): UsePhoneSignInResult;
 export function usePhoneSignIn(
   authOrOptions?: Auth | null | UsePhoneSignInOptions,
   maybeOptions?: UsePhoneSignInOptions,

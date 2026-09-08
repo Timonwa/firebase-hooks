@@ -52,11 +52,11 @@ export interface UseSignupOptions extends HookErrorOptions {
   onIdToken?: OnIdToken | null;
 }
 
-export function useSignup(options?: UseSignupOptions): ReturnType<typeof useSignupBase>;
-export function useSignup(
-  auth: Auth | null,
-  options?: UseSignupOptions,
-): ReturnType<typeof useSignupBase>;
+/** What `useSignup` returns. */
+export type UseSignupResult = ReturnType<typeof useSignupBase>;
+
+export function useSignup(options?: UseSignupOptions): UseSignupResult;
+export function useSignup(auth: Auth | null, options?: UseSignupOptions): UseSignupResult;
 export function useSignup(
   authOrOptions?: Auth | null | UseSignupOptions,
   maybeOptions?: UseSignupOptions,

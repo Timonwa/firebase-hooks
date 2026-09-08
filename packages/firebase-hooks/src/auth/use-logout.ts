@@ -32,11 +32,11 @@ export interface UseLogoutOptions extends HookErrorOptions {
   onBeforeSignOut?: (() => void | Promise<void>) | null;
 }
 
-export function useLogout(options?: UseLogoutOptions): ReturnType<typeof useLogoutBase>;
-export function useLogout(
-  auth: Auth | null,
-  options?: UseLogoutOptions,
-): ReturnType<typeof useLogoutBase>;
+/** What `useLogout` returns. */
+export type UseLogoutResult = ReturnType<typeof useLogoutBase>;
+
+export function useLogout(options?: UseLogoutOptions): UseLogoutResult;
+export function useLogout(auth: Auth | null, options?: UseLogoutOptions): UseLogoutResult;
 export function useLogout(
   authOrOptions?: Auth | null | UseLogoutOptions,
   maybeOptions?: UseLogoutOptions,

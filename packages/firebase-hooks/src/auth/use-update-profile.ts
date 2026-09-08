@@ -22,13 +22,14 @@ import {
   useAuthTask,
 } from "./_shared";
 
-export function useUpdateProfile(
-  options?: HookErrorOptions,
-): ReturnType<typeof useUpdateProfileBase>;
+/** What `useUpdateProfile` returns. */
+export type UseUpdateProfileResult = ReturnType<typeof useUpdateProfileBase>;
+
+export function useUpdateProfile(options?: HookErrorOptions): UseUpdateProfileResult;
 export function useUpdateProfile(
   auth: Auth | null,
   options?: HookErrorOptions,
-): ReturnType<typeof useUpdateProfileBase>;
+): UseUpdateProfileResult;
 export function useUpdateProfile(
   authOrOptions?: Auth | null | HookErrorOptions,
   maybeOptions?: HookErrorOptions,

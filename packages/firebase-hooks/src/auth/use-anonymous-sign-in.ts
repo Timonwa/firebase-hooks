@@ -38,13 +38,16 @@ export interface UseAnonymousSignInOptions extends HookErrorOptions {
   onIdToken?: OnIdToken | null;
 }
 
+/** What `useAnonymousSignIn` returns. */
+export type UseAnonymousSignInResult = ReturnType<typeof useAnonymousSignInBase>;
+
 export function useAnonymousSignIn(
   options?: UseAnonymousSignInOptions,
-): ReturnType<typeof useAnonymousSignInBase>;
+): UseAnonymousSignInResult;
 export function useAnonymousSignIn(
   auth: Auth | null,
   options?: UseAnonymousSignInOptions,
-): ReturnType<typeof useAnonymousSignInBase>;
+): UseAnonymousSignInResult;
 export function useAnonymousSignIn(
   authOrOptions?: Auth | null | UseAnonymousSignInOptions,
   maybeOptions?: UseAnonymousSignInOptions,
