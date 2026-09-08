@@ -66,7 +66,8 @@ export interface UseEmailLinkSignInOptionsProps extends HookErrorOptions {
   onIdToken?: OnIdToken | null;
 }
 
-type CompleteSignInResult =
+/** `needsEmail` is set when the link opened where the address was never stored. */
+export type CompleteSignInResult =
   | { success: true; user: User; credential: UserCredential }
   | {
       success: false;

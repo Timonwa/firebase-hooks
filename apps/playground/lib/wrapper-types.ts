@@ -1,16 +1,14 @@
 /**
- * Proof that a consumer can type a wrapper without restating the package's
- * shapes — it resolves through the exports map exactly as an installed app
- * does, so `pnpm --filter playground typecheck` fails if any of these stop
- * being reachable from `@timonwa/firebase-hooks/auth`.
- *
- * Type-only, so nothing here ships in the bundle.
+ * Type-only. Resolves the package's public types through its exports map the
+ * way an installed app does, so `typecheck` fails if one stops being reachable.
  */
 
-import type { HookResult } from '@timonwa/firebase-hooks';
+import type { AsyncStatus, HookResult } from '@timonwa/firebase-hooks';
 import type {
   AuthContextValueProps,
   AuthProviderProps,
+  CompleteSignInResult,
+  VerifyEmailStatusType,
   UseAnonymousSignInOptionsProps,
   UseCustomTokenSignInOptionsProps,
   UseDeleteAccountOptionsProps,
@@ -39,6 +37,14 @@ export type WrappedLogin = (
   email: string,
   password: string,
 ) => Promise<HookResult<{ uid: string }>>;
+
+/** A page rendering the link-completion result without redeclaring its shape. */
+export type CallbackState =
+  | { phase: Exclude<AsyncStatus, 'failed'> }
+  | { phase: 'failed'; result: Extract<CompleteSignInResult, { success: false }> };
+
+/** The status vocabulary, shared rather than respelled per hook. */
+export const VERIFY_STATES: VerifyEmailStatusType[] = ['processing', 'success', 'failed'];
 
 /** Every option interface, reachable by name from the auth entry. */
 export type AuthOptions = {

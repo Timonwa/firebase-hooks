@@ -23,6 +23,7 @@
 
 import { type Auth, applyActionCode, type User } from "firebase/auth";
 import { useEffect, useRef, useState } from "react";
+import type { AsyncStatus } from "../core/types";
 import {
   getFirebaseErrorCode,
   type HookErrorOptions,
@@ -31,7 +32,7 @@ import {
   useErrorMessageResolver,
 } from "./_shared";
 
-type VerifyEmailStatusType = "processing" | "success" | "failed";
+export type VerifyEmailStatusType = AsyncStatus;
 
 export interface UseVerifyEmailOptionsProps extends HookErrorOptions {
   /**

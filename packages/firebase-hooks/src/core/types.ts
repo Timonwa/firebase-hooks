@@ -22,6 +22,12 @@ export interface HookErrorOptions {
   formatErrorMessage?: (error: unknown) => string;
 }
 
+/**
+ * Where a hook that acts on mount has got to. Starts at `processing` — there is
+ * no idle state, because the work begins before you can render.
+ */
+export type AsyncStatus = "processing" | "success" | "failed";
+
 /** What failed, for the global `onError` observer. */
 export interface HookErrorContext {
   /** Stable id of the operation: "login", "oauth-sign-in", "update-password", … */

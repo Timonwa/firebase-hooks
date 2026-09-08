@@ -1,9 +1,8 @@
-// The ./auth entry — everything Firebase Auth, including its error catalogue.
-// Shared shapes (HookResult, HookErrorOptions, HookErrorContext) live in the
-// core entry, not here: every service returns them, so they have one home.
+// The ./auth entry — everything Firebase Auth, including its error catalogue
+// and each hook's options interface.
 //
-// Each hook's options interface is re-exported so an app can type a wrapper
-// around it without restating the shape.
+// Shared shapes (HookResult, HookErrorOptions, HookErrorContext, AsyncStatus)
+// ship from the core entry instead: every service returns them.
 
 export type { OnIdToken } from "./_shared.js";
 export { AUTH_ERROR_MESSAGES } from "./auth-error-messages.js";
@@ -27,6 +26,7 @@ export {
   useDeleteAccount,
 } from "./use-delete-account.js";
 export {
+  type CompleteSignInResult,
   type UseEmailLinkSignInOptionsProps,
   useEmailLinkSignIn,
 } from "./use-email-link-sign-in.js";
@@ -49,4 +49,8 @@ export { useUnlinkProvider } from "./use-unlink-provider.js";
 export { type UseUpdateEmailOptionsProps, useUpdateEmail } from "./use-update-email.js";
 export { useUpdatePassword } from "./use-update-password.js";
 export { useUpdateProfile } from "./use-update-profile.js";
-export { type UseVerifyEmailOptionsProps, useVerifyEmail } from "./use-verify-email.js";
+export {
+  type UseVerifyEmailOptionsProps,
+  useVerifyEmail,
+  type VerifyEmailStatusType,
+} from "./use-verify-email.js";
