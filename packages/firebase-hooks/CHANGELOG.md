@@ -1,5 +1,110 @@
 # @timonwa/firebase-hooks
 
+## 0.3.0
+
+### Minor Changes
+
+- [#21](https://github.com/Timonwa/firebase-hooks/pull/21) [`fc59c2e`](https://github.com/Timonwa/firebase-hooks/commit/fc59c2e6ccd64fffe63ecd37b8f54cc61bc4937c) Thanks [@Timonwa](https://github.com/Timonwa)! - **Breaking: `useVerifyEmail`'s `status` uses the standard async vocabulary.** `"processing"` is now `"pending"` and `"failed"` is now `"error"`, matching TanStack Query's `QueryStatus` rather than spelling the same three states differently.
+  
+  ```tsx
+  - if (status === 'processing') return <Spinner />;
+  - if (status === 'failed') return <ErrorState message={error} />;
+  + if (status === 'pending') return <Spinner />;
+  + if (status === 'error') return <ErrorState message={error} />;
+  ```
+  
+  **Breaking: `useEmailLinkSignIn`'s `sendLink` option is now `sendEmail`.** All three emailed-link hooks take the same option name. The returned `sendLink` function is unchanged.
+  
+  ```tsx
+  -useEmailLinkSignIn({ sendLink: email => api.send(email) });
+  +useEmailLinkSignIn({ sendEmail: ({ email }) => api.send(email) });
+  ```
+
+- [#21](https://github.com/Timonwa/firebase-hooks/pull/21) [`23f2e5d`](https://github.com/Timonwa/firebase-hooks/commit/23f2e5dc1f15516061520ee174225eb4eda6fda7) Thanks [@Timonwa](https://github.com/Timonwa)! - `useSendPasswordResetEmail` and `useSendEmailVerification` gain a `sendEmail` option, matching `useEmailLinkSignIn`'s `sendLink`. Both hooks previously sent from the browser with no way to delegate, which put an email-sending path outside an app's own rate limiter — awkward when the same app already rate-limits the sign-in link server-side.
+  
+  ```tsx
+  const { send } = useSendPasswordResetEmail({
+    sendEmail: ({ email, actionCodeSettings }) =>
+      requestPasswordReset(email, actionCodeSettings),
+  });
+  ```
+  
+  The hook keeps its own bookkeeping either way: `status`, `isPending`, `isSuccess`, `error` and `reset` behave identically, and a throwing sender surfaces as an ordinary failure result. The sender receives `{ email, actionCodeSettings }` — the same inputs Firebase's client send takes and the Admin SDK's `generate*Link` wants, so a provider-level `actionCodeSettings` still reaches your server. On `useSendEmailVerification`, `email` is the signed-in user's address, since `send()` takes no arguments; an account without one fails clearly rather than calling your sender with nothing.
+
+- [#21](https://github.com/Timonwa/firebase-hooks/pull/21) [`b45ec5c`](https://github.com/Timonwa/firebase-hooks/commit/b45ec5c4c8c8741e56640b6eee0d7fb28c5d1f53) Thanks [@Timonwa](https://github.com/Timonwa)! - Two result types are no longer module-private:
+  
+  - `CompleteSignInResult` — what `useEmailLinkSignIn`'s `completeSignIn` resolves to, so a callback page can annotate the function that handles it
+  - `VerifyEmailStatus` — `useVerifyEmail`'s status, instead of re-declaring the three states in app code
+  
+  Both ship from `@timonwa/firebase-hooks/auth`.
+  
+  The status vocabulary is also now shared. `AsyncStatus` (`"processing" | "success" | "failed"`) ships from the root entry, and `VerifyEmailStatus` is an alias of it, so hooks that act on mount report the same three states rather than each spelling them differently. There is no idle state: the work starts before a render, which is why `processing` is the initial value.
+
+- [#21](https://github.com/Timonwa/firebase-hooks/pull/21) [`c7830aa`](https://github.com/Timonwa/firebase-hooks/commit/c7830aae05a941288d877a524438063371d98458) Thanks [@Timonwa](https://github.com/Timonwa)! - Every type needed to write a wrapper around a hook is now reachable from `@timonwa/firebase-hooks/auth`:
+  
+  - all 13 `Use*Options` interfaces, so a wrapper can accept and forward a hook's options without restating them
+  - `AuthProviderProps` and `UseAuthResult` (what `useAuth` returns), for an app provider layered over this one
+  
+  ```tsx
+  import { useLogin, type UseLoginOptions } from "@timonwa/firebase-hooks/auth";
+  
+  export function useAppLogin(options?: UseLoginOptions) {
+    return useLogin(options);
+  }
+  ```
+  
+  `HookResult`, `HookErrorOptions` and `HookErrorContext` are unchanged and still ship from the root entry — every service returns them, so they keep one home rather than being re-exported per service.
+
+- [#21](https://github.com/Timonwa/firebase-hooks/pull/21) [`bac2d4d`](https://github.com/Timonwa/firebase-hooks/commit/bac2d4dfa0f254d18a9285a5033f354b99f130ea) Thanks [@Timonwa](https://github.com/Timonwa)! - Every hook now exports the type it returns as `Use<Name>Result` — `UseLoginResult`, `UseSignupResult`, `UseVerifyEmailResult`, and so on, from `@timonwa/firebase-hooks/auth`. A wrapper can state its return type instead of re-deriving it with `ReturnType<typeof useLogin>`.
+  
+  ```tsx
+  import {
+    useLogin,
+    type UseLoginOptions,
+    type UseLoginResult,
+  } from "@timonwa/firebase-hooks/auth";
+  
+  export function useAppLogin(options?: UseLoginOptions): UseLoginResult {
+    return useLogin(options);
+  }
+  ```
+  
+  Same shape as TanStack Query's `UseQueryResult` / `UseMutationResult`. `useAuth` already returned the named `UseAuthResult`.
+
+- [#21](https://github.com/Timonwa/firebase-hooks/pull/21) [`d3a9345`](https://github.com/Timonwa/firebase-hooks/commit/d3a9345afb1aaaafc86d2f8dee9324afd202a75f) Thanks [@Timonwa](https://github.com/Timonwa)! - `AuthProvider` gains `senders`, so an app that emails links from its own API configures that once instead of at every call site:
+  
+  ```tsx
+  <AuthProvider
+    auth={auth}
+    senders={{
+      signInLink: ({ email, actionCodeSettings }) => api.sendSignInLink(email, actionCodeSettings),
+      passwordReset: ({ email, actionCodeSettings }) => api.sendPasswordReset(email, actionCodeSettings),
+      emailVerification: ({ email, actionCodeSettings }) => api.sendVerification(email, actionCodeSettings),
+    }}
+  >
+  ```
+  
+  One key per flow rather than a single sender: the three send different emails, so one sender for all of them could mail a password reset to someone asking to verify an address. The shape follows the same convention as TanStack Query's `defaultOptions`, which namespaces defaults by operation kind so the per-call signature stays identical to the global one.
+  
+  Each key follows the existing rule — a hook's own `sendLink`/`sendEmail` overrides it, and `null` opts that one flow back to Firebase's client-side send.
+
+- [#21](https://github.com/Timonwa/firebase-hooks/pull/21) [`14c4f6a`](https://github.com/Timonwa/firebase-hooks/commit/14c4f6ad5478972e625181d21594725c2372a010) Thanks [@Timonwa](https://github.com/Timonwa)! - **Breaking: every action hook reports `status` with derived booleans, replacing `loading`, `success` and `resetState`.**
+  
+  ```tsx
+  const { login, status, isIdle, isPending, isSuccess, isError, error, reset } =
+    useLogin();
+  //             ^ 'idle' | 'pending' | 'success' | 'error'
+  ```
+  
+  | Before                                     | After                           |
+  | ------------------------------------------ | ------------------------------- |
+  | `loading`                                  | `isPending`                     |
+  | `success` (six hooks, hand-rolled)         | `isSuccess` — now on every hook |
+  | `resetState()` (two hooks)                 | `reset()` — now on every hook   |
+  | `useEmailLinkSignIn`'s returned `setError` | removed; `reset()` covers it    |
+  
+  The booleans are derived from `status`, so exactly one is ever true. This is TanStack Query's mutation result, field for field, and the new `ActionStatus` type ships from the root entry beside `AsyncStatus`. Hooks that act on mount — `useVerifyEmail` — keep `AsyncStatus` (no `idle`, since the work starts before you can render) and gain the same `isPending`/`isSuccess`/`isError`.
+
 ## 0.2.0
 
 ### Minor Changes
