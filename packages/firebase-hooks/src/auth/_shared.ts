@@ -13,7 +13,12 @@ import {
 } from "firebase/auth";
 import { createContext, useCallback, useContext, useRef, useState } from "react";
 import { getFirebaseErrorCode } from "../core/get-firebase-error-code";
-import type { HookErrorContext, HookErrorOptions, HookResult } from "../core/types";
+import type {
+  ActionStatus,
+  HookErrorContext,
+  HookErrorOptions,
+  HookResult,
+} from "../core/types";
 
 export type { HookErrorContext, HookErrorOptions, HookResult };
 // Re-exported so every hook in this module imports its shared shapes from one
@@ -34,6 +39,30 @@ function rawErrorMessage(error: unknown, fallback: string): string {
   return fallback;
 }
 
+/**
+ * Emails a link on the app's behalf, in place of Firebase's client SDK. Receives
+ * the same two things Firebase's own send functions take — and the same two the
+ * Admin SDK's `generate*Link(email, actionCodeSettings)` wants on the server.
+ */
+export type EmailSender = (params: {
+  email: string;
+  actionCodeSettings?: ActionCodeSettings;
+}) => Promise<void>;
+
+/**
+ * Your own sender per emailed flow. Each one replaces the client-side send for
+ * that flow only — the three send different emails, so one sender for all of
+ * them could mail a password reset to someone asking to verify an address.
+ */
+export interface AuthSenders {
+  /** `useEmailLinkSignIn`'s `sendEmail`. */
+  signInLink?: EmailSender;
+  /** `useSendPasswordResetEmail`'s `sendEmail`. */
+  passwordReset?: EmailSender;
+  /** `useSendEmailVerification`'s `sendEmail`. */
+  emailVerification?: EmailSender;
+}
+
 /** Provider-level configuration shared with every hook below the provider. */
 export interface AuthConfigContextValueProps {
   /** The provider's own `Auth`, for hooks called without one. */
@@ -43,6 +72,11 @@ export interface AuthConfigContextValueProps {
   onBeforeSignOut?: () => void | Promise<void>;
   actionCodeSettings?: ActionCodeSettings;
   onError?: (error: unknown, context: HookErrorContext) => void;
+  // Flattened from the provider's `senders` prop, so each resolves through
+  // useResolvedConfig like every other inherited option.
+  sendSignInLink?: EmailSender;
+  sendPasswordReset?: EmailSender;
+  sendEmailVerification?: EmailSender;
 }
 
 export const AuthConfigContext = createContext<AuthConfigContextValueProps | undefined>(
@@ -172,12 +206,12 @@ export function useAuthErrorObserver() {
 }
 
 /**
- * The loading/error/try-catch skeleton every action hook repeats. `run` never
+ * The status/error/try-catch skeleton every action hook repeats. `run` never
  * throws: failures come back as `{ success: false, error, code, cause }` with
- * the `error` state set to the same message.
+ * `status` set to `"error"` and `error` carrying the same message.
  */
 export function useAuthTask(options?: HookErrorOptions) {
-  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState<ActionStatus>("idle");
   const [error, setError] = useState<string | null>(null);
   const resolveMessage = useErrorMessageResolver(options);
   const notifyError = useAuthErrorObserver();
@@ -188,23 +222,40 @@ export function useAuthTask(options?: HookErrorOptions) {
       fallback: string,
       task: () => Promise<T>,
     ): Promise<HookResult<T>> => {
-      setLoading(true);
+      setStatus("pending");
       setError(null);
       try {
         const value = await task();
+        setStatus("success");
         return { success: true, ...value };
       } catch (cause) {
         const message = resolveMessage(cause, fallback);
         const code = getFirebaseErrorCode(cause);
+        setStatus("error");
         setError(message);
         notifyError(cause, { action, code, message });
         return { success: false, error: message, code, cause };
-      } finally {
-        setLoading(false);
       }
     },
     [resolveMessage, notifyError],
   );
 
-  return { loading, error, setError, run };
+  // Back to idle — for a form the user retries with different input, so a stale
+  // success or error message doesn't sit under the new attempt.
+  const reset = useCallback(() => {
+    setStatus("idle");
+    setError(null);
+  }, []);
+
+  return {
+    status,
+    isIdle: status === "idle",
+    isPending: status === "pending",
+    isSuccess: status === "success",
+    isError: status === "error",
+    error,
+    setError,
+    reset,
+    run,
+  };
 }

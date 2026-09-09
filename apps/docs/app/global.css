@@ -1,5 +1,5 @@
-@import 'tailwindcss';
-@import 'fumadocs-ui/css/preset.css';
+@import "tailwindcss";
+@import "fumadocs-ui/css/preset.css";
 
 /* Colours are defined here rather than by importing a Fumadocs preset, so the
    whole palette is one violet-tinted ramp instead of a grey one with an accent
@@ -107,7 +107,11 @@ html > body[data-scroll-locked] {
   height: 2.25rem;
   border-radius: 0.625rem;
   color: var(--color-fd-primary);
-  background-color: color-mix(in oklch, var(--color-fd-primary) 12%, transparent);
+  background-color: color-mix(
+    in oklch,
+    var(--color-fd-primary) 12%,
+    transparent
+  );
 }
 
 /* The hero's dot grid — the one decorative signature on the page. Masked so it
@@ -117,17 +121,32 @@ html > body[data-scroll-locked] {
    fainter than a light dot on a dark one at the same mix, so a single value
    leaves the grid invisible in light mode. */
 :root {
-  --dot-grid-color: color-mix(in oklch, var(--color-fd-foreground) 30%, transparent);
+  --dot-grid-color: color-mix(
+    in oklch,
+    var(--color-fd-foreground) 30%,
+    transparent
+  );
 }
 
 .dark {
-  --dot-grid-color: color-mix(in oklch, var(--color-fd-foreground) 20%, transparent);
+  --dot-grid-color: color-mix(
+    in oklch,
+    var(--color-fd-foreground) 20%,
+    transparent
+  );
 }
 
 @utility dot-grid {
-  background-image: radial-gradient(var(--dot-grid-color) 1.2px, transparent 1.2px);
+  background-image: radial-gradient(
+    var(--dot-grid-color) 1.2px,
+    transparent 1.2px
+  );
   background-size: 22px 22px;
-  mask-image: radial-gradient(ellipse 85% 70% at 50% 0%, black, transparent 80%);
+  mask-image: radial-gradient(
+    ellipse 85% 70% at 50% 0%,
+    black,
+    transparent 80%
+  );
 }
 
 /* Geist Mono renders wide at the inherited size; the small step down keeps an

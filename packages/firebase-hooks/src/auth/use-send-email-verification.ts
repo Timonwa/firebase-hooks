@@ -5,18 +5,25 @@
  *
  * @param auth - Firebase `Auth` instance, or null while it initialises
  * @param options.actionCodeSettings - Where the emailed verification link lands
+ * @param options.sendEmail - Replace the client-side sender; gets the signed-in user's address
  * @returns `{ send, loading, error, success }`
  *
  * @example
- * const { send, loading, success } = useSendEmailVerification(auth);
+ * const { send, loading, success } = useSendEmailVerification();
  * <button onClick={send} disabled={loading}>Resend verification email</button>
+ *
+ * @example
+ * // Sent by your own API, so the flow goes through your rate limiter
+ * const { send } = useSendEmailVerification({
+ *   sendEmail: ({ email }) => requestVerification(email),
+ * });
  */
 
 "use client";
 
 import { type ActionCodeSettings, type Auth, sendEmailVerification } from "firebase/auth";
-import { useState } from "react";
 import {
+  type EmailSender,
   type HookErrorOptions,
   type HookResult,
   requireCurrentUser,
@@ -25,49 +32,65 @@ import {
   useResolvedConfig,
 } from "./_shared";
 
-export interface UseSendEmailVerificationOptionsProps extends HookErrorOptions {
+export interface UseSendEmailVerificationOptions extends HookErrorOptions {
   /** Where the emailed link points back to. Overrides the provider; `null` opts out. */
   actionCodeSettings?: ActionCodeSettings | null;
+  /**
+   * Replace the sender — e.g. your own API emails the link instead of Firebase.
+   * `email` is the signed-in user's address.
+   */
+  sendEmail?: EmailSender | null;
 }
 
+/** What `useSendEmailVerification` returns. */
+export type UseSendEmailVerificationResult = ReturnType<
+  typeof useSendEmailVerificationBase
+>;
+
 export function useSendEmailVerification(
-  options?: UseSendEmailVerificationOptionsProps,
-): ReturnType<typeof useSendEmailVerificationBase>;
+  options?: UseSendEmailVerificationOptions,
+): UseSendEmailVerificationResult;
 export function useSendEmailVerification(
   auth: Auth | null,
-  options?: UseSendEmailVerificationOptionsProps,
-): ReturnType<typeof useSendEmailVerificationBase>;
+  options?: UseSendEmailVerificationOptions,
+): UseSendEmailVerificationResult;
 export function useSendEmailVerification(
-  authOrOptions?: Auth | null | UseSendEmailVerificationOptionsProps,
-  maybeOptions?: UseSendEmailVerificationOptionsProps,
+  authOrOptions?: Auth | null | UseSendEmailVerificationOptions,
+  maybeOptions?: UseSendEmailVerificationOptions,
 ) {
   return useSendEmailVerificationBase(...useAuthArgs(authOrOptions, maybeOptions));
 }
 
 function useSendEmailVerificationBase(
   auth: Auth | null,
-  options: UseSendEmailVerificationOptionsProps,
+  options: UseSendEmailVerificationOptions,
 ) {
-  const { loading, error, run } = useAuthTask(options);
+  const { status, isIdle, isPending, isSuccess, isError, error, reset, run } =
+    useAuthTask(options);
   const actionCodeSettings = useResolvedConfig(
     "actionCodeSettings",
     options.actionCodeSettings,
   );
-  const [success, setSuccess] = useState(false);
+  const sendEmail = useResolvedConfig("sendEmailVerification", options.sendEmail);
 
   const send = async (): Promise<HookResult> => {
-    setSuccess(false);
     const result = await run(
       "send-email-verification",
       "Failed to send verification email",
       async () => {
-        await sendEmailVerification(requireCurrentUser(auth), actionCodeSettings);
+        const user = requireCurrentUser(auth);
+        if (sendEmail) {
+          // `send()` takes no arguments, so the address comes off the user.
+          if (!user.email) throw new Error("This account has no email address");
+          await sendEmail({ email: user.email, actionCodeSettings });
+        } else {
+          await sendEmailVerification(user, actionCodeSettings);
+        }
         return {};
       },
     );
-    if (result.success) setSuccess(true);
     return result;
   };
 
-  return { send, loading, error, success };
+  return { send, status, isIdle, isPending, isSuccess, isError, error, reset };
 }

@@ -81,7 +81,7 @@ Nothing to pass: the provider supplies both the instance and the `onIdToken` you
 import { useLogin } from '@timonwa/firebase-hooks/auth';
 
 function LoginForm() {
-  const { login, loading, error } = useLogin();
+  const { login, isPending, error } = useLogin();
 
   async function onSubmit(email: string, password: string) {
     const result = await login(email, password);

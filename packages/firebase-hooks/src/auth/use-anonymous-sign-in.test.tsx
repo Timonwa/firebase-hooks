@@ -52,6 +52,6 @@ describe("useAnonymousSignIn", () => {
     expect(result.current.error).toBe(
       "Firebase: Error (auth/admin-restricted-operation).",
     );
-    expect(result.current.loading).toBe(false);
+    expect(result.current.isPending).toBe(false);
   });
 });

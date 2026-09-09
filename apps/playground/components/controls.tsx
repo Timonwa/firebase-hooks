@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
 import type {
   ButtonHTMLAttributes,
   InputHTMLAttributes,
   ReactNode,
   SelectHTMLAttributes,
-} from 'react';
+} from "react";
 
 export function Field({
   label,
@@ -13,10 +13,10 @@ export function Field({
 }: { label: string } & InputHTMLAttributes<HTMLInputElement>) {
   return (
     <label className="flex flex-col gap-1 text-sm">
-      <span className="text-muted text-xs">{label}</span>
+      <span className="text-xs text-muted">{label}</span>
       <input
         {...props}
-        className="border-line bg-bg focus:border-accent rounded-md border px-3 py-2 text-sm outline-none"
+        className="rounded-md border border-line bg-bg px-3 py-2 text-sm outline-none focus:border-accent"
       />
     </label>
   );
@@ -38,8 +38,8 @@ export function Toggle({
       <input
         type="checkbox"
         checked={checked}
-        onChange={(event) => onChange(event.target.checked)}
-        className="accent-accent mt-0.5"
+        onChange={event => onChange(event.target.checked)}
+        className="mt-0.5 accent-accent"
       />
       <span className="flex flex-col gap-0.5">
         <span className="text-fg">{label}</span>
@@ -64,9 +64,8 @@ export function Select({
       <span className="text-fg">{label}</span>
       <select
         {...props}
-        className="border-line bg-bg focus:border-accent rounded-md border px-2 py-1.5 text-xs outline-none"
-      >
-        {options.map((option) => (
+        className="rounded-md border border-line bg-bg px-2 py-1.5 text-xs outline-none focus:border-accent">
+        {options.map(option => (
           <option key={option.value} value={option.value}>
             {option.label}
           </option>
@@ -78,15 +77,15 @@ export function Select({
 }
 
 export function Button({
-  variant = 'primary',
+  variant = "primary",
   ...props
 }: {
-  variant?: 'primary' | 'secondary' | 'danger';
+  variant?: "primary" | "secondary" | "danger";
 } & ButtonHTMLAttributes<HTMLButtonElement>) {
   const styles = {
-    primary: 'bg-accent text-accent-fg hover:opacity-90',
-    secondary: 'border border-line hover:bg-surface',
-    danger: 'bg-red-600 text-white hover:bg-red-500',
+    primary: "bg-accent text-accent-fg hover:opacity-90",
+    secondary: "border border-line hover:bg-surface",
+    danger: "bg-red-600 text-white hover:bg-red-500",
   }[variant];
 
   return (

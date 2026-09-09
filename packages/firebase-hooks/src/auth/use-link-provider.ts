@@ -31,13 +31,14 @@ import {
   useAuthTask,
 } from "./_shared";
 
-export function useLinkProvider(
-  options?: HookErrorOptions,
-): ReturnType<typeof useLinkProviderBase>;
+/** What `useLinkProvider` returns. */
+export type UseLinkProviderResult = ReturnType<typeof useLinkProviderBase>;
+
+export function useLinkProvider(options?: HookErrorOptions): UseLinkProviderResult;
 export function useLinkProvider(
   auth: Auth | null,
   options?: HookErrorOptions,
-): ReturnType<typeof useLinkProviderBase>;
+): UseLinkProviderResult;
 export function useLinkProvider(
   authOrOptions?: Auth | null | HookErrorOptions,
   maybeOptions?: HookErrorOptions,
@@ -46,7 +47,8 @@ export function useLinkProvider(
 }
 
 function useLinkProviderBase(auth: Auth | null, options: HookErrorOptions) {
-  const { loading, error, run } = useAuthTask(options);
+  const { status, isIdle, isPending, isSuccess, isError, error, reset, run } =
+    useAuthTask(options);
 
   const linkWithProvider = (
     provider: FirebaseAuthProvider,
@@ -68,5 +70,15 @@ function useLinkProviderBase(auth: Auth | null, options: HookErrorOptions) {
       return { user: credential.user, credential };
     });
 
-  return { linkWithProvider, linkWithPassword, loading, error };
+  return {
+    linkWithProvider,
+    linkWithPassword,
+    status,
+    isIdle,
+    isPending,
+    isSuccess,
+    isError,
+    error,
+    reset,
+  };
 }

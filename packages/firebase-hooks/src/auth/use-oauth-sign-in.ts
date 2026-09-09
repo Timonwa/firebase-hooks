@@ -43,7 +43,7 @@ import {
   useResolvedConfig,
 } from "./_shared";
 
-export interface UseOAuthSignInOptionsProps extends HookErrorOptions {
+export interface UseOAuthSignInOptions extends HookErrorOptions {
   /**
    * Called with a freshly minted ID token after sign-in — mint your server
    * session here. Throwing aborts the flow. Overrides the provider; `null` opts out.
@@ -51,22 +51,24 @@ export interface UseOAuthSignInOptionsProps extends HookErrorOptions {
   onIdToken?: OnIdToken | null;
 }
 
-export function useOAuthSignIn(
-  options?: UseOAuthSignInOptionsProps,
-): ReturnType<typeof useOAuthSignInBase>;
+/** What `useOAuthSignIn` returns. */
+export type UseOAuthSignInResult = ReturnType<typeof useOAuthSignInBase>;
+
+export function useOAuthSignIn(options?: UseOAuthSignInOptions): UseOAuthSignInResult;
 export function useOAuthSignIn(
   auth: Auth | null,
-  options?: UseOAuthSignInOptionsProps,
-): ReturnType<typeof useOAuthSignInBase>;
+  options?: UseOAuthSignInOptions,
+): UseOAuthSignInResult;
 export function useOAuthSignIn(
-  authOrOptions?: Auth | null | UseOAuthSignInOptionsProps,
-  maybeOptions?: UseOAuthSignInOptionsProps,
+  authOrOptions?: Auth | null | UseOAuthSignInOptions,
+  maybeOptions?: UseOAuthSignInOptions,
 ) {
   return useOAuthSignInBase(...useAuthArgs(authOrOptions, maybeOptions));
 }
 
-function useOAuthSignInBase(auth: Auth | null, options: UseOAuthSignInOptionsProps) {
-  const { loading, error, run } = useAuthTask(options);
+function useOAuthSignInBase(auth: Auth | null, options: UseOAuthSignInOptions) {
+  const { status, isIdle, isPending, isSuccess, isError, error, reset, run } =
+    useAuthTask(options);
   // getRedirectResult consumes the pending result — guard Strict Mode's double effect.
   const redirectHandledRef = useRef(false);
   // Read the callback through a ref so an inline option object can't re-trigger the effect.
@@ -100,5 +102,5 @@ function useOAuthSignInBase(auth: Auth | null, options: UseOAuthSignInOptionsPro
       return { user: credential.user, credential };
     });
 
-  return { signIn, loading, error };
+  return { signIn, status, isIdle, isPending, isSuccess, isError, error, reset };
 }

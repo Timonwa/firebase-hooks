@@ -33,13 +33,14 @@ import {
   useAuthTask,
 } from "./_shared";
 
-export function useReauthenticate(
-  options?: HookErrorOptions,
-): ReturnType<typeof useReauthenticateBase>;
+/** What `useReauthenticate` returns. */
+export type UseReauthenticateResult = ReturnType<typeof useReauthenticateBase>;
+
+export function useReauthenticate(options?: HookErrorOptions): UseReauthenticateResult;
 export function useReauthenticate(
   auth: Auth | null,
   options?: HookErrorOptions,
-): ReturnType<typeof useReauthenticateBase>;
+): UseReauthenticateResult;
 export function useReauthenticate(
   authOrOptions?: Auth | null | HookErrorOptions,
   maybeOptions?: HookErrorOptions,
@@ -48,7 +49,8 @@ export function useReauthenticate(
 }
 
 function useReauthenticateBase(auth: Auth | null, options: HookErrorOptions) {
-  const { loading, error, run } = useAuthTask(options);
+  const { status, isIdle, isPending, isSuccess, isError, error, reset, run } =
+    useAuthTask(options);
 
   const reauthenticateWithPassword = (currentPassword: string): Promise<HookResult> =>
     run("reauthenticate", "Reauthentication failed", async () => {
@@ -64,5 +66,15 @@ function useReauthenticateBase(auth: Auth | null, options: HookErrorOptions) {
       return {};
     });
 
-  return { reauthenticateWithPassword, reauthenticateWithProvider, loading, error };
+  return {
+    reauthenticateWithPassword,
+    reauthenticateWithProvider,
+    status,
+    isIdle,
+    isPending,
+    isSuccess,
+    isError,
+    error,
+    reset,
+  };
 }

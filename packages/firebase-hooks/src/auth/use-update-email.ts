@@ -25,7 +25,6 @@ import {
   type Auth,
   verifyBeforeUpdateEmail,
 } from "firebase/auth";
-import { useState } from "react";
 import {
   type HookErrorOptions,
   type HookResult,
@@ -36,32 +35,33 @@ import {
   useResolvedConfig,
 } from "./_shared";
 
-export interface UseUpdateEmailOptionsProps extends HookErrorOptions {
+export interface UseUpdateEmailOptions extends HookErrorOptions {
   /** Where the emailed link points back to. Overrides the provider; `null` opts out. */
   actionCodeSettings?: ActionCodeSettings | null;
 }
 
-export function useUpdateEmail(
-  options?: UseUpdateEmailOptionsProps,
-): ReturnType<typeof useUpdateEmailBase>;
+/** What `useUpdateEmail` returns. */
+export type UseUpdateEmailResult = ReturnType<typeof useUpdateEmailBase>;
+
+export function useUpdateEmail(options?: UseUpdateEmailOptions): UseUpdateEmailResult;
 export function useUpdateEmail(
   auth: Auth | null,
-  options?: UseUpdateEmailOptionsProps,
-): ReturnType<typeof useUpdateEmailBase>;
+  options?: UseUpdateEmailOptions,
+): UseUpdateEmailResult;
 export function useUpdateEmail(
-  authOrOptions?: Auth | null | UseUpdateEmailOptionsProps,
-  maybeOptions?: UseUpdateEmailOptionsProps,
+  authOrOptions?: Auth | null | UseUpdateEmailOptions,
+  maybeOptions?: UseUpdateEmailOptions,
 ) {
   return useUpdateEmailBase(...useAuthArgs(authOrOptions, maybeOptions));
 }
 
-function useUpdateEmailBase(auth: Auth | null, options: UseUpdateEmailOptionsProps) {
-  const { loading, error, run } = useAuthTask(options);
+function useUpdateEmailBase(auth: Auth | null, options: UseUpdateEmailOptions) {
+  const { status, isIdle, isPending, isSuccess, isError, error, reset, run } =
+    useAuthTask(options);
   const actionCodeSettings = useResolvedConfig(
     "actionCodeSettings",
     options.actionCodeSettings,
   );
-  const [success, setSuccess] = useState(false);
 
   // Shaped like the SDK's `verifyBeforeUpdateEmail(user, newEmail, …)` — the
   // required value leads, and the reauthentication this hook adds goes after.
@@ -69,16 +69,14 @@ function useUpdateEmailBase(auth: Auth | null, options: UseUpdateEmailOptionsPro
     newEmail: string,
     { currentPassword }: { currentPassword?: string } = {},
   ): Promise<HookResult> => {
-    setSuccess(false);
     const result = await run("update-email", "Failed to update email", async () => {
       const user = requireCurrentUser(auth);
       if (currentPassword) await reauthenticateUserWithPassword(user, currentPassword);
       await verifyBeforeUpdateEmail(user, newEmail, actionCodeSettings);
       return {};
     });
-    if (result.success) setSuccess(true);
     return result;
   };
 
-  return { update, loading, error, success };
+  return { update, status, isIdle, isPending, isSuccess, isError, error, reset };
 }

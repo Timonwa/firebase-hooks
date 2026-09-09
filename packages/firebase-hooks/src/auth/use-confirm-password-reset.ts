@@ -17,7 +17,6 @@
 "use client";
 
 import { type Auth, confirmPasswordReset, verifyPasswordResetCode } from "firebase/auth";
-import { useState } from "react";
 import {
   type HookErrorOptions,
   type HookResult,
@@ -26,13 +25,18 @@ import {
   useAuthTask,
 } from "./_shared";
 
+/** What `useConfirmPasswordReset` returns. */
+export type UseConfirmPasswordResetResult = ReturnType<
+  typeof useConfirmPasswordResetBase
+>;
+
 export function useConfirmPasswordReset(
   options?: HookErrorOptions,
-): ReturnType<typeof useConfirmPasswordResetBase>;
+): UseConfirmPasswordResetResult;
 export function useConfirmPasswordReset(
   auth: Auth | null,
   options?: HookErrorOptions,
-): ReturnType<typeof useConfirmPasswordResetBase>;
+): UseConfirmPasswordResetResult;
 export function useConfirmPasswordReset(
   authOrOptions?: Auth | null | HookErrorOptions,
   maybeOptions?: HookErrorOptions,
@@ -41,8 +45,8 @@ export function useConfirmPasswordReset(
 }
 
 function useConfirmPasswordResetBase(auth: Auth | null, options: HookErrorOptions) {
-  const { loading, error, setError, run } = useAuthTask(options);
-  const [success, setSuccess] = useState(false);
+  const { status, isIdle, isPending, isSuccess, isError, error, reset, run } =
+    useAuthTask(options);
 
   const verifyCode = (oobCode: string): Promise<HookResult<{ email: string }>> =>
     run(
@@ -55,7 +59,6 @@ function useConfirmPasswordResetBase(auth: Auth | null, options: HookErrorOption
     );
 
   const confirm = async (oobCode: string, newPassword: string): Promise<HookResult> => {
-    setSuccess(false);
     const result = await run(
       "confirm-password-reset",
       "Failed to reset password",
@@ -64,14 +67,18 @@ function useConfirmPasswordResetBase(auth: Auth | null, options: HookErrorOption
         return {};
       },
     );
-    if (result.success) setSuccess(true);
     return result;
   };
 
-  const resetState = () => {
-    setError(null);
-    setSuccess(false);
+  return {
+    confirm,
+    verifyCode,
+    status,
+    isIdle,
+    isPending,
+    isSuccess,
+    isError,
+    error,
+    reset,
   };
-
-  return { confirm, verifyCode, loading, error, success, resetState };
 }

@@ -1,5 +1,11 @@
 {
   "title": "Guides",
-  "pages": ["server-sessions", "error-handling", "ssr", "compatibility"],
+  "pages": [
+    "server-sessions",
+    "error-handling",
+    "email-action-page",
+    "ssr",
+    "compatibility"
+  ],
   "defaultOpen": true
 }

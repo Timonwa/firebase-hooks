@@ -18,8 +18,8 @@
     "test": "pnpm --filter @timonwa/firebase-hooks test",
     "test:watch": "pnpm --filter @timonwa/firebase-hooks test:watch",
     "typecheck": "pnpm -r typecheck",
-    "lint": "biome check . && prettier --check \"**/*.md\" && pnpm --filter docs lint",
-    "lint:fix": "biome check --write . && prettier --write \"**/*.md\" && pnpm --filter docs lint:fix",
+    "lint": "biome check . && prettier --check .",
+    "lint:fix": "biome check --write . && prettier --write .",
     "check:exports": "pnpm --filter @timonwa/firebase-hooks check:exports",
     "check:publish": "pnpm --filter @timonwa/firebase-hooks check:publish",
     "verify": "pnpm build && pnpm typecheck && pnpm lint && pnpm test && pnpm check:publish && pnpm check:exports",
@@ -33,7 +33,8 @@
     "@changesets/cli": "^3.0.0",
     "husky": "^9.1.7",
     "lint-staged": "^17.3.0",
-    "prettier": "^3.9.6"
+    "prettier": "^3.9.6",
+    "prettier-plugin-tailwindcss": "^0.8.1"
   },
   "lint-staged": {
     "apps/**/*.{ts,tsx,mdx,json,css}": "prettier --write --ignore-unknown",

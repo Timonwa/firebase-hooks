@@ -20,6 +20,18 @@ Nothing throws, so you don't need to guard every call site.
 const { login } = useLogin(); // auth may be null — calling login just fails cleanly
 ```
 
+### When you have to pass null
+
+One case turns that affordance into a requirement. Next 16 with Cache Components prerenders your provider, and `getAuth()` reads the clock — which Next rejects as an unstable prerender value, failing the build. The error names your own file, so it reads as a bug in your code:
+
+```tsx
+<AuthProvider auth={typeof window === 'undefined' ? null : getFirebaseAuth()}>
+  {children}
+</AuthProvider>
+```
+
+Server-side there is no `Auth` instance, which is correct: Firebase Auth is a browser API, and the prerendered HTML is the signed-out shell either way. The client creates it on hydration and `isLoading` covers the gap.
+
 ## Distinguishing "signed out" from "not yet known"
 
 [`useAuth`](/docs/auth/auth-provider) exposes `isLoading`, true only until Firebase's first callback. Without it, a signed-in user flashes a signed-out UI on every load.

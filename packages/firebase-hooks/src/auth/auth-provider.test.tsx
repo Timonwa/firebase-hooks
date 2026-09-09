@@ -107,13 +107,13 @@ describe("error model", () => {
     act(() => {
       pending = result.current.login("a@b.c", "pw");
     });
-    expect(result.current.loading).toBe(true);
+    expect(result.current.isPending).toBe(true);
 
     await act(async () => {
       rejectSignIn(new Error("boom"));
       await pending;
     });
-    expect(result.current.loading).toBe(false);
+    expect(result.current.isPending).toBe(false);
     expect(result.current.error).toBe("boom");
   });
 });
@@ -349,5 +349,124 @@ describe("auth argument resolution", () => {
 
     expect(signInWithEmailAndPassword).not.toHaveBeenCalled();
     expect(outcome).toMatchObject({ success: false });
+  });
+});
+
+describe("provider-level senders", () => {
+  it("each hook inherits its own sender, and only its own", async () => {
+    const signInLink = vi.fn(async () => {});
+    const passwordReset = vi.fn(async () => {});
+    const wrapper = withAuthProvider({
+      auth: makeAuth(),
+      senders: { signInLink, passwordReset },
+    });
+
+    const { result } = renderHook(() => useSendPasswordResetEmail(), { wrapper });
+    await act(async () => {
+      await result.current.send("a@b.c");
+    });
+
+    // The three senders email different things, so a reset must never reach
+    // the sign-in-link sender.
+    expect(passwordReset).toHaveBeenCalledWith(
+      expect.objectContaining({ email: "a@b.c" }),
+    );
+    expect(signInLink).not.toHaveBeenCalled();
+    expect(sendPasswordResetEmail).not.toHaveBeenCalled();
+  });
+
+  it("a hook's own sender overrides the provider's", async () => {
+    const passwordReset = vi.fn(async () => {});
+    const own = vi.fn(async () => {});
+    const wrapper = withAuthProvider({ auth: makeAuth(), senders: { passwordReset } });
+
+    const { result } = renderHook(() => useSendPasswordResetEmail({ sendEmail: own }), {
+      wrapper,
+    });
+    await act(async () => {
+      await result.current.send("a@b.c");
+    });
+
+    expect(own).toHaveBeenCalledWith(expect.objectContaining({ email: "a@b.c" }));
+    expect(passwordReset).not.toHaveBeenCalled();
+  });
+
+  it("null opts one flow back to Firebase's own send", async () => {
+    const passwordReset = vi.fn(async () => {});
+    const wrapper = withAuthProvider({ auth: makeAuth(), senders: { passwordReset } });
+
+    const { result } = renderHook(
+      () => useSendPasswordResetEmail({ sendEmail: null, actionCodeSettings: null }),
+      { wrapper },
+    );
+    await act(async () => {
+      await result.current.send("a@b.c");
+    });
+
+    expect(passwordReset).not.toHaveBeenCalled();
+    expect(sendPasswordResetEmail).toHaveBeenCalled();
+  });
+});
+
+describe("status", () => {
+  it("starts idle, is pending while running, and settles on success", async () => {
+    let finish!: (value: unknown) => void;
+    vi.mocked(signInWithEmailAndPassword).mockImplementation(
+      () => new Promise((resolve) => (finish = resolve)) as never,
+    );
+    const { result } = renderHook(() => useLogin(makeAuth()));
+
+    expect(result.current.status).toBe("idle");
+    expect(result.current.isIdle).toBe(true);
+
+    let pending!: Promise<unknown>;
+    await act(async () => {
+      pending = result.current.login("a@b.c", "pw");
+    });
+    expect(result.current.status).toBe("pending");
+    expect(result.current.isPending).toBe(true);
+
+    await act(async () => {
+      finish({ user: makeUser() });
+      await pending;
+    });
+    expect(result.current.status).toBe("success");
+    expect(result.current.isSuccess).toBe(true);
+    expect(result.current.isPending).toBe(false);
+  });
+
+  it("settles on error with the message, and reset() returns to idle", async () => {
+    vi.mocked(signInWithEmailAndPassword).mockRejectedValue(
+      new FakeFirebaseError(
+        "auth/invalid-credential",
+        "Firebase: Error (auth/invalid-credential).",
+      ),
+    );
+    const { result } = renderHook(() => useLogin(makeAuth()));
+
+    await act(async () => {
+      await result.current.login("a@b.c", "pw");
+    });
+    expect(result.current.status).toBe("error");
+    expect(result.current.isError).toBe(true);
+    expect(result.current.error).toBe("Firebase: Error (auth/invalid-credential).");
+
+    act(() => result.current.reset());
+    expect(result.current.status).toBe("idle");
+    expect(result.current.error).toBeNull();
+    expect(result.current.isError).toBe(false);
+  });
+
+  it("the booleans are derived from status, never independently set", async () => {
+    vi.mocked(signInWithEmailAndPassword).mockResolvedValue({
+      user: makeUser(),
+    } as never);
+    const { result } = renderHook(() => useLogin(makeAuth()));
+    await act(async () => {
+      await result.current.login("a@b.c", "pw");
+    });
+    const { status, isIdle, isPending, isSuccess, isError } = result.current;
+    expect([isIdle, isPending, isSuccess, isError].filter(Boolean)).toHaveLength(1);
+    expect(isSuccess).toBe(status === "success");
   });
 });

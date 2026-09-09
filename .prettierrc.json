@@ -1,5 +1,20 @@
 {
   "$schema": "https://json.schemastore.org/prettierrc",
-  "printWidth": 90,
-  "proseWrap": "never"
+  "printWidth": 80,
+  "semi": true,
+  "trailingComma": "all",
+  "arrowParens": "avoid",
+  "bracketSameLine": true,
+  "proseWrap": "never",
+  "plugins": ["prettier-plugin-tailwindcss"],
+  "overrides": [
+    {
+      "files": "apps/docs/**",
+      "options": { "tailwindStylesheet": "./apps/docs/app/global.css" }
+    },
+    {
+      "files": "apps/playground/**",
+      "options": { "tailwindStylesheet": "./apps/playground/app/globals.css" }
+    }
+  ]
 }

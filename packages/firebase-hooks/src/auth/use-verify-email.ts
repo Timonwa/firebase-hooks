@@ -8,14 +8,14 @@
  * @param auth - Firebase `Auth` instance, or null while it initialises
  * @param oobCode - The code from the verification link, or null while parsing the URL
  * @param options.onVerified - Runs after a successful verification (e.g. refresh the session)
- * @returns `{ status, error, code, cause }` — status is "processing" | "success" | "failed";
+ * @returns `{ status, error, code, cause }` — status is "pending" | "error" | "success";
  * `code`/`cause` carry the raw failure like every other hook
  *
  * @example
  * const oobCode = searchParams.get("oobCode");
  * const { status, error } = useVerifyEmail(auth, oobCode, { onVerified: refreshSession });
- * if (status === "processing") return <Spinner />;
- * if (status === "failed") return <ErrorState message={error} />;
+ * if (status === "pending") return <Spinner />;
+ * if (status === "error") return <ErrorState message={error} />;
  * return <SuccessState />;
  */
 
@@ -23,6 +23,7 @@
 
 import { type Auth, applyActionCode, type User } from "firebase/auth";
 import { useEffect, useRef, useState } from "react";
+import type { AsyncStatus } from "../core/types";
 import {
   getFirebaseErrorCode,
   type HookErrorOptions,
@@ -31,9 +32,9 @@ import {
   useErrorMessageResolver,
 } from "./_shared";
 
-type VerifyEmailStatusType = "processing" | "success" | "failed";
+export type VerifyEmailStatus = AsyncStatus;
 
-export interface UseVerifyEmailOptionsProps extends HookErrorOptions {
+export interface UseVerifyEmailOptions extends HookErrorOptions {
   /**
    * Runs after the code is applied and the token refreshed — refresh your
    * server session here.
@@ -41,19 +42,22 @@ export interface UseVerifyEmailOptionsProps extends HookErrorOptions {
   onVerified?: (user: User | null) => void | Promise<void>;
 }
 
+/** What `useVerifyEmail` returns. */
+export type UseVerifyEmailResult = ReturnType<typeof useVerifyEmailBase>;
+
 export function useVerifyEmail(
   oobCode: string | null,
-  options?: UseVerifyEmailOptionsProps,
-): ReturnType<typeof useVerifyEmailBase>;
+  options?: UseVerifyEmailOptions,
+): UseVerifyEmailResult;
 export function useVerifyEmail(
   auth: Auth | null,
   oobCode: string | null,
-  options?: UseVerifyEmailOptionsProps,
-): ReturnType<typeof useVerifyEmailBase>;
+  options?: UseVerifyEmailOptions,
+): UseVerifyEmailResult;
 export function useVerifyEmail(
   ...args:
-    | [oobCode: string | null, options?: UseVerifyEmailOptionsProps]
-    | [auth: Auth | null, oobCode: string | null, options?: UseVerifyEmailOptionsProps]
+    | [oobCode: string | null, options?: UseVerifyEmailOptions]
+    | [auth: Auth | null, oobCode: string | null, options?: UseVerifyEmailOptions]
 ) {
   // Arity, not just type: `useVerifyEmail(null)` has to mean "no code in the
   // URL" — the common case, since `searchParams.get()` returns null — while
@@ -65,9 +69,9 @@ export function useVerifyEmail(
     args.length > 2 ||
     (args.length === 2 && (typeof second === "string" || second === null));
 
-  const [auth, options] = useAuthArgs<UseVerifyEmailOptionsProps>(
+  const [auth, options] = useAuthArgs<UseVerifyEmailOptions>(
     withAuth ? (args[0] as Auth | null) : undefined,
-    (withAuth ? args[2] : args[1]) as UseVerifyEmailOptionsProps | undefined,
+    (withAuth ? args[2] : args[1]) as UseVerifyEmailOptions | undefined,
   );
   const oobCode = ((withAuth ? args[1] : args[0]) as string | null) ?? null;
 
@@ -77,9 +81,9 @@ export function useVerifyEmail(
 function useVerifyEmailBase(
   auth: Auth | null,
   oobCode: string | null,
-  options: UseVerifyEmailOptionsProps,
+  options: UseVerifyEmailOptions,
 ) {
-  const [status, setStatus] = useState<VerifyEmailStatusType>("processing");
+  const [status, setStatus] = useState<VerifyEmailStatus>("pending");
   const [error, setError] = useState<string | null>(null);
   const [code, setCode] = useState<string | null>(null);
   const [cause, setCause] = useState<unknown>(null);
@@ -92,7 +96,7 @@ function useVerifyEmailBase(
   useEffect(() => {
     if (!auth) return;
     if (!oobCode) {
-      setStatus("failed");
+      setStatus("error");
       setError("Verification code is missing");
       return;
     }
@@ -115,7 +119,7 @@ function useVerifyEmailBase(
       })
       .catch((err: unknown) => {
         const message = resolveMessage(err, "Failed to verify email");
-        setStatus("failed");
+        setStatus("error");
         setError(message);
         setCode(getFirebaseErrorCode(err));
         setCause(err);
@@ -127,5 +131,13 @@ function useVerifyEmailBase(
       });
   }, [auth, oobCode, resolveMessage, notifyError]);
 
-  return { status, error, code, cause };
+  return {
+    status,
+    isPending: status === "pending",
+    isSuccess: status === "success",
+    isError: status === "error",
+    error,
+    code,
+    cause,
+  };
 }

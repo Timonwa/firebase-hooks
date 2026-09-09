@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { usePathname } from 'next/navigation';
-import { type ReactNode, useEffect, useState } from 'react';
-import { AppSidebar } from './app-sidebar';
-import { TopBar } from './top-bar';
+import { usePathname } from "next/navigation";
+import { type ReactNode, useEffect, useState } from "react";
+import { AppSidebar } from "./app-sidebar";
+import { TopBar } from "./top-bar";
 
 /**
  * The page frame, and the owner of the drawer state.
@@ -23,15 +23,15 @@ export function Shell({ children }: { children: ReactNode }) {
     if (!navOpen) return;
 
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setNavOpen(false);
+      if (event.key === "Escape") setNavOpen(false);
     };
     // The drawer covers the page, so the page behind it must not scroll.
-    document.body.style.overflow = 'hidden';
-    document.addEventListener('keydown', onKeyDown);
+    document.body.style.overflow = "hidden";
+    document.addEventListener("keydown", onKeyDown);
 
     return () => {
-      document.body.style.overflow = '';
-      document.removeEventListener('keydown', onKeyDown);
+      document.body.style.overflow = "";
+      document.removeEventListener("keydown", onKeyDown);
     };
   }, [navOpen]);
 
@@ -42,8 +42,8 @@ export function Shell({ children }: { children: ReactNode }) {
         tabIndex={-1}
         aria-hidden
         onClick={() => setNavOpen(false)}
-        className={`ease-panel fixed inset-0 z-30 bg-black/40 transition-opacity duration-200 lg:hidden ${
-          navOpen ? 'opacity-100' : 'pointer-events-none opacity-0'
+        className={`fixed inset-0 z-30 bg-black/40 transition-opacity duration-200 ease-panel lg:hidden ${
+          navOpen ? "opacity-100" : "pointer-events-none opacity-0"
         }`}
       />
 

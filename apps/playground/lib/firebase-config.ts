@@ -1,7 +1,7 @@
-import type { FirebaseOptions } from 'firebase/app';
+import type { FirebaseOptions } from "firebase/app";
 
 export type PlaygroundConfig = FirebaseOptions &
-  Record<'apiKey' | 'authDomain' | 'projectId' | 'appId', string>;
+  Record<"apiKey" | "authDomain" | "projectId" | "appId", string>;
 
 /** Read once at boot from `.env.local`; see `.env.example`. */
 export function getFirebaseConfig(): PlaygroundConfig | null {

@@ -11,7 +11,7 @@ const { signIn } = useAnonymousSignIn();
 
 ## Returns
 
-`signIn()` resolves to `{ success: true, user, credential }` or a failure result. Also exposes `loading` and `error`.
+`signIn()` resolves to `{ success: true, user, credential }` or a failure result. Also exposes `status`, `isPending`, `error`, and `reset`.
 
 ## Upgrading a guest
 
@@ -21,5 +21,5 @@ The resulting user can be upgraded to a real account **without losing their data
 
 <AutoTypeTable
   path="../../packages/firebase-hooks/src/auth/use-anonymous-sign-in.ts"
-  name="UseAnonymousSignInOptionsProps"
+  name="UseAnonymousSignInOptions"
 />

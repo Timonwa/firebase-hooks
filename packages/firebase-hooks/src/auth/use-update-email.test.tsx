@@ -27,7 +27,7 @@ describe("useUpdateEmail", () => {
     });
     expect(order).toEqual(["reauth", "verify"]);
     expect(verifyBeforeUpdateEmail).toHaveBeenCalledWith(user, "new@b.c", undefined);
-    expect(result.current.success).toBe(true);
+    expect(result.current.isSuccess).toBe(true);
   });
 
   it("without currentPassword goes straight to verifyBeforeUpdateEmail", async () => {
@@ -68,7 +68,7 @@ describe("useUpdateEmail", () => {
       code: "auth/requires-recent-login",
       cause: firebaseError,
     });
-    expect(result.current.success).toBe(false);
+    expect(result.current.isSuccess).toBe(false);
   });
 
   it("a passwordless account can't take the currentPassword path", async () => {

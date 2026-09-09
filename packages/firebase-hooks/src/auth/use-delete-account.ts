@@ -31,7 +31,7 @@ import {
   useAuthTask,
 } from "./_shared";
 
-export interface UseDeleteAccountOptionsProps extends HookErrorOptions {
+export interface UseDeleteAccountOptions extends HookErrorOptions {
   /**
    * Runs while the user is still authenticated — clean up server-side data
    * here. Throwing aborts the deletion.
@@ -39,22 +39,26 @@ export interface UseDeleteAccountOptionsProps extends HookErrorOptions {
   onBeforeDelete?: (user: User) => void | Promise<void>;
 }
 
+/** What `useDeleteAccount` returns. */
+export type UseDeleteAccountResult = ReturnType<typeof useDeleteAccountBase>;
+
 export function useDeleteAccount(
-  options?: UseDeleteAccountOptionsProps,
-): ReturnType<typeof useDeleteAccountBase>;
+  options?: UseDeleteAccountOptions,
+): UseDeleteAccountResult;
 export function useDeleteAccount(
   auth: Auth | null,
-  options?: UseDeleteAccountOptionsProps,
-): ReturnType<typeof useDeleteAccountBase>;
+  options?: UseDeleteAccountOptions,
+): UseDeleteAccountResult;
 export function useDeleteAccount(
-  authOrOptions?: Auth | null | UseDeleteAccountOptionsProps,
-  maybeOptions?: UseDeleteAccountOptionsProps,
+  authOrOptions?: Auth | null | UseDeleteAccountOptions,
+  maybeOptions?: UseDeleteAccountOptions,
 ) {
   return useDeleteAccountBase(...useAuthArgs(authOrOptions, maybeOptions));
 }
 
-function useDeleteAccountBase(auth: Auth | null, options: UseDeleteAccountOptionsProps) {
-  const { loading, error, run } = useAuthTask(options);
+function useDeleteAccountBase(auth: Auth | null, options: UseDeleteAccountOptions) {
+  const { status, isIdle, isPending, isSuccess, isError, error, reset, run } =
+    useAuthTask(options);
 
   const deleteAccount = ({
     currentPassword,
@@ -69,5 +73,5 @@ function useDeleteAccountBase(auth: Auth | null, options: UseDeleteAccountOption
       return {};
     });
 
-  return { deleteAccount, loading, error };
+  return { deleteAccount, status, isIdle, isPending, isSuccess, isError, error, reset };
 }

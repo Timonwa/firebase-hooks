@@ -41,7 +41,7 @@ import {
   useResolvedConfig,
 } from "./_shared";
 
-export interface UsePhoneSignInOptionsProps extends HookErrorOptions {
+export interface UsePhoneSignInOptions extends HookErrorOptions {
   /**
    * Size of the managed reCAPTCHA widget.
    * @defaultValue "invisible"
@@ -54,22 +54,24 @@ export interface UsePhoneSignInOptionsProps extends HookErrorOptions {
   onIdToken?: OnIdToken | null;
 }
 
-export function usePhoneSignIn(
-  options?: UsePhoneSignInOptionsProps,
-): ReturnType<typeof usePhoneSignInBase>;
+/** What `usePhoneSignIn` returns. */
+export type UsePhoneSignInResult = ReturnType<typeof usePhoneSignInBase>;
+
+export function usePhoneSignIn(options?: UsePhoneSignInOptions): UsePhoneSignInResult;
 export function usePhoneSignIn(
   auth: Auth | null,
-  options?: UsePhoneSignInOptionsProps,
-): ReturnType<typeof usePhoneSignInBase>;
+  options?: UsePhoneSignInOptions,
+): UsePhoneSignInResult;
 export function usePhoneSignIn(
-  authOrOptions?: Auth | null | UsePhoneSignInOptionsProps,
-  maybeOptions?: UsePhoneSignInOptionsProps,
+  authOrOptions?: Auth | null | UsePhoneSignInOptions,
+  maybeOptions?: UsePhoneSignInOptions,
 ) {
   return usePhoneSignInBase(...useAuthArgs(authOrOptions, maybeOptions));
 }
 
-function usePhoneSignInBase(auth: Auth | null, options: UsePhoneSignInOptionsProps) {
-  const { loading, error, run } = useAuthTask(options);
+function usePhoneSignInBase(auth: Auth | null, options: UsePhoneSignInOptions) {
+  const { status, isIdle, isPending, isSuccess, isError, error, reset, run } =
+    useAuthTask(options);
   const onIdToken = useResolvedConfig("onIdToken", options.onIdToken);
   const [codeSent, setCodeSent] = useState(false);
   const confirmationRef = useRef<ConfirmationResult | null>(null);
@@ -110,5 +112,16 @@ function usePhoneSignInBase(auth: Auth | null, options: UsePhoneSignInOptionsPro
       return { user: credential.user, credential };
     });
 
-  return { sendCode, confirmCode, codeSent, loading, error };
+  return {
+    sendCode,
+    confirmCode,
+    codeSent,
+    status,
+    isIdle,
+    isPending,
+    isSuccess,
+    isError,
+    error,
+    reset,
+  };
 }

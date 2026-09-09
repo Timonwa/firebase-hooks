@@ -1,7 +1,7 @@
-import defaultMdxComponents from 'fumadocs-ui/mdx';
-import type { MDXComponents } from 'mdx/types';
-import { createGenerator } from 'fumadocs-typescript';
-import { AutoTypeTable, type AutoTypeTableProps } from 'fumadocs-typescript/ui';
+import defaultMdxComponents from "fumadocs-ui/mdx";
+import type { MDXComponents } from "mdx/types";
+import { createGenerator } from "fumadocs-typescript";
+import { AutoTypeTable, type AutoTypeTableProps } from "fumadocs-typescript/ui";
 
 // One generator for the whole site, so the TypeScript program is built once
 // rather than per page. Caching defaults to 'fs'.

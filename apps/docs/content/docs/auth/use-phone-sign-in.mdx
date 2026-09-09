@@ -23,7 +23,7 @@ const result = await confirmCode(smsCode);
 
 `confirmCode(code)` resolves to `{ success: true, user, credential }` or a failure result.
 
-`codeSent` flips true after a successful send. Also exposes `loading` and `error`.
+`codeSent` flips true after a successful send. Also exposes `status`, `isPending`, `error`, and `reset`.
 
 ## The reCAPTCHA verifier
 
@@ -33,5 +33,5 @@ Created and cleaned up for you — you never construct a `RecaptchaVerifier`. Ch
 
 <AutoTypeTable
   path="../../packages/firebase-hooks/src/auth/use-phone-sign-in.ts"
-  name="UsePhoneSignInOptionsProps"
+  name="UsePhoneSignInOptions"
 />

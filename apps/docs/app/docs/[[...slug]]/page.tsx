@@ -1,4 +1,4 @@
-import { getPageImageUrl, getPageMarkdownUrl, source } from '@/lib/source';
+import { getPageImageUrl, getPageMarkdownUrl, source } from "@/lib/source";
 import {
   DocsBody,
   DocsDescription,
@@ -6,17 +6,17 @@ import {
   DocsTitle,
   MarkdownCopyButton,
   ViewOptionsPopover,
-} from 'fumadocs-ui/layouts/docs/page';
-import { notFound } from 'next/navigation';
-import { getMDXComponents } from '@/components/mdx';
-import type { Metadata } from 'next';
-import { createRelativeLink } from 'fumadocs-ui/mdx';
-import { JsonLd } from '@/components/json-ld';
-import { breadcrumbSchema, techArticleSchema } from '@/lib/schema';
-import { buildMetadata } from '@/lib/seo';
-import { gitConfig } from '@/lib/shared';
+} from "fumadocs-ui/layouts/docs/page";
+import { notFound } from "next/navigation";
+import { getMDXComponents } from "@/components/mdx";
+import type { Metadata } from "next";
+import { createRelativeLink } from "fumadocs-ui/mdx";
+import { JsonLd } from "@/components/json-ld";
+import { breadcrumbSchema, techArticleSchema } from "@/lib/schema";
+import { buildMetadata } from "@/lib/seo";
+import { gitConfig } from "@/lib/shared";
 
-export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
+export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
   const params = await props.params;
   const page = source.getPage(params.slug);
   if (!page) notFound();
@@ -26,11 +26,12 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
 
   // Breadcrumbs mirror the URL, which is what Google expects them to.
   const trail = [
-    { name: 'Docs', path: '/docs' },
+    { name: "Docs", path: "/docs" },
     ...page.slugs.map((_, index) => ({
       name:
-        source.getPage(page.slugs.slice(0, index + 1))?.data.title ?? page.slugs[index],
-      path: `/docs/${page.slugs.slice(0, index + 1).join('/')}`,
+        source.getPage(page.slugs.slice(0, index + 1))?.data.title ??
+        page.slugs[index],
+      path: `/docs/${page.slugs.slice(0, index + 1).join("/")}`,
     })),
   ];
 
@@ -47,7 +48,9 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
         ]}
       />
       <DocsTitle>{page.data.title}</DocsTitle>
-      <DocsDescription className="mb-0">{page.data.description}</DocsDescription>
+      <DocsDescription className="mb-0">
+        {page.data.description}
+      </DocsDescription>
       <div className="flex flex-row items-center gap-2 border-b pb-6">
         <MarkdownCopyButton markdownUrl={markdownUrl} />
         <ViewOptionsPopover
@@ -72,7 +75,7 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata(
-  props: PageProps<'/docs/[[...slug]]'>,
+  props: PageProps<"/docs/[[...slug]]">,
 ): Promise<Metadata> {
   const params = await props.params;
   const page = source.getPage(params.slug);
@@ -86,6 +89,6 @@ export async function generateMetadata(
     path: page.url,
     imageUrl: getPageImageUrl(page).url,
     imageAlt: page.data.title,
-    type: 'article',
+    type: "article",
   });
 }

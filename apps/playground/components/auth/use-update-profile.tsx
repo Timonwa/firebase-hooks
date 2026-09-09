@@ -1,18 +1,18 @@
-'use client';
+"use client";
 
-import { useUpdateProfile } from '@timonwa/firebase-hooks/auth';
-import { useState } from 'react';
-import { Button, Field } from '@/components/controls';
-import { hookSnippet, useErrorFormat } from '@/components/hook-options';
-import { HookSection } from '@/components/hook-section';
+import { useUpdateProfile } from "@timonwa/firebase-hooks/auth";
+import { useState } from "react";
+import { Button, Field } from "@/components/controls";
+import { hookSnippet, useErrorFormat } from "@/components/hook-options";
+import { HookSection } from "@/components/hook-section";
 
 export function UseUpdateProfileSection() {
   const errorFormat = useErrorFormat();
-  const { update, loading, error, success } = useUpdateProfile({
+  const { update, status, isPending, isSuccess, error } = useUpdateProfile({
     formatErrorMessage: errorFormat.value,
   });
-  const [displayName, setDisplayName] = useState('');
-  const [photoURL, setPhotoURL] = useState('');
+  const [displayName, setDisplayName] = useState("");
+  const [photoURL, setPhotoURL] = useState("");
   const [result, setResult] = useState<unknown>();
 
   return (
@@ -20,10 +20,10 @@ export function UseUpdateProfileSection() {
       hook="useUpdateProfile"
       why="Firebase treats profile fields as non-sensitive, so this is the one account operation that needs no reauthentication."
       snippet={hookSnippet({
-        hook: 'useUpdateProfile',
-        returns: 'update, loading, error, success',
+        hook: "useUpdateProfile",
+        returns: "update, isPending, isSuccess, error",
         lines: [errorFormat.line],
-        body: 'await update({ displayName, photoURL });',
+        body: "await update({ displayName, photoURL });",
       })}
       options={errorFormat.control}
       form={
@@ -31,15 +31,15 @@ export function UseUpdateProfileSection() {
           <Field
             label="Display name"
             value={displayName}
-            onChange={(e) => setDisplayName(e.target.value)}
+            onChange={e => setDisplayName(e.target.value)}
           />
           <Field
             label="Photo URL"
             value={photoURL}
-            onChange={(e) => setPhotoURL(e.target.value)}
+            onChange={e => setPhotoURL(e.target.value)}
           />
           <Button
-            disabled={loading}
+            disabled={isPending}
             onClick={async () =>
               setResult(
                 await update({
@@ -47,16 +47,17 @@ export function UseUpdateProfileSection() {
                   ...(photoURL && { photoURL }),
                 }),
               )
-            }
-          >
-            {loading ? 'Saving…' : 'Update profile'}
+            }>
+            {isPending ? "Saving…" : "Update profile"}
           </Button>
-          {success ? <p className="text-sm text-green-600">Profile updated.</p> : null}
+          {isSuccess ? (
+            <p className="text-sm text-green-600">Profile updated.</p>
+          ) : null}
         </>
       }
       result={result}
       error={error}
-      loading={loading}
+      status={status}
     />
   );
 }

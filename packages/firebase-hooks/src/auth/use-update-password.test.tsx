@@ -23,7 +23,7 @@ describe("useUpdatePassword", () => {
       await result.current.update("new-pw", { currentPassword: "current-pw" });
     });
     expect(order).toEqual(["reauth", "update"]);
-    expect(result.current.success).toBe(true);
+    expect(result.current.isSuccess).toBe(true);
   });
 
   it("skips reauthentication when currentPassword is omitted", async () => {
@@ -52,7 +52,7 @@ describe("useUpdatePassword", () => {
       code: "auth/requires-recent-login",
       cause: firebaseError,
     });
-    expect(result.current.success).toBe(false);
+    expect(result.current.isSuccess).toBe(false);
   });
 
   it("a passwordless account can't take the currentPassword path", async () => {

@@ -1,29 +1,29 @@
-'use client';
+"use client";
 
-import { UseAnonymousSignInSection } from '@/components/auth/use-anonymous-sign-in';
-import { UseAuthSection } from '@/components/auth/use-auth';
-import { UseConfirmPasswordResetSection } from '@/components/auth/use-confirm-password-reset';
-import { UseCustomTokenSignInSection } from '@/components/auth/use-custom-token-sign-in';
-import { UseDeleteAccountSection } from '@/components/auth/use-delete-account';
-import { UseEmailLinkSignInSection } from '@/components/auth/use-email-link-sign-in';
-import { UseLinkProviderSection } from '@/components/auth/use-link-provider';
-import { UseLoginSection } from '@/components/auth/use-login';
-import { UseLogoutSection } from '@/components/auth/use-logout';
-import { UseOAuthSignInSection } from '@/components/auth/use-oauth-sign-in';
-import { UsePhoneSignInSection } from '@/components/auth/use-phone-sign-in';
-import { UseReauthenticateSection } from '@/components/auth/use-reauthenticate';
-import { UseSendEmailVerificationSection } from '@/components/auth/use-send-email-verification';
-import { UseSendPasswordResetEmailSection } from '@/components/auth/use-send-password-reset-email';
-import { UseSignupSection } from '@/components/auth/use-signup';
-import { UseUnlinkProviderSection } from '@/components/auth/use-unlink-provider';
-import { UseUpdateEmailSection } from '@/components/auth/use-update-email';
-import { UseUpdatePasswordSection } from '@/components/auth/use-update-password';
-import { UseUpdateProfileSection } from '@/components/auth/use-update-profile';
-import { UseVerifyEmailSection } from '@/components/auth/use-verify-email';
-import { useFirebase } from '@/components/firebase-provider';
-import { GroupHeading } from '@/components/group-heading';
-import { NeedsConfig } from '@/components/needs-config';
-import { PageIntro } from '@/components/page-intro';
+import { UseAnonymousSignInSection } from "@/components/auth/use-anonymous-sign-in";
+import { UseAuthSection } from "@/components/auth/use-auth";
+import { UseConfirmPasswordResetSection } from "@/components/auth/use-confirm-password-reset";
+import { UseCustomTokenSignInSection } from "@/components/auth/use-custom-token-sign-in";
+import { UseDeleteAccountSection } from "@/components/auth/use-delete-account";
+import { UseEmailLinkSignInSection } from "@/components/auth/use-email-link-sign-in";
+import { UseLinkProviderSection } from "@/components/auth/use-link-provider";
+import { UseLoginSection } from "@/components/auth/use-login";
+import { UseLogoutSection } from "@/components/auth/use-logout";
+import { UseOAuthSignInSection } from "@/components/auth/use-oauth-sign-in";
+import { UsePhoneSignInSection } from "@/components/auth/use-phone-sign-in";
+import { UseReauthenticateSection } from "@/components/auth/use-reauthenticate";
+import { UseSendEmailVerificationSection } from "@/components/auth/use-send-email-verification";
+import { UseSendPasswordResetEmailSection } from "@/components/auth/use-send-password-reset-email";
+import { UseSignupSection } from "@/components/auth/use-signup";
+import { UseUnlinkProviderSection } from "@/components/auth/use-unlink-provider";
+import { UseUpdateEmailSection } from "@/components/auth/use-update-email";
+import { UseUpdatePasswordSection } from "@/components/auth/use-update-password";
+import { UseUpdateProfileSection } from "@/components/auth/use-update-profile";
+import { UseVerifyEmailSection } from "@/components/auth/use-verify-email";
+import { useFirebase } from "@/components/firebase-provider";
+import { GroupHeading } from "@/components/group-heading";
+import { NeedsConfig } from "@/components/needs-config";
+import { PageIntro } from "@/components/page-intro";
 
 /**
  * Every auth hook on one page, grouped the way the docs group them.

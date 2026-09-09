@@ -1,20 +1,24 @@
-'use client';
+"use client";
 
-import { useAnonymousSignIn } from '@timonwa/firebase-hooks/auth';
-import { useState } from 'react';
-import { Button } from '@/components/controls';
-import { hookSnippet, useErrorFormat, useFlowCallback } from '@/components/hook-options';
-import { HookSection } from '@/components/hook-section';
+import { useAnonymousSignIn } from "@timonwa/firebase-hooks/auth";
+import { useState } from "react";
+import { Button } from "@/components/controls";
+import {
+  hookSnippet,
+  useErrorFormat,
+  useFlowCallback,
+} from "@/components/hook-options";
+import { HookSection } from "@/components/hook-section";
 
 export function UseAnonymousSignInSection() {
   const errorFormat = useErrorFormat();
   const onIdToken = useFlowCallback({
-    name: 'onIdToken',
-    signature: '(idToken)',
-    body: 'createSession(idToken)',
-    throwsHint: 'The guest session is not created.',
+    name: "onIdToken",
+    signature: "(idToken)",
+    body: "createSession(idToken)",
+    throwsHint: "The guest session is not created.",
   });
-  const { signIn, loading, error } = useAnonymousSignIn({
+  const { signIn, status, isPending, error } = useAnonymousSignIn({
     formatErrorMessage: errorFormat.value,
     onIdToken: onIdToken.value,
   });
@@ -25,15 +29,16 @@ export function UseAnonymousSignInSection() {
       hook="useAnonymousSignIn"
       why={
         <>
-          A guest session you can upgrade later with <code>useLinkProvider</code> — the
-          uid survives, so everything they created while anonymous still belongs to them.
+          A guest session you can upgrade later with{" "}
+          <code>useLinkProvider</code> — the uid survives, so everything they
+          created while anonymous still belongs to them.
         </>
       }
       snippet={hookSnippet({
-        hook: 'useAnonymousSignIn',
-        returns: 'signIn, loading, error',
+        hook: "useAnonymousSignIn",
+        returns: "signIn, isPending, error",
         lines: [onIdToken.line, errorFormat.line],
-        body: 'await signIn();',
+        body: "await signIn();",
       })}
       options={
         <>
@@ -42,13 +47,15 @@ export function UseAnonymousSignInSection() {
         </>
       }
       form={
-        <Button disabled={loading} onClick={async () => setResult(await signIn())}>
-          {loading ? 'Signing in…' : 'Continue as guest'}
+        <Button
+          disabled={isPending}
+          onClick={async () => setResult(await signIn())}>
+          {isPending ? "Signing in…" : "Continue as guest"}
         </Button>
       }
       result={result}
       error={error}
-      loading={loading}
+      status={status}
     />
   );
 }

@@ -1,6 +1,12 @@
-import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
-import { Heart } from 'lucide-react';
-import { appName, gitConfig, npmUrl, packageVersion, supportUrl } from './shared';
+import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared";
+import { Heart } from "lucide-react";
+import {
+  appName,
+  gitConfig,
+  npmUrl,
+  packageVersion,
+  supportUrl,
+} from "./shared";
 
 const REPO_URL = `https://github.com/${gitConfig.user}/${gitConfig.repo}`;
 
@@ -19,29 +25,29 @@ export function baseOptions(): BaseLayoutProps {
       title: (
         <span className="inline-flex items-baseline gap-2">
           <span className="font-medium">{appName}</span>
-          <span className="text-fd-muted-foreground rounded-full border px-1.5 py-0.5 text-[10px] leading-none">
+          <span className="rounded-full border px-1.5 py-0.5 text-[10px] leading-none text-fd-muted-foreground">
             v{packageVersion}
           </span>
         </span>
       ),
     },
     links: [
-      { text: 'npm', url: npmUrl, external: true },
+      { text: "npm", url: npmUrl, external: true },
       {
-        type: 'icon',
-        label: 'GitHub repository',
+        type: "icon",
+        label: "GitHub repository",
         icon: GITHUB_ICON,
-        text: 'GitHub',
+        text: "GitHub",
         url: REPO_URL,
         external: true,
       },
       {
         // A quiet icon beside GitHub rather than a coloured CTA — asking once, in
         // passing, reads better on a docs site than a banner would.
-        type: 'icon',
-        label: 'Sponsor this project',
+        type: "icon",
+        label: "Sponsor this project",
         icon: <Heart />,
-        text: 'Sponsor',
+        text: "Sponsor",
         url: supportUrl,
         external: true,
       },

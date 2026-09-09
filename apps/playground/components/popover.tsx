@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { type ReactNode, useEffect, useId, useRef, useState } from 'react';
+import { type ReactNode, useEffect, useId, useRef, useState } from "react";
 
 /**
  * A trigger button and the panel it opens.
@@ -32,16 +32,16 @@ export function Popover({
       if (!containerRef.current?.contains(event.target as Node)) setOpen(false);
     };
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== 'Escape') return;
+      if (event.key !== "Escape") return;
       setOpen(false);
       triggerRef.current?.focus();
     };
 
-    document.addEventListener('pointerdown', onPointerDown);
-    document.addEventListener('keydown', onKeyDown);
+    document.addEventListener("pointerdown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
     return () => {
-      document.removeEventListener('pointerdown', onPointerDown);
-      document.removeEventListener('keydown', onKeyDown);
+      document.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
     };
   }, [open]);
 
@@ -50,15 +50,14 @@ export function Popover({
       <button
         ref={triggerRef}
         type="button"
-        onClick={() => setOpen((value) => !value)}
+        onClick={() => setOpen(value => !value)}
         aria-label={label}
         aria-expanded={open}
         aria-haspopup="dialog"
         aria-controls={open ? panelId : undefined}
         className={`grid size-8 place-items-center rounded-md transition-colors ${
-          open ? 'bg-fg/5 text-fg' : 'text-muted hover:text-fg hover:bg-fg/5'
-        }`}
-      >
+          open ? "bg-fg/5 text-fg" : "text-muted hover:bg-fg/5 hover:text-fg"
+        }`}>
         {trigger}
       </button>
 
@@ -67,8 +66,7 @@ export function Popover({
           id={panelId}
           role="dialog"
           aria-label={label}
-          className="border-line bg-surface animate-pop absolute top-full right-0 z-50 mt-2 w-64 origin-top-right rounded-xl border p-1 shadow-lg"
-        >
+          className="absolute top-full right-0 z-50 mt-2 w-64 origin-top-right animate-pop rounded-xl border border-line bg-surface p-1 shadow-lg">
           {children}
         </div>
       ) : null}

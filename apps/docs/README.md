@@ -12,9 +12,9 @@ Open <http://localhost:3000>.
 
 ## Environment
 
-| Variable               | Required | What it's for                                                 |
-| ---------------------- | -------- | ------------------------------------------------------------- |
-| `NEXT_PUBLIC_SITE_URL` | No       | Absolute origin for canonicals, the sitemap and OG image URLs |
+| Variable | Required | What it's for |
+| --- | --- | --- |
+| `NEXT_PUBLIC_SITE_URL` | No | Absolute origin for canonicals, the sitemap and OG image URLs |
 
 **Nothing to configure on Vercel.** The origin resolves from `VERCEL_PROJECT_PRODUCTION_URL`, which Vercel sets automatically. Set `NEXT_PUBLIC_SITE_URL` only once a custom domain points at the site.
 
@@ -22,17 +22,17 @@ Locally the origin falls back to `http://localhost:3000`. If your dev server pic
 
 ## Layout
 
-| Path                    | What it is                                                                   |
-| ----------------------- | ---------------------------------------------------------------------------- |
-| `content/docs/`         | The MDX pages; `meta.json` per folder controls nav order                     |
-| `lib/source.ts`         | Content source adapter — the nav, sitemap and OG routes all read from it     |
-| `lib/site.ts`           | Site config: origin, description, author, whether the env is indexable       |
-| `lib/seo.ts`            | `buildMetadata()` — every page's canonical, OG, Twitter and robots           |
-| `lib/schema.ts`         | JSON-LD graph, anchored by stable `@id`                                      |
-| `lib/layout.shared.tsx` | Nav title, version pill, and the nav links                                   |
-| `app/og/`               | OG image routes — `/og` for the home page, `/og/docs/*` prerendered per page |
-| `app/(home)/`           | Landing page and its footer                                                  |
-| `app/docs/`             | Documentation layout and pages                                               |
+| Path | What it is |
+| --- | --- |
+| `content/docs/` | The MDX pages; `meta.json` per folder controls nav order |
+| `lib/source.ts` | Content source adapter — the nav, sitemap and OG routes all read from it |
+| `lib/site.ts` | Site config: origin, description, author, whether the env is indexable |
+| `lib/seo.ts` | `buildMetadata()` — every page's canonical, OG, Twitter and robots |
+| `lib/schema.ts` | JSON-LD graph, anchored by stable `@id` |
+| `lib/layout.shared.tsx` | Nav title, version pill, and the nav links |
+| `app/og/` | OG image routes — `/og` for the home page, `/og/docs/*` prerendered per page |
+| `app/(home)/` | Landing page and its footer |
+| `app/docs/` | Documentation layout and pages |
 
 ## Writing a page
 

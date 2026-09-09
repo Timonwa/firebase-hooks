@@ -31,11 +31,11 @@ Actions with nothing to return resolve to plain `{ success: true }`.
 
 ## On failure
 
-| Field   | Type             | What it is                                            |
-| ------- | ---------------- | ----------------------------------------------------- |
-| `error` | `string`         | The message for rendering — raw by default            |
-| `code`  | `string \| null` | Firebase's own code, e.g. `"auth/invalid-credential"` |
-| `cause` | `unknown`        | The complete untouched error                          |
+| Field | Type | What it is |
+| --- | --- | --- |
+| `error` | `string` | The message for rendering — raw by default |
+| `code` | `string \| null` | Firebase's own code, e.g. `"auth/invalid-credential"` |
+| `cause` | `unknown` | The complete untouched error |
 
 `code` and `cause` are always Firebase's own. Only `error` is ever processed, and only if you opt in — see [Error handling](/docs/guides/error-handling).
 
@@ -50,6 +50,32 @@ if (!result.success) {
   return;
 }
 result.user; // User — narrowed, no optional chaining needed
+```
+
+## AsyncStatus
+
+`HookResult` covers actions you call. A hook that acts on mount reports a status instead, and they all use one vocabulary:
+
+```ts
+type AsyncStatus = 'pending' | 'error' | 'success';
+```
+
+There is no idle state — the work starts before you can render, so `pending` is where it begins. [`useVerifyEmail`](/docs/auth/use-verify-email) reports it as `VerifyEmailStatus`, an alias of this.
+
+Actions you call get one more state, because nothing runs until you call them:
+
+```ts
+type ActionStatus = 'idle' | AsyncStatus;
+```
+
+Every action hook returns `status: ActionStatus` with `isIdle`, `isPending`, `isSuccess` and `isError` derived from it, plus `reset()`. Two vocabularies rather than one is deliberate — the same split TanStack Query makes between a query's status and a mutation's.
+
+Render the three branches and you've handled every case:
+
+```tsx
+if (status === 'pending') return <Spinner />;
+if (status === 'error') return <ErrorState message={error} />;
+return <Success />;
 ```
 
 ## Related types

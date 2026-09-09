@@ -1,6 +1,6 @@
-import { highlight } from 'fumadocs-core/highlight';
-import { CodeBlock, Pre } from 'fumadocs-ui/components/codeblock';
-import type { ReactNode } from 'react';
+import { highlight } from "fumadocs-core/highlight";
+import { CodeBlock, Pre } from "fumadocs-ui/components/codeblock";
+import type { ReactNode } from "react";
 
 /**
  * Shiki-highlighted code for hand-written pages. MDX code fences get this from
@@ -16,11 +16,11 @@ import type { ReactNode } from 'react';
  * lines scroll; overriding to `w-full` is what gives `pre-wrap` something to
  * wrap against. Without the `pre` override the wrap silently does nothing.
  */
-const WRAP = '[&_pre]:w-full [&_code]:whitespace-pre-wrap [&_code]:break-words';
+const WRAP = "[&_pre]:w-full [&_code]:whitespace-pre-wrap [&_code]:break-words";
 
 export async function CodeSample({
   code,
-  lang = 'tsx',
+  lang = "tsx",
   title,
   className,
   wrap = false,
@@ -33,18 +33,17 @@ export async function CodeSample({
 }): Promise<ReactNode> {
   return highlight(code, {
     lang,
-    themes: { light: 'github-light', dark: 'github-dark' },
+    themes: { light: "github-light", dark: "github-dark" },
     // Emit --shiki-light/--shiki-dark variables instead of a baked-in colour.
     // Fumadocs' stylesheet switches on those; without this the light theme is
     // hardcoded and the blocks stay light in dark mode.
     defaultColor: false,
     components: {
-      pre: (props) => (
+      pre: props => (
         <CodeBlock
           title={title}
-          className={[wrap && WRAP, className].filter(Boolean).join(' ')}
-          keepBackground={false}
-        >
+          className={[wrap && WRAP, className].filter(Boolean).join(" ")}
+          keepBackground={false}>
           <Pre {...props} />
         </CodeBlock>
       ),

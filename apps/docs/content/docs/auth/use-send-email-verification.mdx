@@ -6,24 +6,37 @@ description: The resend-verification-email button.
 Sends, or re-sends, the verification email to the signed-in user.
 
 ```tsx
-const { send, loading, success } = useSendEmailVerification();
+const { send, isPending, isSuccess } = useSendEmailVerification();
 
-<button onClick={send} disabled={loading}>
+<button onClick={send} disabled={isPending}>
   Resend verification email
 </button>;
 ```
 
 ## Returns
 
-`send()` resolves to `{ success: true }` or a failure result. Also exposes `loading`, `error`, and `success`.
+`send()` resolves to `{ success: true }` or a failure result. Also exposes `status`, `isPending`, `isSuccess`, `error`, and `reset`.
 
 ## Notes
 
 Pair with a cooldown to stop rapid re-sends — Firebase rate-limits these, and hitting the limit is a worse experience than a disabled button.
 
+### Sending it yourself
+
+`sendEmail` replaces the browser send, so the request goes through your own API and your own rate limiter:
+
+```tsx
+const { send } = useSendEmailVerification({
+  sendEmail: ({ email, actionCodeSettings }) =>
+    requestVerification(email, actionCodeSettings),
+});
+```
+
+It receives `{ email, actionCodeSettings }` — `email` is the signed-in user's address, since `send()` takes no arguments, and `actionCodeSettings` is whatever the hook or provider resolved, ready for the Admin SDK's `generateEmailVerificationLink`. An account with no email — phone-only, for instance — fails with a clear result rather than calling your sender with nothing.
+
 ## Options
 
 <AutoTypeTable
   path="../../packages/firebase-hooks/src/auth/use-send-email-verification.ts"
-  name="UseSendEmailVerificationOptionsProps"
+  name="UseSendEmailVerificationOptions"
 />

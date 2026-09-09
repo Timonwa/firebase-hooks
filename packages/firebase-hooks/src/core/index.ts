@@ -7,6 +7,8 @@ export {
 } from "./format-firebase-error.js";
 export { getFirebaseErrorCode } from "./get-firebase-error-code.js";
 export type {
+  ActionStatus,
+  AsyncStatus,
   HookErrorContext,
   HookErrorOptions,
   HookResult,

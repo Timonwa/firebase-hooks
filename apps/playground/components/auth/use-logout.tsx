@@ -1,19 +1,24 @@
-'use client';
+"use client";
 
-import { useLogout } from '@timonwa/firebase-hooks/auth';
-import { useState } from 'react';
-import { Button } from '@/components/controls';
-import { hookSnippet, useErrorFormat, useFlowCallback } from '@/components/hook-options';
-import { HookSection } from '@/components/hook-section';
+import { useLogout } from "@timonwa/firebase-hooks/auth";
+import { useState } from "react";
+import { Button } from "@/components/controls";
+import {
+  hookSnippet,
+  useErrorFormat,
+  useFlowCallback,
+} from "@/components/hook-options";
+import { HookSection } from "@/components/hook-section";
 
 export function UseLogoutSection() {
   const errorFormat = useErrorFormat();
   const onBeforeSignOut = useFlowCallback({
-    name: 'onBeforeSignOut',
-    body: 'clearSession()',
-    throwsHint: 'You stay signed in — check the header, the session is still there.',
+    name: "onBeforeSignOut",
+    body: "clearSession()",
+    throwsHint:
+      "You stay signed in — check the header, the session is still there.",
   });
-  const { logout, loading, error } = useLogout({
+  const { logout, status, isPending, error } = useLogout({
     formatErrorMessage: errorFormat.value,
     onBeforeSignOut: onBeforeSignOut.value,
   });
@@ -24,16 +29,17 @@ export function UseLogoutSection() {
       hook="useLogout"
       why={
         <>
-          <code>onBeforeSignOut</code> runs <strong>first</strong>. If clearing your
-          server session fails, the Firebase session is left intact and the user can retry
-          — rather than being stranded signed-out locally but still live on your server.
+          <code>onBeforeSignOut</code> runs <strong>first</strong>. If clearing
+          your server session fails, the Firebase session is left intact and the
+          user can retry — rather than being stranded signed-out locally but
+          still live on your server.
         </>
       }
       snippet={hookSnippet({
-        hook: 'useLogout',
-        returns: 'logout, loading, error',
+        hook: "useLogout",
+        returns: "logout, isPending, error",
         lines: [onBeforeSignOut.line, errorFormat.line],
-        body: 'await logout();',
+        body: "await logout();",
       })}
       options={
         <>
@@ -44,15 +50,14 @@ export function UseLogoutSection() {
       form={
         <Button
           variant="secondary"
-          disabled={loading}
-          onClick={async () => setResult(await logout())}
-        >
-          {loading ? 'Signing out…' : 'Sign out'}
+          disabled={isPending}
+          onClick={async () => setResult(await logout())}>
+          {isPending ? "Signing out…" : "Sign out"}
         </Button>
       }
       result={result}
       error={error}
-      loading={loading}
+      status={status}
     />
   );
 }

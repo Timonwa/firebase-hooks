@@ -42,9 +42,14 @@ import {
   useMemo,
   useState,
 } from "react";
-import { AuthConfigContext, type HookErrorContext, type OnIdToken } from "./_shared";
+import {
+  AuthConfigContext,
+  type AuthSenders,
+  type HookErrorContext,
+  type OnIdToken,
+} from "./_shared";
 
-interface AuthContextValueProps {
+export interface UseAuthResult {
   firebaseUser: User | null;
   /** Custom claims from the current ID token; null while signed out or loading. */
   claims: Record<string, unknown> | null;
@@ -52,9 +57,9 @@ interface AuthContextValueProps {
   isLoading: boolean;
 }
 
-const AuthContext = createContext<AuthContextValueProps | undefined>(undefined);
+const AuthContext = createContext<UseAuthResult | undefined>(undefined);
 
-interface AuthProviderProps {
+export interface AuthProviderProps {
   /** The Firebase `Auth` instance, or null while it initialises. */
   auth: Auth | null;
   /** Package-wide default error wording; each hook's own option overrides it. */
@@ -67,6 +72,11 @@ interface AuthProviderProps {
   actionCodeSettings?: ActionCodeSettings;
   /** Fire-and-forget observer every hook failure flows through (logging/analytics). */
   onError?: (error: unknown, context: HookErrorContext) => void;
+  /**
+   * Your own sender per emailed flow, so the sends go through your API rather
+   * than the browser. A hook's own option overrides its entry here.
+   */
+  senders?: AuthSenders;
   children: ReactNode;
 }
 
@@ -77,6 +87,7 @@ export function AuthProvider({
   onBeforeSignOut,
   actionCodeSettings,
   onError,
+  senders,
   children,
 }: AuthProviderProps) {
   const [firebaseUser, setFirebaseUser] = useState<User | null>(null);
@@ -106,6 +117,10 @@ export function AuthProvider({
     return () => unsubscribe();
   }, [auth]);
 
+  // Destructured so an inline `senders={{ … }}` doesn't rebuild the config on
+  // every render.
+  const { signInLink, passwordReset, emailVerification } = senders ?? {};
+
   const config = useMemo(
     () => ({
       auth,
@@ -114,8 +129,21 @@ export function AuthProvider({
       onBeforeSignOut,
       actionCodeSettings,
       onError,
+      sendSignInLink: signInLink,
+      sendPasswordReset: passwordReset,
+      sendEmailVerification: emailVerification,
     }),
-    [auth, formatErrorMessage, onIdToken, onBeforeSignOut, actionCodeSettings, onError],
+    [
+      auth,
+      formatErrorMessage,
+      onIdToken,
+      onBeforeSignOut,
+      actionCodeSettings,
+      onError,
+      signInLink,
+      passwordReset,
+      emailVerification,
+    ],
   );
 
   return (
@@ -134,7 +162,7 @@ export function AuthProvider({
   );
 }
 
-export function useAuth(): AuthContextValueProps {
+export function useAuth(): UseAuthResult {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error("useAuth must be used inside <AuthProvider>");
   return ctx;

@@ -1,33 +1,34 @@
-'use client';
+"use client";
 
-import { useSendEmailVerification } from '@timonwa/firebase-hooks/auth';
-import { useState } from 'react';
-import { Button } from '@/components/controls';
+import { useSendEmailVerification } from "@timonwa/firebase-hooks/auth";
+import { useState } from "react";
+import { Button } from "@/components/controls";
 import {
   hookSnippet,
   useActionCodeSettings,
   useErrorFormat,
-} from '@/components/hook-options';
-import { HookSection } from '@/components/hook-section';
+} from "@/components/hook-options";
+import { HookSection } from "@/components/hook-section";
 
 export function UseSendEmailVerificationSection() {
   const errorFormat = useErrorFormat();
   const actionCodeSettings = useActionCodeSettings();
-  const { send, loading, error, success } = useSendEmailVerification({
-    actionCodeSettings: actionCodeSettings.value,
-    formatErrorMessage: errorFormat.value,
-  });
+  const { send, status, isPending, isSuccess, error } =
+    useSendEmailVerification({
+      actionCodeSettings: actionCodeSettings.value,
+      formatErrorMessage: errorFormat.value,
+    });
   const [result, setResult] = useState<unknown>();
 
   return (
     <HookSection
       hook="useSendEmailVerification"
-      why="The resend button. Firebase rate-limits these hard, so the loading and success flags are what you build the cooldown around."
+      why="The resend button. Firebase rate-limits these hard, so `isPending` and `isSuccess` are what you build the cooldown around."
       snippet={hookSnippet({
-        hook: 'useSendEmailVerification',
-        returns: 'send, loading, success',
+        hook: "useSendEmailVerification",
+        returns: "send, isPending, isSuccess",
         lines: [actionCodeSettings.line, errorFormat.line],
-        body: '<button onClick={send} disabled={loading}>Resend</button>;',
+        body: "<button onClick={send} disabled={isPending}>Resend</button>;",
       })}
       options={
         <>
@@ -37,17 +38,19 @@ export function UseSendEmailVerificationSection() {
       }
       form={
         <>
-          <Button disabled={loading} onClick={async () => setResult(await send())}>
-            {loading ? 'Sending…' : 'Send verification email'}
+          <Button
+            disabled={isPending}
+            onClick={async () => setResult(await send())}>
+            {isPending ? "Sending…" : "Send verification email"}
           </Button>
-          {success ? (
+          {isSuccess ? (
             <p className="text-sm text-green-600">Verification email sent.</p>
           ) : null}
         </>
       }
       result={result}
       error={error}
-      loading={loading}
+      status={status}
     />
   );
 }

@@ -12,7 +12,7 @@ import { useLogin } from '@timonwa/firebase-hooks/auth';
 import { auth } from '@/lib/firebase';
 
 function LoginForm() {
-  const { login, loading, error } = useLogin({
+  const { login, isPending, error } = useLogin({
     onIdToken: (idToken) => createSession(idToken),
   });
 
@@ -27,14 +27,14 @@ function LoginForm() {
 
 <AutoTypeTable
   path="../../packages/firebase-hooks/src/auth/use-login.ts"
-  name="UseLoginOptionsProps"
+  name="UseLoginOptions"
 />
 
 ## Returns
 
 `login(email, password)` resolves to a [`HookResult`](/docs/core/hook-result) — `{ success: true, user, credential }` on success, or `{ success: false, error, code, cause }` on failure. It never throws.
 
-The hook also exposes `loading` and `error` for rendering.
+The hook also exposes `status`, `isPending`, `isSuccess`, `isError`, `error`, and `reset` for rendering.
 
 ## Notes
 

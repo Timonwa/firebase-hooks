@@ -9,7 +9,7 @@
  * @param auth - Firebase `Auth` instance, or null while it initialises
  * @param options.actionCodeSettings - Where the emailed link lands (`url`, `handleCodeInApp: true`)
  * @param options.storageKey - localStorage key the address persists under (default: "emailForSignIn")
- * @param options.sendLink - Replace the client-side sender (e.g. your API emails the link instead)
+ * @param options.sendEmail - Replace the client-side sender (e.g. your API emails the link instead)
  * @param options.onIdToken - Called with the ID token + user after sign-in
  * @returns `{ sendLink, completeSignIn, loading, error }`
  *
@@ -39,6 +39,7 @@ import {
   type UserCredential,
 } from "firebase/auth";
 import {
+  type EmailSender,
   type HookErrorOptions,
   type HookResult,
   type OnIdToken,
@@ -49,7 +50,7 @@ import {
   useResolvedConfig,
 } from "./_shared";
 
-export interface UseEmailLinkSignInOptionsProps extends HookErrorOptions {
+export interface UseEmailLinkSignInOptions extends HookErrorOptions {
   /** Where the emailed link points back to. Overrides the provider; `null` opts out. */
   actionCodeSettings?: ActionCodeSettings | null;
   /**
@@ -58,7 +59,7 @@ export interface UseEmailLinkSignInOptionsProps extends HookErrorOptions {
    */
   storageKey?: string;
   /** Replace the sender — e.g. your own API emails the link instead of Firebase. */
-  sendLink?: (email: string) => Promise<void>;
+  sendEmail?: EmailSender | null;
   /**
    * Called with a freshly minted ID token after sign-in — mint your server
    * session here. Throwing aborts the flow. Overrides the provider; `null` opts out.
@@ -66,7 +67,8 @@ export interface UseEmailLinkSignInOptionsProps extends HookErrorOptions {
   onIdToken?: OnIdToken | null;
 }
 
-type CompleteSignInResult =
+/** `needsEmail` is set when the link opened where the address was never stored. */
+export type CompleteSignInResult =
   | { success: true; user: User; credential: UserCredential }
   | {
       success: false;
@@ -76,36 +78,39 @@ type CompleteSignInResult =
       needsEmail?: boolean;
     };
 
+/** What `useEmailLinkSignIn` returns. */
+export type UseEmailLinkSignInResult = ReturnType<typeof useEmailLinkSignInBase>;
+
 export function useEmailLinkSignIn(
-  options?: UseEmailLinkSignInOptionsProps,
-): ReturnType<typeof useEmailLinkSignInBase>;
+  options?: UseEmailLinkSignInOptions,
+): UseEmailLinkSignInResult;
 export function useEmailLinkSignIn(
   auth: Auth | null,
-  options?: UseEmailLinkSignInOptionsProps,
-): ReturnType<typeof useEmailLinkSignInBase>;
+  options?: UseEmailLinkSignInOptions,
+): UseEmailLinkSignInResult;
 export function useEmailLinkSignIn(
-  authOrOptions?: Auth | null | UseEmailLinkSignInOptionsProps,
-  maybeOptions?: UseEmailLinkSignInOptionsProps,
+  authOrOptions?: Auth | null | UseEmailLinkSignInOptions,
+  maybeOptions?: UseEmailLinkSignInOptions,
 ) {
   return useEmailLinkSignInBase(...useAuthArgs(authOrOptions, maybeOptions));
 }
 
-function useEmailLinkSignInBase(
-  auth: Auth | null,
-  options: UseEmailLinkSignInOptionsProps,
-) {
+function useEmailLinkSignInBase(auth: Auth | null, options: UseEmailLinkSignInOptions) {
   const { storageKey = "emailForSignIn" } = options;
-  const { loading, error, setError, run } = useAuthTask(options);
+  const { status, isIdle, isPending, isSuccess, isError, error, reset, run } =
+    useAuthTask(options);
   const onIdToken = useResolvedConfig("onIdToken", options.onIdToken);
   const actionCodeSettings = useResolvedConfig(
     "actionCodeSettings",
     options.actionCodeSettings,
   );
 
+  const send = useResolvedConfig("sendSignInLink", options.sendEmail);
+
   const sendLink = (email: string): Promise<HookResult> =>
     run("send-sign-in-link", "Failed to send sign-in link", async () => {
-      if (options.sendLink) {
-        await options.sendLink(email);
+      if (send) {
+        await send({ email, actionCodeSettings: actionCodeSettings ?? undefined });
       } else {
         if (!actionCodeSettings) {
           throw new Error(
@@ -164,5 +169,15 @@ function useEmailLinkSignInBase(
     return result;
   };
 
-  return { sendLink, completeSignIn, loading, error, setError };
+  return {
+    sendLink,
+    completeSignIn,
+    status,
+    isIdle,
+    isPending,
+    isSuccess,
+    isError,
+    error,
+    reset,
+  };
 }

@@ -11,7 +11,7 @@ await unlinkProvider('google.com');
 
 ## Returns
 
-`unlinkProvider(providerId)` resolves to `{ success: true, user, credential }` or a failure result. Also exposes `loading` and `error`.
+`unlinkProvider(providerId)` resolves to `{ success: true, user, credential }` or a failure result. Also exposes `status`, `isPending`, `error`, and `reset`.
 
 Provider ids are Firebase's own: `"google.com"`, `"password"`, `"github.com"`, and so on.
 

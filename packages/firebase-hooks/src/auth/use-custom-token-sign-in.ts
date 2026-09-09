@@ -31,7 +31,7 @@ import {
   useResolvedConfig,
 } from "./_shared";
 
-export interface UseCustomTokenSignInOptionsProps extends HookErrorOptions {
+export interface UseCustomTokenSignInOptions extends HookErrorOptions {
   /**
    * Called with a freshly minted ID token after sign-in — mint your server
    * session here. Throwing aborts the flow. Overrides the provider; `null` opts out.
@@ -39,25 +39,29 @@ export interface UseCustomTokenSignInOptionsProps extends HookErrorOptions {
   onIdToken?: OnIdToken | null;
 }
 
+/** What `useCustomTokenSignIn` returns. */
+export type UseCustomTokenSignInResult = ReturnType<typeof useCustomTokenSignInBase>;
+
 export function useCustomTokenSignIn(
-  options?: UseCustomTokenSignInOptionsProps,
-): ReturnType<typeof useCustomTokenSignInBase>;
+  options?: UseCustomTokenSignInOptions,
+): UseCustomTokenSignInResult;
 export function useCustomTokenSignIn(
   auth: Auth | null,
-  options?: UseCustomTokenSignInOptionsProps,
-): ReturnType<typeof useCustomTokenSignInBase>;
+  options?: UseCustomTokenSignInOptions,
+): UseCustomTokenSignInResult;
 export function useCustomTokenSignIn(
-  authOrOptions?: Auth | null | UseCustomTokenSignInOptionsProps,
-  maybeOptions?: UseCustomTokenSignInOptionsProps,
+  authOrOptions?: Auth | null | UseCustomTokenSignInOptions,
+  maybeOptions?: UseCustomTokenSignInOptions,
 ) {
   return useCustomTokenSignInBase(...useAuthArgs(authOrOptions, maybeOptions));
 }
 
 function useCustomTokenSignInBase(
   auth: Auth | null,
-  options: UseCustomTokenSignInOptionsProps,
+  options: UseCustomTokenSignInOptions,
 ) {
-  const { loading, error, run } = useAuthTask(options);
+  const { status, isIdle, isPending, isSuccess, isError, error, reset, run } =
+    useAuthTask(options);
   const onIdToken = useResolvedConfig("onIdToken", options.onIdToken);
 
   const signIn = (
@@ -69,5 +73,5 @@ function useCustomTokenSignInBase(
       return { user: credential.user, credential };
     });
 
-  return { signIn, loading, error };
+  return { signIn, status, isIdle, isPending, isSuccess, isError, error, reset };
 }

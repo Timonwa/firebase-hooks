@@ -4,7 +4,7 @@ description: Delete the account, with reauth and server cleanup.
 ---
 
 ```tsx
-const { deleteAccount, loading, error } = useDeleteAccount({
+const { deleteAccount, isPending, error } = useDeleteAccount({
   onBeforeDelete: (user) => deleteUserRecord(user.uid),
 });
 
@@ -14,7 +14,7 @@ if (result.success) router.push('/goodbye');
 
 ## Returns
 
-`deleteAccount({ currentPassword? })` resolves to `{ success: true }` or a failure result. Also exposes `loading` and `error`.
+`deleteAccount({ currentPassword? })` resolves to `{ success: true }` or a failure result. Also exposes `status`, `isPending`, `error`, and `reset`.
 
 ## Cleaning up first
 
@@ -28,5 +28,5 @@ Deletion requires a recent sign-in. Pass `currentPassword` for automatic reauthe
 
 <AutoTypeTable
   path="../../packages/firebase-hooks/src/auth/use-delete-account.ts"
-  name="UseDeleteAccountOptionsProps"
+  name="UseDeleteAccountOptions"
 />

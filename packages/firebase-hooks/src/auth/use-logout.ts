@@ -24,7 +24,7 @@ import {
   useResolvedConfig,
 } from "./_shared";
 
-export interface UseLogoutOptionsProps extends HookErrorOptions {
+export interface UseLogoutOptions extends HookErrorOptions {
   /**
    * Runs before Firebase clears the session — clear your server session here.
    * Throwing leaves the user signed in. Overrides the provider; `null` opts out.
@@ -32,22 +32,21 @@ export interface UseLogoutOptionsProps extends HookErrorOptions {
   onBeforeSignOut?: (() => void | Promise<void>) | null;
 }
 
+/** What `useLogout` returns. */
+export type UseLogoutResult = ReturnType<typeof useLogoutBase>;
+
+export function useLogout(options?: UseLogoutOptions): UseLogoutResult;
+export function useLogout(auth: Auth | null, options?: UseLogoutOptions): UseLogoutResult;
 export function useLogout(
-  options?: UseLogoutOptionsProps,
-): ReturnType<typeof useLogoutBase>;
-export function useLogout(
-  auth: Auth | null,
-  options?: UseLogoutOptionsProps,
-): ReturnType<typeof useLogoutBase>;
-export function useLogout(
-  authOrOptions?: Auth | null | UseLogoutOptionsProps,
-  maybeOptions?: UseLogoutOptionsProps,
+  authOrOptions?: Auth | null | UseLogoutOptions,
+  maybeOptions?: UseLogoutOptions,
 ) {
   return useLogoutBase(...useAuthArgs(authOrOptions, maybeOptions));
 }
 
-function useLogoutBase(auth: Auth | null, options: UseLogoutOptionsProps) {
-  const { loading, error, run } = useAuthTask(options);
+function useLogoutBase(auth: Auth | null, options: UseLogoutOptions) {
+  const { status, isIdle, isPending, isSuccess, isError, error, reset, run } =
+    useAuthTask(options);
   const onBeforeSignOut = useResolvedConfig("onBeforeSignOut", options.onBeforeSignOut);
 
   const logout = (): Promise<HookResult> =>
@@ -57,5 +56,5 @@ function useLogoutBase(auth: Auth | null, options: UseLogoutOptionsProps) {
       return {};
     });
 
-  return { logout, loading, error };
+  return { logout, status, isIdle, isPending, isSuccess, isError, error, reset };
 }

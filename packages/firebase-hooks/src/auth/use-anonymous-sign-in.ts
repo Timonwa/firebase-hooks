@@ -30,7 +30,7 @@ import {
   useResolvedConfig,
 } from "./_shared";
 
-export interface UseAnonymousSignInOptionsProps extends HookErrorOptions {
+export interface UseAnonymousSignInOptions extends HookErrorOptions {
   /**
    * Called with a freshly minted ID token after sign-in — mint your server
    * session here. Throwing aborts the flow. Overrides the provider; `null` opts out.
@@ -38,25 +38,26 @@ export interface UseAnonymousSignInOptionsProps extends HookErrorOptions {
   onIdToken?: OnIdToken | null;
 }
 
+/** What `useAnonymousSignIn` returns. */
+export type UseAnonymousSignInResult = ReturnType<typeof useAnonymousSignInBase>;
+
 export function useAnonymousSignIn(
-  options?: UseAnonymousSignInOptionsProps,
-): ReturnType<typeof useAnonymousSignInBase>;
+  options?: UseAnonymousSignInOptions,
+): UseAnonymousSignInResult;
 export function useAnonymousSignIn(
   auth: Auth | null,
-  options?: UseAnonymousSignInOptionsProps,
-): ReturnType<typeof useAnonymousSignInBase>;
+  options?: UseAnonymousSignInOptions,
+): UseAnonymousSignInResult;
 export function useAnonymousSignIn(
-  authOrOptions?: Auth | null | UseAnonymousSignInOptionsProps,
-  maybeOptions?: UseAnonymousSignInOptionsProps,
+  authOrOptions?: Auth | null | UseAnonymousSignInOptions,
+  maybeOptions?: UseAnonymousSignInOptions,
 ) {
   return useAnonymousSignInBase(...useAuthArgs(authOrOptions, maybeOptions));
 }
 
-function useAnonymousSignInBase(
-  auth: Auth | null,
-  options: UseAnonymousSignInOptionsProps,
-) {
-  const { loading, error, run } = useAuthTask(options);
+function useAnonymousSignInBase(auth: Auth | null, options: UseAnonymousSignInOptions) {
+  const { status, isIdle, isPending, isSuccess, isError, error, reset, run } =
+    useAuthTask(options);
   const onIdToken = useResolvedConfig("onIdToken", options.onIdToken);
 
   const signIn = (): Promise<HookResult<{ user: User; credential: UserCredential }>> =>
@@ -66,5 +67,5 @@ function useAnonymousSignInBase(
       return { user: credential.user, credential };
     });
 
-  return { signIn, loading, error };
+  return { signIn, status, isIdle, isPending, isSuccess, isError, error, reset };
 }

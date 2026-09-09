@@ -1,37 +1,38 @@
-'use client';
+"use client";
 
-import { useSignup } from '@timonwa/firebase-hooks/auth';
-import { useState } from 'react';
-import { Button, Field } from '@/components/controls';
+import { useSignup } from "@timonwa/firebase-hooks/auth";
+import { useState } from "react";
+import { Button, Field } from "@/components/controls";
 import {
   hookSnippet,
   useBooleanOption,
   useErrorFormat,
   useFlowCallback,
-} from '@/components/hook-options';
-import { HookSection } from '@/components/hook-section';
+} from "@/components/hook-options";
+import { HookSection } from "@/components/hook-section";
 
 export function UseSignupSection() {
   const errorFormat = useErrorFormat();
   const sendVerificationEmail = useBooleanOption({
-    name: 'sendVerificationEmail',
+    name: "sendVerificationEmail",
     defaultValue: true,
-    hint: 'Off, and the account is created without the email going out.',
+    hint: "Off, and the account is created without the email going out.",
   });
   const onIdToken = useFlowCallback({
-    name: 'onIdToken',
-    signature: '(idToken)',
-    body: 'createSession(idToken)',
-    throwsHint: 'Signup aborts after the account exists — try signing in with it.',
+    name: "onIdToken",
+    signature: "(idToken)",
+    body: "createSession(idToken)",
+    throwsHint:
+      "Signup aborts after the account exists — try signing in with it.",
   });
-  const { signup, loading, error } = useSignup({
+  const { signup, status, isPending, error } = useSignup({
     sendVerificationEmail: sendVerificationEmail.value,
     formatErrorMessage: errorFormat.value,
     onIdToken: onIdToken.value,
   });
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [displayName, setDisplayName] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [displayName, setDisplayName] = useState("");
   const [result, setResult] = useState<unknown>();
 
   return (
@@ -39,16 +40,16 @@ export function UseSignupSection() {
       hook="useSignup"
       why={
         <>
-          Three Firebase calls in the right order — create the account, set the profile,
-          send the verification email — behind one call. Turn{' '}
+          Three Firebase calls in the right order — create the account, set the
+          profile, send the verification email — behind one call. Turn{" "}
           <code>sendVerificationEmail</code> off in Options to send it yourself.
         </>
       }
       snippet={hookSnippet({
-        hook: 'useSignup',
-        returns: 'signup, loading, error',
+        hook: "useSignup",
+        returns: "signup, isPending, error",
         lines: [sendVerificationEmail.line, onIdToken.line, errorFormat.line],
-        body: 'await signup(email, password, { displayName });',
+        body: "await signup(email, password, { displayName });",
       })}
       options={
         <>
@@ -59,33 +60,40 @@ export function UseSignupSection() {
       }
       form={
         <>
-          <Field label="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+          <Field
+            label="Email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+          />
           <Field
             label="Password"
             type="password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={e => setPassword(e.target.value)}
           />
           <Field
             label="Display name (optional)"
             value={displayName}
-            onChange={(e) => setDisplayName(e.target.value)}
+            onChange={e => setDisplayName(e.target.value)}
           />
           <Button
-            disabled={loading}
+            disabled={isPending}
             onClick={async () =>
               setResult(
-                await signup(email, password, displayName ? { displayName } : undefined),
+                await signup(
+                  email,
+                  password,
+                  displayName ? { displayName } : undefined,
+                ),
               )
-            }
-          >
-            {loading ? 'Creating…' : 'Create account'}
+            }>
+            {isPending ? "Creating…" : "Create account"}
           </Button>
         </>
       }
       result={result}
       error={error}
-      loading={loading}
+      status={status}
     />
   );
 }

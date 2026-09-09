@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { formatFirebaseError } from '@timonwa/firebase-hooks';
-import { AUTH_ERROR_MESSAGES } from '@timonwa/firebase-hooks/auth';
-import { useCallback, useState } from 'react';
-import { Select, Toggle } from './controls';
+import { formatFirebaseError } from "@timonwa/firebase-hooks";
+import { AUTH_ERROR_MESSAGES } from "@timonwa/firebase-hooks/auth";
+import { useCallback, useState } from "react";
+import { Select, Toggle } from "./controls";
 
 /**
  * Options a hook takes, as controls you can set before running it.
@@ -22,31 +22,35 @@ const stripped = (error: unknown) => formatFirebaseError(error);
 const catalogued = (error: unknown) =>
   formatFirebaseError(error, { messages: AUTH_ERROR_MESSAGES });
 
-type ErrorFormat = 'inherit' | 'stripped' | 'catalogue';
+type ErrorFormat = "inherit" | "stripped" | "catalogue";
 
 const ERROR_FORMATS: Record<
   ErrorFormat,
-  { label: string; value: ((error: unknown) => string) | undefined; line: string | null }
+  {
+    label: string;
+    value: ((error: unknown) => string) | undefined;
+    line: string | null;
+  }
 > = {
   inherit: {
-    label: 'not set — follows “Format errors” above',
+    label: "not set — follows “Format errors” above",
     value: undefined,
     line: null,
   },
   stripped: {
-    label: 'formatFirebaseError',
+    label: "formatFirebaseError",
     value: stripped,
-    line: 'formatErrorMessage: formatFirebaseError,',
+    line: "formatErrorMessage: formatFirebaseError,",
   },
   catalogue: {
-    label: 'formatFirebaseError + AUTH_ERROR_MESSAGES',
+    label: "formatFirebaseError + AUTH_ERROR_MESSAGES",
     value: catalogued,
-    line: 'formatErrorMessage: (error) =>\n    formatFirebaseError(error, { messages: AUTH_ERROR_MESSAGES }),',
+    line: "formatErrorMessage: (error) =>\n    formatFirebaseError(error, { messages: AUTH_ERROR_MESSAGES }),",
   },
 };
 
 export function useErrorFormat() {
-  const [format, setFormat] = useState<ErrorFormat>('inherit');
+  const [format, setFormat] = useState<ErrorFormat>("inherit");
   const entry = ERROR_FORMATS[format];
 
   return {
@@ -57,7 +61,7 @@ export function useErrorFormat() {
         label="formatErrorMessage"
         hint="Setting it here overrides the provider for this hook only. Cause a failure to see it."
         value={format}
-        onChange={(event) => setFormat(event.target.value as ErrorFormat)}
+        onChange={event => setFormat(event.target.value as ErrorFormat)}
         options={Object.entries(ERROR_FORMATS).map(([value, { label }]) => ({
           value,
           label,
@@ -67,7 +71,7 @@ export function useErrorFormat() {
   };
 }
 
-type CallbackMode = 'off' | 'run' | 'throw';
+type CallbackMode = "off" | "run" | "throw";
 
 /**
  * `onIdToken` / `onBeforeSignOut` / `onBeforeDelete` — the callbacks that run
@@ -76,7 +80,7 @@ type CallbackMode = 'off' | 'run' | 'throw';
  */
 export function useFlowCallback({
   name,
-  signature = '()',
+  signature = "()",
   body,
   throwsHint,
 }: {
@@ -85,26 +89,27 @@ export function useFlowCallback({
   body: string;
   throwsHint: string;
 }) {
-  const [mode, setMode] = useState<CallbackMode>('off');
+  const [mode, setMode] = useState<CallbackMode>("off");
   const [events, setEvents] = useState<string[]>([]);
 
   const record = useCallback((entry: string) => {
-    setEvents((current) => [...current.slice(-4), entry]);
+    setEvents(current => [...current.slice(-4), entry]);
   }, []);
 
   const value =
-    mode === 'off'
+    mode === "off"
       ? undefined
       : (...args: unknown[]) => {
-          const arg = typeof args[0] === 'string' ? `${args[0].slice(0, 12)}…` : '';
+          const arg =
+            typeof args[0] === "string" ? `${args[0].slice(0, 12)}…` : "";
           record(`${new Date().toLocaleTimeString()} — ${name}(${arg})`);
-          if (mode === 'throw') throw new Error(`${name} failed`);
+          if (mode === "throw") throw new Error(`${name} failed`);
         };
 
   const line =
-    mode === 'off'
+    mode === "off"
       ? null
-      : mode === 'throw'
+      : mode === "throw"
         ? `${name}: ${signature} => { throw new Error("${name} failed"); },`
         : `${name}: ${signature} => ${body},`;
 
@@ -115,18 +120,18 @@ export function useFlowCallback({
       <div className="flex flex-col gap-2">
         <Select
           label={name}
-          hint={mode === 'throw' ? throwsHint : undefined}
+          hint={mode === "throw" ? throwsHint : undefined}
           value={mode}
-          onChange={(event) => setMode(event.target.value as CallbackMode)}
+          onChange={event => setMode(event.target.value as CallbackMode)}
           options={[
-            { value: 'off', label: 'not set' },
-            { value: 'run', label: 'set — logs when it runs' },
-            { value: 'throw', label: 'set — throws' },
+            { value: "off", label: "not set" },
+            { value: "run", label: "set — logs when it runs" },
+            { value: "throw", label: "set — throws" },
           ]}
         />
         {events.length > 0 ? (
-          <ul className="border-line text-muted rounded-md border px-2 py-1.5 font-mono text-[11px]">
-            {events.map((entry) => (
+          <ul className="rounded-md border border-line px-2 py-1.5 font-mono text-[11px] text-muted">
+            {events.map(entry => (
               <li key={entry}>{entry}</li>
             ))}
           </ul>
@@ -136,7 +141,7 @@ export function useFlowCallback({
   };
 }
 
-type ActionCodeMode = 'inherit' | 'app' | 'off';
+type ActionCodeMode = "inherit" | "app" | "off";
 
 /**
  * `actionCodeSettings` — where the emailed link comes back to.
@@ -144,25 +149,25 @@ type ActionCodeMode = 'inherit' | 'app' | 'off';
  * `null` is not the same as leaving it out: it opts out of the provider's
  * setting, so Firebase's own hosted page handles the link.
  */
-export function useActionCodeSettings(path = '/auth/action') {
-  const [mode, setMode] = useState<ActionCodeMode>('inherit');
+export function useActionCodeSettings(path = "/auth/action") {
+  const [mode, setMode] = useState<ActionCodeMode>("inherit");
   const url =
-    typeof window === 'undefined'
+    typeof window === "undefined"
       ? `http://localhost:3000${path}`
       : `${window.location.origin}${path}`;
 
   const value =
-    mode === 'inherit'
+    mode === "inherit"
       ? undefined
-      : mode === 'off'
+      : mode === "off"
         ? null
         : { url, handleCodeInApp: false };
 
   const line =
-    mode === 'inherit'
+    mode === "inherit"
       ? null
-      : mode === 'off'
-        ? 'actionCodeSettings: null,'
+      : mode === "off"
+        ? "actionCodeSettings: null,"
         : `actionCodeSettings: { url: "${url}" },`;
 
   return {
@@ -173,11 +178,11 @@ export function useActionCodeSettings(path = '/auth/action') {
         label="actionCodeSettings"
         hint="Only takes effect once the console's action URL points here."
         value={mode}
-        onChange={(event) => setMode(event.target.value as ActionCodeMode)}
+        onChange={event => setMode(event.target.value as ActionCodeMode)}
         options={[
-          { value: 'inherit', label: 'not set — follows the provider' },
-          { value: 'app', label: `come back to ${path}` },
-          { value: 'off', label: 'null — opt out, use Firebase’s page' },
+          { value: "inherit", label: "not set — follows the provider" },
+          { value: "app", label: `come back to ${path}` },
+          { value: "off", label: "null — opt out, use Firebase’s page" },
         ]}
       />
     ),
@@ -231,11 +236,11 @@ export function useStringOption({
     line: value === defaultValue ? null : `${name}: ${JSON.stringify(value)},`,
     control: (
       <label className="flex flex-col gap-1 text-xs">
-        <span className="text-fg font-mono">{label ?? name}</span>
+        <span className="font-mono text-fg">{label ?? name}</span>
         <input
           value={value}
-          onChange={(event) => setValue(event.target.value)}
-          className="border-line bg-bg focus:border-accent rounded-md border px-2 py-1.5 text-xs outline-none"
+          onChange={event => setValue(event.target.value)}
+          className="rounded-md border border-line bg-bg px-2 py-1.5 text-xs outline-none focus:border-accent"
         />
         {hint ? <span className="text-muted">{hint}</span> : null}
       </label>
@@ -265,7 +270,7 @@ export function hookSnippet({
   // No `auth` argument: the playground runs below an AuthProvider, so the hooks
   // take theirs from it. The snippet shows what you would actually write here.
   const call = set.length
-    ? `const { ${returns} } = ${hook}({\n${set.map((line) => `  ${line}`).join('\n')}\n});`
+    ? `const { ${returns} } = ${hook}({\n${set.map(line => `  ${line}`).join("\n")}\n});`
     : `const { ${returns} } = ${hook}();`;
 
   return body ? `${call}\n\n${body}` : call;

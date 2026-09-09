@@ -17,9 +17,9 @@ describe("useSendPasswordResetEmail", () => {
       await result.current.send("a@b.c");
     });
     expect(sendPasswordResetEmail).toHaveBeenCalled();
-    expect(result.current.success).toBe(true);
-    act(() => result.current.resetState());
-    expect(result.current.success).toBe(false);
+    expect(result.current.isSuccess).toBe(true);
+    act(() => result.current.reset());
+    expect(result.current.isSuccess).toBe(false);
   });
 
   it("hook-level actionCodeSettings wins over the provider default; null opts out", async () => {
@@ -73,7 +73,54 @@ describe("useSendPasswordResetEmail", () => {
       code: "auth/invalid-email",
       cause: firebaseError,
     });
-    expect(result.current.success).toBe(false);
+    expect(result.current.isSuccess).toBe(false);
     expect(result.current.error).toBe("Firebase: Error (auth/invalid-email).");
+  });
+});
+
+describe("sendEmail", () => {
+  it("delegates the send and never touches Firebase", async () => {
+    const sendEmail = vi.fn(async () => {});
+    const { result } = renderHook(() =>
+      useSendPasswordResetEmail(makeAuth(), { sendEmail }),
+    );
+
+    await act(async () => {
+      await result.current.send("a@b.c");
+    });
+
+    expect(sendEmail).toHaveBeenCalledWith(expect.objectContaining({ email: "a@b.c" }));
+    expect(sendPasswordResetEmail).not.toHaveBeenCalled();
+    expect(result.current.isSuccess).toBe(true);
+  });
+
+  it("a throwing sender fails like any other error, leaving success false", async () => {
+    const sendEmail = vi.fn(async () => {
+      throw new Error("rate limited");
+    });
+    const { result } = renderHook(() =>
+      useSendPasswordResetEmail(makeAuth(), { sendEmail }),
+    );
+
+    let outcome: unknown;
+    await act(async () => {
+      outcome = await result.current.send("a@b.c");
+    });
+
+    expect(outcome).toMatchObject({ success: false, error: "rate limited" });
+    expect(result.current.isSuccess).toBe(false);
+  });
+
+  it("needs no actionCodeSettings, since Firebase is not the sender", async () => {
+    const sendEmail = vi.fn(async () => {});
+    const { result } = renderHook(() =>
+      useSendPasswordResetEmail(makeAuth(), { sendEmail, actionCodeSettings: null }),
+    );
+
+    await act(async () => {
+      await result.current.send("a@b.c");
+    });
+
+    expect(result.current.isSuccess).toBe(true);
   });
 });

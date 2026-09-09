@@ -1,4 +1,4 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
 /* Same palette as the docs site, so the two read as one product: violet accent
    with neutrals carrying a trace of the accent hue rather than being flat grey. */
@@ -27,7 +27,7 @@
 /* Plain declarations rather than a nested `@theme`: the utilities generated
    above already resolve through `var(--color-*)`, so redefining the variables
    under a selector is enough to repaint everything. */
-[data-theme='dark'] {
+[data-theme="dark"] {
   --color-bg: oklch(15.2% 0.012 285);
   --color-fg: oklch(94% 0.004 285);
   --color-muted: oklch(70.5% 0.014 285);
@@ -86,6 +86,6 @@ body {
   color: var(--shiki-light);
 }
 
-[data-theme='dark'] .shiki-block code span {
+[data-theme="dark"] .shiki-block code span {
   color: var(--shiki-dark);
 }

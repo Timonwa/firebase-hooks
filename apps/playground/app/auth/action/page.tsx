@@ -1,13 +1,16 @@
-'use client';
+"use client";
 
-import { useConfirmPasswordReset, useVerifyEmail } from '@timonwa/firebase-hooks/auth';
-import { useSearchParams } from 'next/navigation';
-import { Suspense, useState } from 'react';
-import { Button, Field } from '@/components/controls';
-import { useFirebase } from '@/components/firebase-provider';
-import { HookSection } from '@/components/hook-section';
-import { NeedsConfig } from '@/components/needs-config';
-import { PageIntro } from '@/components/page-intro';
+import {
+  useConfirmPasswordReset,
+  useVerifyEmail,
+} from "@timonwa/firebase-hooks/auth";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useState } from "react";
+import { Button, Field } from "@/components/controls";
+import { useFirebase } from "@/components/firebase-provider";
+import { HookSection } from "@/components/hook-section";
+import { NeedsConfig } from "@/components/needs-config";
+import { PageIntro } from "@/components/page-intro";
 
 /**
  * Firebase points every emailed action at one URL and tells them apart with a
@@ -15,7 +18,7 @@ import { PageIntro } from '@/components/page-intro';
  */
 export default function AuthActionPage() {
   return (
-    <Suspense fallback={<p className="text-muted text-sm">Loading…</p>}>
+    <Suspense fallback={<p className="text-sm text-muted">Loading…</p>}>
       <AuthAction />
     </Suspense>
   );
@@ -24,8 +27,8 @@ export default function AuthActionPage() {
 function AuthAction() {
   const { config } = useFirebase();
   const params = useSearchParams();
-  const mode = params.get('mode');
-  const oobCode = params.get('oobCode');
+  const mode = params.get("mode");
+  const oobCode = params.get("oobCode");
 
   if (!config) return <NeedsConfig />;
 
@@ -36,17 +39,18 @@ function AuthAction() {
         lead={
           mode
             ? `Handling mode=${mode}.`
-            : 'Firebase sends every emailed action here with a mode and an oobCode. Open it from a real email to see the hooks run.'
+            : "Firebase sends every emailed action here with a mode and an oobCode. Open it from a real email to see the hooks run."
         }
       />
 
-      {mode === 'verifyEmail' ? <VerifyEmail oobCode={oobCode} /> : null}
-      {mode === 'resetPassword' ? <ConfirmReset oobCode={oobCode} /> : null}
+      {mode === "verifyEmail" ? <VerifyEmail oobCode={oobCode} /> : null}
+      {mode === "resetPassword" ? <ConfirmReset oobCode={oobCode} /> : null}
 
       {!mode ? (
-        <p className="text-muted text-sm">
-          Point the action URL at this page in <strong>Authentication → Templates</strong>
-          , then click a link from a verification or reset email.
+        <p className="text-sm text-muted">
+          Point the action URL at this page in{" "}
+          <strong>Authentication → Templates</strong>, then click a link from a
+          verification or reset email.
         </p>
       ) : null}
     </>
@@ -63,32 +67,33 @@ function VerifyEmail({ oobCode }: Props) {
       hook="useVerifyEmail"
       why={
         <>
-          Applies the code on mount and reports a status you render from. It’s guarded
-          against React Strict Mode’s double effect — the code is single-use, so without
-          that guard the second run fails and the user sees an error on a verification
-          that actually succeeded.
+          Applies the code on mount and reports a status you render from. It’s
+          guarded against React Strict Mode’s double effect — the code is
+          single-use, so without that guard the second run fails and the user
+          sees an error on a verification that actually succeeded.
         </>
       }
       snippet={`const { status, error } = useVerifyEmail(oobCode, {
   onVerified: refreshSession,
 });
 
-if (status === "processing") return <Spinner />;`}
+if (status === "pending") return <Spinner />;`}
       form={
         <p className="text-sm">
-          Status: <code className="text-accent font-mono">{status}</code>
+          Status: <code className="font-mono text-accent">{status}</code>
         </p>
       }
       result={{ status }}
       error={error}
-      loading={status === 'processing'}
+      status={status}
     />
   );
 }
 
 function ConfirmReset({ oobCode }: Props) {
-  const { confirm, verifyCode, loading, error, success } = useConfirmPasswordReset();
-  const [password, setPassword] = useState('');
+  const { confirm, verifyCode, status, isPending, isSuccess, error } =
+    useConfirmPasswordReset();
+  const [password, setPassword] = useState("");
   const [result, setResult] = useState<unknown>();
 
   return (
@@ -96,9 +101,10 @@ function ConfirmReset({ oobCode }: Props) {
       hook="useConfirmPasswordReset"
       why={
         <>
-          <code>verifyCode</code> checks the code <em>and returns the account email</em>,
-          so the page can show whose password is being reset before asking for a new one —
-          rather than taking a new password and failing afterwards.
+          <code>verifyCode</code> checks the code{" "}
+          <em>and returns the account email</em>, so the page can show whose
+          password is being reset before asking for a new one — rather than
+          taking a new password and failing afterwards.
         </>
       }
       snippet={`const check = await verifyCode(oobCode);
@@ -109,29 +115,31 @@ await confirm(oobCode, newPassword);`}
         <>
           <Button
             variant="secondary"
-            disabled={loading || !oobCode}
-            onClick={async () => setResult(await verifyCode(oobCode ?? ''))}
-          >
+            disabled={isPending || !oobCode}
+            onClick={async () => setResult(await verifyCode(oobCode ?? ""))}>
             verifyCode()
           </Button>
           <Field
             label="New password"
             type="password"
             value={password}
-            onChange={(event) => setPassword(event.target.value)}
+            onChange={event => setPassword(event.target.value)}
           />
           <Button
-            disabled={loading || !oobCode}
-            onClick={async () => setResult(await confirm(oobCode ?? '', password))}
-          >
-            {loading ? 'Saving…' : 'Set new password'}
+            disabled={isPending || !oobCode}
+            onClick={async () =>
+              setResult(await confirm(oobCode ?? "", password))
+            }>
+            {isPending ? "Saving…" : "Set new password"}
           </Button>
-          {success ? <p className="text-sm text-green-600">Password updated.</p> : null}
+          {isSuccess ? (
+            <p className="text-sm text-green-600">Password updated.</p>
+          ) : null}
         </>
       }
       result={result}
       error={error}
-      loading={loading}
+      status={status}
     />
   );
 }

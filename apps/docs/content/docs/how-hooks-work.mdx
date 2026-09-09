@@ -39,7 +39,7 @@ Actions never throw. Each resolves to a `HookResult`:
 { success: false, error, code, cause }
 ```
 
-The hook's own `error` state carries the same message for rendering, and `loading` tracks the action. Some hooks also expose `success` and `resetState`.
+Alongside the result, every action hook reports where it is: `status` is `"idle" | "pending" | "success" | "error"`, with `isIdle`, `isPending`, `isSuccess` and `isError` derived from it, `error` carrying the message for rendering, and `reset()` returning to idle — for a form the user retries, so a stale message doesn't sit under the new attempt. It's the same shape as TanStack Query's mutation result. Hooks that act on mount, like `useVerifyEmail`, report [`AsyncStatus`](/docs/core/hook-result#asyncstatus) instead: the same words without `idle`.
 
 ```tsx
 const result = await login(email, password);
@@ -48,6 +48,34 @@ else if (result.code === 'auth/too-many-requests') startCooldown();
 ```
 
 See [Error handling](/docs/guides/error-handling) for the full model.
+
+## Writing a wrapper around a hook
+
+Everything a wrapper needs to name is exported. Each hook's options interface comes from the auth entry, so you can accept and forward them without restating the shape:
+
+```tsx
+import {
+  useLogin,
+  type UseLoginOptions,
+  type UseLoginResult,
+} from '@timonwa/firebase-hooks/auth';
+
+export function useAppLogin(options?: UseLoginOptions): UseLoginResult {
+  const { login, isPending, error } = useLogin(options);
+  // …your own state on top
+  return { login, isPending, error };
+}
+```
+
+Every hook exports what it returns as `Use<Name>Result` — `UseLoginResult`, `UseSignupResult`, and so on — so a wrapper can state its return type rather than re-deriving it. `AuthProviderProps` and `UseAuthResult` are exported too, for an app provider layered over this one — see [Server sessions](/docs/guides/server-sessions).
+
+The result and error shapes — `HookResult`, `HookErrorOptions`, `HookErrorContext` — come from the **root** entry instead, because every service shares them:
+
+```ts
+import type { HookResult } from '@timonwa/firebase-hooks';
+```
+
+Hooks whose only option is `formatErrorMessage` take `HookErrorOptions` directly rather than declaring an interface of their own. See [Core](/docs/core).
 
 ## `onIdToken` runs after a successful sign-in
 
