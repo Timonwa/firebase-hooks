@@ -1,4 +1,4 @@
-import { siteConfig } from './site';
+import { siteConfig } from "./site";
 
 // Stable @id values so the nodes reference each other as one graph rather than
 // being emitted as disconnected islands.
@@ -10,8 +10,8 @@ const absolute = (path: string) => new URL(path, siteConfig.url).toString();
 
 export function personSchema() {
   return {
-    '@type': 'Person',
-    '@id': PERSON_ID,
+    "@type": "Person",
+    "@id": PERSON_ID,
     name: siteConfig.author,
     url: siteConfig.socials[0],
     sameAs: [...siteConfig.socials],
@@ -20,14 +20,14 @@ export function personSchema() {
 
 export function websiteSchema() {
   return {
-    '@type': 'WebSite',
-    '@id': SITE_ID,
+    "@type": "WebSite",
+    "@id": SITE_ID,
     url: siteConfig.url,
     name: siteConfig.name,
     description: siteConfig.description,
-    inLanguage: 'en',
-    image: absolute('/icon-512.png'),
-    publisher: { '@id': PERSON_ID },
+    inLanguage: "en",
+    image: absolute("/icon-512.png"),
+    publisher: { "@id": PERSON_ID },
   };
 }
 
@@ -37,34 +37,34 @@ export function websiteSchema() {
  */
 export function softwareSchema() {
   return {
-    '@type': 'SoftwareSourceCode',
-    '@id': SOFTWARE_ID,
+    "@type": "SoftwareSourceCode",
+    "@id": SOFTWARE_ID,
     name: siteConfig.packageName,
     description: siteConfig.description,
     url: siteConfig.url,
-    codeRepository: 'https://github.com/Timonwa/firebase-hooks',
-    image: absolute('/icon-512.png'),
-    programmingLanguage: 'TypeScript',
-    runtimePlatform: 'React',
-    license: 'https://opensource.org/licenses/MIT',
-    author: { '@id': PERSON_ID },
-    isPartOf: { '@id': SITE_ID },
+    codeRepository: "https://github.com/Timonwa/firebase-hooks",
+    image: absolute("/icon-512.png"),
+    programmingLanguage: "TypeScript",
+    runtimePlatform: "React",
+    license: "https://opensource.org/licenses/MIT",
+    author: { "@id": PERSON_ID },
+    isPartOf: { "@id": SITE_ID },
   };
 }
 
 export function siteGraph() {
   return {
-    '@context': 'https://schema.org',
-    '@graph': [personSchema(), websiteSchema(), softwareSchema()],
+    "@context": "https://schema.org",
+    "@graph": [personSchema(), websiteSchema(), softwareSchema()],
   };
 }
 
 export function breadcrumbSchema(trail: { name: string; path: string }[]) {
   return {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
     itemListElement: trail.map((crumb, index) => ({
-      '@type': 'ListItem',
+      "@type": "ListItem",
       position: index + 1,
       name: crumb.name,
       item: absolute(crumb.path),
@@ -82,13 +82,13 @@ export function techArticleSchema({
   path: string;
 }) {
   return {
-    '@context': 'https://schema.org',
-    '@type': 'TechArticle',
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
     headline: title,
     ...(description && { description }),
     url: absolute(path),
-    author: { '@id': PERSON_ID },
-    isPartOf: { '@id': SITE_ID },
-    about: { '@id': SOFTWARE_ID },
+    author: { "@id": PERSON_ID },
+    isPartOf: { "@id": SITE_ID },
+    about: { "@id": SOFTWARE_ID },
   };
 }

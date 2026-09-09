@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { useUpdateEmail } from '@timonwa/firebase-hooks/auth';
-import { useState } from 'react';
-import { Button, Field } from '@/components/controls';
+import { useUpdateEmail } from "@timonwa/firebase-hooks/auth";
+import { useState } from "react";
+import { Button, Field } from "@/components/controls";
 import {
   hookSnippet,
   useActionCodeSettings,
   useErrorFormat,
-} from '@/components/hook-options';
-import { HookSection } from '@/components/hook-section';
+} from "@/components/hook-options";
+import { HookSection } from "@/components/hook-section";
 
 export function UseUpdateEmailSection() {
   const errorFormat = useErrorFormat();
@@ -17,8 +17,8 @@ export function UseUpdateEmailSection() {
     actionCodeSettings: actionCodeSettings.value,
     formatErrorMessage: errorFormat.value,
   });
-  const [newEmail, setNewEmail] = useState('');
-  const [currentPassword, setCurrentPassword] = useState('');
+  const [newEmail, setNewEmail] = useState("");
+  const [currentPassword, setCurrentPassword] = useState("");
   const [result, setResult] = useState<unknown>();
 
   return (
@@ -26,15 +26,15 @@ export function UseUpdateEmailSection() {
       hook="useUpdateEmail"
       why={
         <>
-          Uses <code>verifyBeforeUpdateEmail</code>, so <code>success</code> means “we
-          sent the email”, <strong>not</strong> “the address changed” — it changes when
-          the link is clicked. Wording your UI as though it already changed is the bug
-          this distinction prevents.
+          Uses <code>verifyBeforeUpdateEmail</code>, so <code>success</code>{" "}
+          means “we sent the email”, <strong>not</strong> “the address changed”
+          — it changes when the link is clicked. Wording your UI as though it
+          already changed is the bug this distinction prevents.
         </>
       }
       snippet={hookSnippet({
-        hook: 'useUpdateEmail',
-        returns: 'update, isPending, isSuccess, error',
+        hook: "useUpdateEmail",
+        returns: "update, isPending, isSuccess, error",
         lines: [actionCodeSettings.line, errorFormat.line],
         body: `await update(newEmail, { currentPassword });
 // success === true → "check <newEmail> to confirm"`,
@@ -50,23 +50,25 @@ export function UseUpdateEmailSection() {
           <Field
             label="New email"
             value={newEmail}
-            onChange={(e) => setNewEmail(e.target.value)}
+            onChange={e => setNewEmail(e.target.value)}
           />
           <Field
             label="Current password (omit for OAuth-only accounts)"
             type="password"
             value={currentPassword}
-            onChange={(e) => setCurrentPassword(e.target.value)}
+            onChange={e => setCurrentPassword(e.target.value)}
           />
           <Button
             disabled={isPending}
             onClick={async () =>
               setResult(
-                await update(newEmail, currentPassword ? { currentPassword } : undefined),
+                await update(
+                  newEmail,
+                  currentPassword ? { currentPassword } : undefined,
+                ),
               )
-            }
-          >
-            {isPending ? 'Sending…' : 'Update email'}
+            }>
+            {isPending ? "Sending…" : "Update email"}
           </Button>
           {isSuccess ? (
             <p className="text-sm text-green-600">

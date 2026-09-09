@@ -1,6 +1,6 @@
-import { ImageResponse } from 'next/og';
-import { OgImage } from '@/components/og-image';
-import { siteConfig } from '@/lib/site';
+import { ImageResponse } from "next/og";
+import { OgImage } from "@/components/og-image";
+import { siteConfig } from "@/lib/site";
 
 /**
  * The default OG card, for the home page, 404 and anything without its own.
@@ -11,8 +11,8 @@ export function GET(request: Request) {
 
   return new ImageResponse(
     <OgImage
-      title={searchParams.get('title') ?? siteConfig.name}
-      subtitle={searchParams.get('subtitle') ?? siteConfig.description}
+      title={searchParams.get("title") ?? siteConfig.name}
+      subtitle={searchParams.get("subtitle") ?? siteConfig.description}
     />,
     { width: 1200, height: 630 },
   );

@@ -5,7 +5,8 @@
 **Breaking: every action hook reports `status` with derived booleans, replacing `loading`, `success` and `resetState`.**
 
 ```tsx
-const { login, status, isIdle, isPending, isSuccess, isError, error, reset } = useLogin();
+const { login, status, isIdle, isPending, isSuccess, isError, error, reset } =
+  useLogin();
 //             ^ 'idle' | 'pending' | 'success' | 'error'
 ```
 

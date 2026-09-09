@@ -37,7 +37,7 @@ Create your `Auth` instance once with the Firebase SDK, then wrap your app:
 import { AuthProvider } from "@timonwa/firebase-hooks/auth";
 import { auth } from "@/lib/firebase"; // getAuth(initializeApp(config))
 
-<AuthProvider auth={auth} onIdToken={(idToken) => createSession(idToken)}>
+<AuthProvider auth={auth} onIdToken={idToken => createSession(idToken)}>
   {children}
 </AuthProvider>;
 ```
@@ -74,7 +74,10 @@ The most-used services ship first; more (Realtime Database, Remote Config, Cloud
 Each service is its own import, so an app only carries the services it uses. The root holds what every service shares — `formatFirebaseError`, `getFirebaseErrorCode`, and the `HookResult` types.
 
 ```ts
-import { formatFirebaseError, getFirebaseErrorCode } from "@timonwa/firebase-hooks";
+import {
+  formatFirebaseError,
+  getFirebaseErrorCode,
+} from "@timonwa/firebase-hooks";
 import {
   AuthProvider,
   useLogin,
@@ -97,11 +100,12 @@ One contract, so learning one hook is learning them all:
 ```tsx
 <AuthProvider
   auth={auth}
-  onIdToken={(idToken) => createSession(idToken)}
+  onIdToken={idToken => createSession(idToken)}
   onBeforeSignOut={() => clearSession()}
   actionCodeSettings={{ url: `${origin}/auth/action`, handleCodeInApp: true }}
-  formatErrorMessage={(e) => formatFirebaseError(e, { messages: AUTH_ERROR_MESSAGES })}
->
+  formatErrorMessage={e =>
+    formatFirebaseError(e, { messages: AUTH_ERROR_MESSAGES })
+  }>
   {children}
 </AuthProvider>;
 
@@ -149,8 +153,7 @@ For logging and analytics, the provider's **`onError` observer** sees every fail
 ```tsx
 <AuthProvider
   auth={auth}
-  onError={(error, { action, code }) => track("auth_error", { action, code })}
->
+  onError={(error, { action, code }) => track("auth_error", { action, code })}>
   {children}
 </AuthProvider>
 ```

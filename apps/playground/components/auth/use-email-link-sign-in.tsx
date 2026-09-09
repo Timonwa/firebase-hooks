@@ -1,40 +1,40 @@
-'use client';
+"use client";
 
-import { useEmailLinkSignIn } from '@timonwa/firebase-hooks/auth';
-import { useState } from 'react';
-import { Button, Field } from '@/components/controls';
+import { useEmailLinkSignIn } from "@timonwa/firebase-hooks/auth";
+import { useState } from "react";
+import { Button, Field } from "@/components/controls";
 import {
   hookSnippet,
   useErrorFormat,
   useFlowCallback,
   useStringOption,
-} from '@/components/hook-options';
-import { HookSection } from '@/components/hook-section';
+} from "@/components/hook-options";
+import { HookSection } from "@/components/hook-section";
 
 export function UseEmailLinkSignInSection() {
   const errorFormat = useErrorFormat();
   const storageKey = useStringOption({
-    name: 'storageKey',
-    defaultValue: 'emailForSignIn',
-    hint: 'The localStorage key holding the address between send and complete.',
+    name: "storageKey",
+    defaultValue: "emailForSignIn",
+    hint: "The localStorage key holding the address between send and complete.",
   });
   const onIdToken = useFlowCallback({
-    name: 'onIdToken',
-    signature: '(idToken)',
-    body: 'createSession(idToken)',
-    throwsHint: 'Aborts on the callback page, not here.',
+    name: "onIdToken",
+    signature: "(idToken)",
+    body: "createSession(idToken)",
+    throwsHint: "Aborts on the callback page, not here.",
   });
   const returnUrl =
-    typeof window !== 'undefined'
+    typeof window !== "undefined"
       ? `${window.location.origin}/auth/callback`
-      : 'http://localhost:3000/auth/callback';
+      : "http://localhost:3000/auth/callback";
   const { sendLink, status, isPending, error } = useEmailLinkSignIn({
     actionCodeSettings: { url: returnUrl, handleCodeInApp: true },
     storageKey: storageKey.value,
     formatErrorMessage: errorFormat.value,
     onIdToken: onIdToken.value,
   });
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
   const [result, setResult] = useState<unknown>();
 
   return (
@@ -42,9 +42,10 @@ export function UseEmailLinkSignInSection() {
       hook="useEmailLinkSignIn"
       why={
         <>
-          Firebase's own guide tells you to call <code>window.prompt</code> when the link
-          is opened on another device. This reports <code>needsEmail</code> instead, so
-          you render your own input. Try it at{' '}
+          Firebase's own guide tells you to call <code>window.prompt</code> when
+          the link is opened on another device. This reports{" "}
+          <code>needsEmail</code> instead, so you render your own input. Try it
+          at{" "}
           <a className="underline underline-offset-4" href="/auth/callback">
             /auth/callback
           </a>
@@ -52,8 +53,8 @@ export function UseEmailLinkSignInSection() {
         </>
       }
       snippet={hookSnippet({
-        hook: 'useEmailLinkSignIn',
-        returns: 'sendLink, isPending, error',
+        hook: "useEmailLinkSignIn",
+        returns: "sendLink, isPending, error",
         lines: [
           `actionCodeSettings: { url: "${returnUrl}", handleCodeInApp: true },`,
           storageKey.line,
@@ -75,12 +76,15 @@ if (!result.success && result.needsEmail) showEmailField();`,
       }
       form={
         <>
-          <Field label="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+          <Field
+            label="Email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+          />
           <Button
             disabled={isPending}
-            onClick={async () => setResult(await sendLink(email))}
-          >
-            {isPending ? 'Sending…' : 'Send sign-in link'}
+            onClick={async () => setResult(await sendLink(email))}>
+            {isPending ? "Sending…" : "Send sign-in link"}
           </Button>
         </>
       }

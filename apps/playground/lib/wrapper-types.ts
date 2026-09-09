@@ -3,7 +3,7 @@
  * way an installed app does, so `typecheck` fails if one stops being reachable.
  */
 
-import type { AsyncStatus, HookResult } from '@timonwa/firebase-hooks';
+import type { AsyncStatus, HookResult } from "@timonwa/firebase-hooks";
 import type {
   UseAuthResult,
   AuthProviderProps,
@@ -41,14 +41,14 @@ import type {
   UseSignupOptions,
   UseUpdateEmailOptions,
   UseVerifyEmailOptions,
-} from '@timonwa/firebase-hooks/auth';
+} from "@timonwa/firebase-hooks/auth";
 
 /** The wrapper shape the docs recommend for server-fetched user records. */
 export type AppAuth = UseAuthResult & { record: { plan: string } | null };
 
 /** An app provider layered on top, reusing the package's own props. */
-export type AppAuthProviderProps = Omit<AuthProviderProps, 'auth'> & {
-  auth: AuthProviderProps['auth'];
+export type AppAuthProviderProps = Omit<AuthProviderProps, "auth"> & {
+  auth: AuthProviderProps["auth"];
 };
 
 /** A wrapper stating what it resolves to, rather than redeclaring the shape. */
@@ -59,11 +59,18 @@ export type WrappedLogin = (
 
 /** A page rendering the link-completion result without redeclaring its shape. */
 export type CallbackState =
-  | { phase: Exclude<AsyncStatus, 'error'> }
-  | { phase: 'error'; result: Extract<CompleteSignInResult, { success: false }> };
+  | { phase: Exclude<AsyncStatus, "error"> }
+  | {
+      phase: "error";
+      result: Extract<CompleteSignInResult, { success: false }>;
+    };
 
 /** The status vocabulary, shared rather than respelled per hook. */
-export const VERIFY_STATES: VerifyEmailStatus[] = ['pending', 'error', 'success'];
+export const VERIFY_STATES: VerifyEmailStatus[] = [
+  "pending",
+  "error",
+  "success",
+];
 
 /** Every option interface, reachable by name from the auth entry. */
 export type AuthOptions = {

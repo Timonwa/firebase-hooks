@@ -1,17 +1,17 @@
-'use client';
+"use client";
 
-import { useUnlinkProvider } from '@timonwa/firebase-hooks/auth';
-import { useState } from 'react';
-import { Button, Field } from '@/components/controls';
-import { hookSnippet, useErrorFormat } from '@/components/hook-options';
-import { HookSection } from '@/components/hook-section';
+import { useUnlinkProvider } from "@timonwa/firebase-hooks/auth";
+import { useState } from "react";
+import { Button, Field } from "@/components/controls";
+import { hookSnippet, useErrorFormat } from "@/components/hook-options";
+import { HookSection } from "@/components/hook-section";
 
 export function UseUnlinkProviderSection() {
   const errorFormat = useErrorFormat();
   const { unlinkProvider, status, isPending, error } = useUnlinkProvider({
     formatErrorMessage: errorFormat.value,
   });
-  const [providerId, setProviderId] = useState('google.com');
+  const [providerId, setProviderId] = useState("google.com");
   const [result, setResult] = useState<unknown>();
 
   return (
@@ -19,8 +19,8 @@ export function UseUnlinkProviderSection() {
       hook="useUnlinkProvider"
       why="Firebase refuses to unlink the last remaining method, so an account can't be locked out this way — the refusal arrives as an ordinary failure result you can show."
       snippet={hookSnippet({
-        hook: 'useUnlinkProvider',
-        returns: 'unlinkProvider, isPending, error',
+        hook: "useUnlinkProvider",
+        returns: "unlinkProvider, isPending, error",
         lines: [errorFormat.line],
         body: 'await unlinkProvider("google.com");',
       })}
@@ -30,13 +30,12 @@ export function UseUnlinkProviderSection() {
           <Field
             label="Provider id"
             value={providerId}
-            onChange={(e) => setProviderId(e.target.value)}
+            onChange={e => setProviderId(e.target.value)}
           />
           <Button
             variant="secondary"
             disabled={isPending}
-            onClick={async () => setResult(await unlinkProvider(providerId))}
-          >
+            onClick={async () => setResult(await unlinkProvider(providerId))}>
             Unlink
           </Button>
         </>

@@ -31,11 +31,11 @@ Actions with nothing to return resolve to plain `{ success: true }`.
 
 ## On failure
 
-| Field   | Type             | What it is                                            |
-| ------- | ---------------- | ----------------------------------------------------- |
-| `error` | `string`         | The message for rendering — raw by default            |
-| `code`  | `string \| null` | Firebase's own code, e.g. `"auth/invalid-credential"` |
-| `cause` | `unknown`        | The complete untouched error                          |
+| Field | Type | What it is |
+| --- | --- | --- |
+| `error` | `string` | The message for rendering — raw by default |
+| `code` | `string \| null` | Firebase's own code, e.g. `"auth/invalid-credential"` |
+| `cause` | `unknown` | The complete untouched error |
 
 `code` and `cause` are always Firebase's own. Only `error` is ever processed, and only if you opt in — see [Error handling](/docs/guides/error-handling).
 

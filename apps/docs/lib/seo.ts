@@ -1,5 +1,5 @@
-import type { Metadata } from 'next';
-import { isIndexableEnv, siteConfig } from './site';
+import type { Metadata } from "next";
+import { isIndexableEnv, siteConfig } from "./site";
 
 type BuildMetadataInput = {
   title?: string;
@@ -9,7 +9,7 @@ type BuildMetadataInput = {
   imageUrl?: string;
   imageAlt?: string;
   noIndex?: boolean;
-  type?: 'website' | 'article';
+  type?: "website" | "article";
 };
 
 /**
@@ -25,21 +25,21 @@ export function getOgImageUrl({
   subtitle?: string;
 } = {}): string {
   const query = new URLSearchParams();
-  if (title) query.set('title', title);
-  if (subtitle) query.set('subtitle', subtitle);
+  if (title) query.set("title", title);
+  if (subtitle) query.set("subtitle", subtitle);
   const suffix = query.toString();
-  return `${siteConfig.url}/og${suffix ? `?${suffix}` : ''}`;
+  return `${siteConfig.url}/og${suffix ? `?${suffix}` : ""}`;
 }
 
 export function buildMetadata(input: BuildMetadataInput = {}): Metadata {
   const {
     title,
     description = siteConfig.description,
-    path = '/',
+    path = "/",
     imageUrl,
     imageAlt = siteConfig.defaultImageAlt,
     noIndex = false,
-    type = 'website',
+    type = "website",
   } = input;
 
   const image = {
@@ -63,9 +63,9 @@ export function buildMetadata(input: BuildMetadataInput = {}): Metadata {
           googleBot: {
             index: true,
             follow: true,
-            'max-image-preview': 'large',
-            'max-snippet': -1,
-            'max-video-preview': -1,
+            "max-image-preview": "large",
+            "max-snippet": -1,
+            "max-video-preview": -1,
           },
         }
       : {
@@ -82,7 +82,7 @@ export function buildMetadata(input: BuildMetadataInput = {}): Metadata {
       images: [image],
     },
     twitter: {
-      card: 'summary_large_image',
+      card: "summary_large_image",
       site: siteConfig.twitter,
       creator: siteConfig.twitter,
       ...(title !== undefined && { title }),

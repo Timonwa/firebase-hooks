@@ -14,6 +14,6 @@
 **Breaking: `useEmailLinkSignIn`'s `sendLink` option is now `sendEmail`.** All three emailed-link hooks take the same option name. The returned `sendLink` function is unchanged.
 
 ```tsx
--useEmailLinkSignIn({ sendLink: (email) => api.send(email) });
+-useEmailLinkSignIn({ sendLink: email => api.send(email) });
 +useEmailLinkSignIn({ sendEmail: ({ email }) => api.send(email) });
 ```

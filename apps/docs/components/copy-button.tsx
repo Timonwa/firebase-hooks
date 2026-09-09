@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { Check, Copy } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { Check, Copy } from "lucide-react";
+import { useEffect, useState } from "react";
 
 /**
  * Copy-to-clipboard for the hero's install command, which is plain text rather
@@ -30,10 +30,9 @@ export function CopyButton({ value, label }: { value: string; label: string }) {
           () => {},
         );
       }}
-      className="text-fd-muted-foreground hover:text-fd-foreground -mr-1 rounded p-1 transition-colors"
-    >
+      className="-mr-1 rounded p-1 text-fd-muted-foreground transition-colors hover:text-fd-foreground">
       {copied ? (
-        <Check className="text-fd-primary size-3.5" aria-hidden />
+        <Check className="size-3.5 text-fd-primary" aria-hidden />
       ) : (
         <Copy className="size-3.5" aria-hidden />
       )}

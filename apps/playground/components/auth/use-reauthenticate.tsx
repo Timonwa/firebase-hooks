@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useReauthenticate } from '@timonwa/firebase-hooks/auth';
-import { GoogleAuthProvider } from 'firebase/auth';
-import { useState } from 'react';
-import { Button, Field } from '@/components/controls';
-import { hookSnippet, useErrorFormat } from '@/components/hook-options';
-import { HookSection } from '@/components/hook-section';
+import { useReauthenticate } from "@timonwa/firebase-hooks/auth";
+import { GoogleAuthProvider } from "firebase/auth";
+import { useState } from "react";
+import { Button, Field } from "@/components/controls";
+import { hookSnippet, useErrorFormat } from "@/components/hook-options";
+import { HookSection } from "@/components/hook-section";
 
 export function UseReauthenticateSection() {
   const errorFormat = useErrorFormat();
@@ -16,7 +16,7 @@ export function UseReauthenticateSection() {
     isPending,
     error,
   } = useReauthenticate({ formatErrorMessage: errorFormat.value });
-  const [password, setPassword] = useState('');
+  const [password, setPassword] = useState("");
   const [result, setResult] = useState<unknown>();
 
   return (
@@ -24,14 +24,15 @@ export function UseReauthenticateSection() {
       hook="useReauthenticate"
       why={
         <>
-          The recent-sign-in check on its own, for sensitive flows the built-in{' '}
-          <code>currentPassword</code> shortcut doesn't cover — and the provider variant
-          is how you reauthenticate an OAuth-only account, which has no password to check.
+          The recent-sign-in check on its own, for sensitive flows the built-in{" "}
+          <code>currentPassword</code> shortcut doesn't cover — and the provider
+          variant is how you reauthenticate an OAuth-only account, which has no
+          password to check.
         </>
       }
       snippet={hookSnippet({
-        hook: 'useReauthenticate',
-        returns: 'reauthenticateWithPassword, reauthenticateWithProvider',
+        hook: "useReauthenticate",
+        returns: "reauthenticateWithPassword, reauthenticateWithProvider",
         lines: [errorFormat.line],
         body: `const check = await reauthenticateWithPassword(currentPassword);
 if (check.success) await performSensitiveOperation();`,
@@ -43,22 +44,24 @@ if (check.success) await performSensitiveOperation();`,
             label="Current password"
             type="password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={e => setPassword(e.target.value)}
           />
           <div className="flex flex-wrap gap-2">
             <Button
               disabled={isPending}
-              onClick={async () => setResult(await reauthenticateWithPassword(password))}
-            >
+              onClick={async () =>
+                setResult(await reauthenticateWithPassword(password))
+              }>
               With password
             </Button>
             <Button
               variant="secondary"
               disabled={isPending}
               onClick={async () =>
-                setResult(await reauthenticateWithProvider(new GoogleAuthProvider()))
-              }
-            >
+                setResult(
+                  await reauthenticateWithProvider(new GoogleAuthProvider()),
+                )
+              }>
               With Google
             </Button>
           </div>

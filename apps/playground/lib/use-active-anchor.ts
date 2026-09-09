@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
 /**
  * The id of the section currently being read.
@@ -13,12 +13,12 @@ import { useEffect, useState } from 'react';
 export function useActiveAnchor(ids: readonly string[]) {
   const [active, setActive] = useState<string | null>(null);
   // Arrays are rebuilt every render, so the effect keys off the contents.
-  const key = ids.join('|');
+  const key = ids.join("|");
 
   useEffect(() => {
     const elements = key
-      .split('|')
-      .map((id) => document.getElementById(id))
+      .split("|")
+      .map(id => document.getElementById(id))
       .filter((element): element is HTMLElement => element !== null);
 
     if (elements.length === 0) return;
@@ -27,7 +27,7 @@ export function useActiveAnchor(ids: readonly string[]) {
     const update = () => {
       frame = 0;
       const passed = elements.filter(
-        (element) => element.getBoundingClientRect().top <= 120,
+        element => element.getBoundingClientRect().top <= 120,
       );
       setActive((passed.at(-1) ?? elements[0]).id);
     };
@@ -37,12 +37,12 @@ export function useActiveAnchor(ids: readonly string[]) {
     };
 
     update();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
     return () => {
       if (frame) cancelAnimationFrame(frame);
-      window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', onScroll);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
     };
   }, [key]);
 

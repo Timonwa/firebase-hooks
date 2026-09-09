@@ -1,12 +1,18 @@
-'use client';
+"use client";
 
-import { formatFirebaseError } from '@timonwa/firebase-hooks';
-import { AUTH_ERROR_MESSAGES, AuthProvider } from '@timonwa/firebase-hooks/auth';
-import { getApps, initializeApp } from 'firebase/app';
-import { type Auth, getAuth } from 'firebase/auth';
-import { createContext, type ReactNode, useContext, useMemo } from 'react';
-import { type PlaygroundConfig, getFirebaseConfig } from '@/lib/firebase-config';
-import { useStoredState } from '@/lib/use-stored-state';
+import { formatFirebaseError } from "@timonwa/firebase-hooks";
+import {
+  AUTH_ERROR_MESSAGES,
+  AuthProvider,
+} from "@timonwa/firebase-hooks/auth";
+import { getApps, initializeApp } from "firebase/app";
+import { type Auth, getAuth } from "firebase/auth";
+import { createContext, type ReactNode, useContext, useMemo } from "react";
+import {
+  type PlaygroundConfig,
+  getFirebaseConfig,
+} from "@/lib/firebase-config";
+import { useStoredState } from "@/lib/use-stored-state";
 
 type FirebaseContextValue = {
   auth: Auth | null;
@@ -24,7 +30,7 @@ const FirebaseContext = createContext<FirebaseContextValue | null>(null);
 function createAuth(config: PlaygroundConfig | null): Auth | null {
   if (!config) return null;
   // initializeApp throws on a duplicate name, which Fast Refresh would cause.
-  const existing = getApps().find((app) => app.name === '[DEFAULT]');
+  const existing = getApps().find(app => app.name === "[DEFAULT]");
   return getAuth(existing ?? initializeApp(config));
 }
 
@@ -35,24 +41,33 @@ function createAuth(config: PlaygroundConfig | null): Auth | null {
 export function FirebaseProvider({ children }: { children: ReactNode }) {
   // Kept across refreshes: these are how you set the playground up to work,
   // and losing them on every reload made them feel broken.
-  const [formatErrors, setFormatErrors] = useStoredState('playground-format-errors', false);
-  const [wrapCode, setWrapCode] = useStoredState('playground-wrap-code', true);
+  const [formatErrors, setFormatErrors] = useStoredState(
+    "playground-format-errors",
+    false,
+  );
+  const [wrapCode, setWrapCode] = useStoredState("playground-wrap-code", true);
   const config = getFirebaseConfig();
   const auth = useMemo(() => createAuth(config), [config]);
 
   return (
     <FirebaseContext.Provider
-      value={{ auth, config, formatErrors, setFormatErrors, wrapCode, setWrapCode }}
-    >
+      value={{
+        auth,
+        config,
+        formatErrors,
+        setFormatErrors,
+        wrapCode,
+        setWrapCode,
+      }}>
       {/* Formatting is opt-in: with it off, `error` is Firebase's own message. */}
       <AuthProvider
         auth={auth}
         formatErrorMessage={
           formatErrors
-            ? (error) => formatFirebaseError(error, { messages: AUTH_ERROR_MESSAGES })
+            ? error =>
+                formatFirebaseError(error, { messages: AUTH_ERROR_MESSAGES })
             : undefined
-        }
-      >
+        }>
         {children}
       </AuthProvider>
     </FirebaseContext.Provider>
@@ -61,6 +76,7 @@ export function FirebaseProvider({ children }: { children: ReactNode }) {
 
 export function useFirebase() {
   const context = useContext(FirebaseContext);
-  if (!context) throw new Error('useFirebase must be used inside <FirebaseProvider>');
+  if (!context)
+    throw new Error("useFirebase must be used inside <FirebaseProvider>");
   return context;
 }
