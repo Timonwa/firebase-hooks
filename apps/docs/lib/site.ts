@@ -21,6 +21,9 @@ const resolvedUrl =
 export const isIndexableEnv =
   (process.env.VERCEL_ENV ?? process.env.NODE_ENV) === "production";
 
+// Gates analytics to the real production deployment; a local `next start` is NODE_ENV production too.
+export const isProductionDeploy = process.env.VERCEL_ENV === "production";
+
 export const siteConfig = {
   name: appName,
   packageName,
@@ -32,4 +35,6 @@ export const siteConfig = {
   author: "Timonwa Akintokun",
   twitter: "@timonwa_",
   socials: ["https://github.com/Timonwa", "https://www.npmjs.com/~timonwa"],
+  umamiUrl: "https://analytics.timonwa.com",
+  umamiWebsiteId: "c7f8fd09-daf1-4eb9-bd15-6a69e67f39a2",
 } as const;

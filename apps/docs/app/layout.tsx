@@ -3,11 +3,13 @@ import { RootProvider } from "fumadocs-ui/provider/next";
 import "./global.css";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
+import { AnalyticsEvents } from "@/components/analytics-events";
 import { JsonLd } from "@/components/json-ld";
 import { siteGraph } from "@/lib/schema";
 import { buildMetadata } from "@/lib/seo";
 import { packageName } from "@/lib/shared";
-import { siteConfig } from "@/lib/site";
+import { isProductionDeploy, siteConfig } from "@/lib/site";
 
 const geistSans = Geist({ subsets: ["latin"], variable: "--font-geist-sans" });
 const geistMono = Geist_Mono({
@@ -53,6 +55,22 @@ export default function Layout({ children }: LayoutProps<"/">) {
         <JsonLd data={siteGraph()} />
         {/* No-ops outside a Vercel deployment, so local runs send nothing. */}
         <Analytics />
+        {isProductionDeploy && (
+          <>
+            <Script
+              src={`${siteConfig.umamiUrl}/script.js`}
+              data-website-id={siteConfig.umamiWebsiteId}
+              data-performance="true"
+              strategy="afterInteractive"
+            />
+            <Script
+              src={`${siteConfig.umamiUrl}/recorder.js`}
+              data-website-id={siteConfig.umamiWebsiteId}
+              strategy="afterInteractive"
+            />
+            <AnalyticsEvents />
+          </>
+        )}
       </body>
     </html>
   );

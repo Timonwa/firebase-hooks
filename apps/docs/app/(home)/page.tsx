@@ -211,12 +211,18 @@ export default function HomePage() {
             <div className="mt-2 flex flex-wrap items-center gap-3">
               <Link
                 href="/docs/getting-started"
+                data-umami-event="cta-click"
+                data-umami-event-cta="get-started"
+                data-umami-event-placement="hero"
                 className="group inline-flex items-center gap-2 rounded-lg bg-fd-primary px-5 py-2.5 text-sm font-medium text-fd-primary-foreground transition-opacity hover:opacity-90">
                 Get started
                 <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
               </Link>
               <Link
                 href="/docs/auth"
+                data-umami-event="cta-click"
+                data-umami-event-cta="browse-hooks"
+                data-umami-event-placement="hero"
                 className="surface px-5 py-2.5 text-sm font-medium transition-colors hover:bg-fd-accent">
                 Browse the hooks
               </Link>
@@ -228,6 +234,7 @@ export default function HomePage() {
                 <CopyButton
                   value={INSTALL_COMMAND}
                   label="Copy install command"
+                  analyticsEvent="install-copy"
                 />
               </div>
             </div>
@@ -334,6 +341,8 @@ export default function HomePage() {
                   <li key={hook}>
                     <Link
                       href={`/docs/auth/${toSlug(hook)}`}
+                      data-umami-event="hook-click"
+                      data-umami-event-hook={hook}
                       className="inline-block rounded-md border border-fd-border px-2.5 py-1 font-mono text-xs transition-colors hover:border-fd-primary/40 hover:bg-fd-primary/5">
                       {/* Colouring the shared prefix carries the accent through
                           twenty otherwise-grey chips, and shows the naming
@@ -399,6 +408,9 @@ export default function HomePage() {
           <div className="mt-7 flex flex-wrap justify-center gap-3">
             <Link
               href="/docs/getting-started"
+              data-umami-event="cta-click"
+              data-umami-event-cta="get-started"
+              data-umami-event-placement="bottom"
               className="group inline-flex items-center gap-2 rounded-lg bg-fd-primary px-5 py-2.5 text-sm font-medium text-fd-primary-foreground transition-opacity hover:opacity-90">
               Get started
               <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
@@ -406,6 +418,9 @@ export default function HomePage() {
             <a
               href={npmUrl}
               rel="noreferrer noopener"
+              data-umami-event="cta-click"
+              data-umami-event-cta="view-npm"
+              data-umami-event-placement="bottom"
               className="rounded-lg border px-5 py-2.5 text-sm font-medium transition-colors hover:bg-fd-accent">
               View on npm ↗
             </a>
