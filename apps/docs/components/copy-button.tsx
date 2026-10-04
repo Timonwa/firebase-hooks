@@ -7,7 +7,15 @@ import { useEffect, useState } from "react";
  * Copy-to-clipboard for the hero's install command, which is plain text rather
  * than a code block. Code samples use Fumadocs' CodeBlock, which brings its own.
  */
-export function CopyButton({ value, label }: { value: string; label: string }) {
+export function CopyButton({
+  value,
+  label,
+  analyticsEvent,
+}: {
+  value: string;
+  label: string;
+  analyticsEvent?: string;
+}) {
   const [copied, setCopied] = useState(false);
 
   // Reset from an effect so the timer is cleared if the button unmounts, and
@@ -22,6 +30,7 @@ export function CopyButton({ value, label }: { value: string; label: string }) {
     <button
       type="button"
       aria-label={label}
+      data-umami-event={analyticsEvent}
       onClick={() => {
         navigator.clipboard.writeText(value).then(
           () => setCopied(true),
